@@ -45,9 +45,11 @@
 			<email>stephan@watermeyer.info</email>
 		</developer>
 	</developers>
-	<!-- Assuming you want to host on @jenkinsci: <scm> <connection>scm:git:git://github.com/jenkinsci/${project.artifactId}-plugin.git</connection> 
-		<developerConnection>scm:git:git@github.com:jenkinsci/${project.artifactId}-plugin.git</developerConnection> 
-		<url>http://github.com/jenkinsci/${project.artifactId}-plugin</url> </scm> -->
+	<scm>
+		<connection>scm:git:git://github.com/phreakadelle/jenkins-extensible-choiceprovider-url-provider.git</connection>
+		<developerConnection>scm:git:git@phreakadelle/jenkins-extensible-choiceprovider-url-provider.git</developerConnection>
+		<url>https://github.com/phreakadelle/jenkins-extensible-choiceprovider-url-provider</url>
+	</scm>
 	<repositories>
 		<repository>
 			<id>repo.jenkins-ci.org</id>
