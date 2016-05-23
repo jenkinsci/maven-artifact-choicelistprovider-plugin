@@ -15,9 +15,9 @@
 	<version>0.0.1</version>
 	<packaging>hpi</packaging>
 
-	<name>TODO Plugin</name>
-	<description>TODO</description>
-	<url>https://wiki.jenkins-ci.org/display/JENKINS/TODO+Plugin</url>
+	<name>Jenkins Extensible Choiceprovider URL Choicelist Provider</name>
+	<description>A ChoiceListProvider to read Parameters from an URL</description>
+	<url>https://github.com/phreakadelle/jenkins-extensible-choiceprovider-url-provider/blob/master/README.md</url>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -91,6 +91,9 @@
 										</versionRange>
 										<goals>
 											<goal>validate</goal>
+											<goal>
+												resolve-test-dependencies
+											</goal>
 										</goals>
 									</pluginExecutionFilter>
 									<action>
