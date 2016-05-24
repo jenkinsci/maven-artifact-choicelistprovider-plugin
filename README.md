@@ -1,7 +1,9 @@
-# ChoiceListProvider Extension to read ArtifactIds from Nexus Repository
-This Plugin adds an additional ChoiceListProvider to the "Extensible Choice Parameter" Plugin.
-With this extension its possible to use the Lucene Service from a Nexus Repository to search for Artifacts using GroupId, ArtifactId and the Packaging.
+# MavenArtifact ChoiceListProvider
+## What is this?
+This Plugin adds an additional ChoiceListProvider to famous <a href="https://wiki.jenkins-ci.org/display/JENKINS/Extensible+Choice+Parameter+plugin">Extensible Choice Parameter</a> Plugin.
 
-# Changelog
-## 24. May 2016
+With this extension its possible to use the Lucene Service from a Nexus Repository to search for artifacts using groupId, artifactId and the packaging.
+
+## Changelog
+### 24. May 2016
 * Initial Version

@@ -1,7 +1,4 @@
 <?jelly escape-by-default='true'?>
-<!--
-  This view is used to render the installed plugins page.
--->
 <div>
-  This Plugin adds an Nexus URL based ChoiceListProvider for the Extensible Choice Plugin.
+  This Plugin adds a new ChoiceListProvider for the "Extensible Choice Plugin" which is able to read Artifact information from a Nexus repository.
 </div>

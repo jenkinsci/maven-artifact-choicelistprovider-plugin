@@ -12,7 +12,7 @@
 
 	<groupId>com.wincornixdorf.jenkins.plugins</groupId>
 	<artifactId>jenkins-extensible-choiceprovider-url-provider</artifactId>
-	<version>0.0.1</version>
+	<version>0.0.2</version>
 	<packaging>hpi</packaging>
 
 	<name>Jenkins Extensible Choiceprovider URL Choicelist Provider</name>
