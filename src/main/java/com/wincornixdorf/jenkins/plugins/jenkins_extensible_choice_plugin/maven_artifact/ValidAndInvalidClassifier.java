@@ -68,4 +68,18 @@ public class ValidAndInvalidClassifier {
 		}
 		return retVal;
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("ValidAndInvalidClassifier [valid=");
+		for (String current : getValid())
+			sb.append(current).append(", ");
+		sb.append("] [invalid=");
+		for (String current : getInvalid())
+			sb.append(current).append(", ");
+		sb.append("]]");
+		return sb.toString();
+	}
+
 }

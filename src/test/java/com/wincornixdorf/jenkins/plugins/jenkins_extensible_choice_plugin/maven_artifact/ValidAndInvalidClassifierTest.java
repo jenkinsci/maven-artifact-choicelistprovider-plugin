@@ -11,4 +11,10 @@ public class ValidAndInvalidClassifierTest {
 		ValidAndInvalidClassifier c = ValidAndInvalidClassifier.fromString("!preinstalled");
 		assertTrue("must be invalid", c.isInvalid("preinstalled"));
 	}
+	
+	@Test
+	public void testToString() {
+		ValidAndInvalidClassifier c = ValidAndInvalidClassifier.fromString("!preinstalled");
+		System.out.println(c.toString());
+	}
 }

@@ -71,7 +71,7 @@ public class NexusLuceneSearchService implements IVersionReader {
 	public List<String> retrieveVersions() {
 		if (LOGGER.isLoggable(Level.FINE)) {
 			LOGGER.fine("query nexus with arguments: r:" + mURL + ", g:" + getGroupId() + ", a:" + getArtifactId()
-					+ ", p:" + getPackaging());
+					+ ", p:" + getPackaging()+ ", c: " + getClassifier().toString());
 		}
 
 		MultivaluedMap<String, String> requestParams = new MultivaluedHashMap<String, String>();

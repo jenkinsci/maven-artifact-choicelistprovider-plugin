@@ -132,7 +132,7 @@ public class MavenArtifactChoiceList extends ChoiceListProvider implements Exten
 				final List<String> entriesFromURL = readURL(url, groupId, artifactId, packaging, classifier);
 
 				if (entriesFromURL.isEmpty()) {
-					return FormValidation.ok("(No Entries found)");
+					return FormValidation.ok("(Working, but no Entries found)");
 				}
 				return FormValidation.ok(StringUtils.join(entriesFromURL, '\n'));
 			} catch (Exception e) {
