@@ -22,6 +22,7 @@ import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.wincornixdorf.jenkins.plugins.jenkins_extensible_choice_plugin.maven_artifact.IVersionReader;
+import com.wincornixdorf.jenkins.plugins.jenkins_extensible_choice_plugin.maven_artifact.ValidAndInvalidClassifier;
 
 public class NexusLuceneSearchService implements IVersionReader {
 
@@ -33,15 +34,22 @@ public class NexusLuceneSearchService implements IVersionReader {
 	private final String mGroupId;
 	private final String mArtifactId;
 	private final String mPackaging;
+	private final ValidAndInvalidClassifier mClassifier;
 
 	private WebResource mInstance;
 
 	public NexusLuceneSearchService(String pURL, String pGroupId, String pArtifactId, String pPackaging) {
+		this(pURL, pGroupId, pArtifactId, pPackaging, ValidAndInvalidClassifier.getDefault());
+	}
+
+	public NexusLuceneSearchService(String pURL, String pGroupId, String pArtifactId, String pPackaging,
+			ValidAndInvalidClassifier pAcceptedClassifier) {
 		super();
 		this.mURL = pURL;
 		this.mGroupId = pGroupId;
 		this.mArtifactId = pArtifactId;
 		this.mPackaging = pPackaging;
+		this.mClassifier = pAcceptedClassifier;
 	}
 
 	void init() {
@@ -73,6 +81,15 @@ public class NexusLuceneSearchService implements IVersionReader {
 			requestParams.putSingle("a", getArtifactId());
 		if (getPackaging() != "")
 			requestParams.putSingle("p", getPackaging());
+		if (getClassifier() != null) {
+			// FIXME: There is of course a better way how to do it...
+			final List<String> query = new ArrayList<String>();
+			for (String current : getClassifier().getValid())
+				query.add(current);
+
+			if (!query.isEmpty())
+				requestParams.put("c", query);
+		}
 
 		final PatchedSearchNGResponse xmlResult = getInstance().queryParams(requestParams)
 				.accept(MediaType.APPLICATION_XML).get(PatchedSearchNGResponse.class);
@@ -87,39 +104,49 @@ public class NexusLuceneSearchService implements IVersionReader {
 
 			// https://davis.wincor-nixdorf.com/nexus/content/repositories/wn-ps-us-pnc/com/wincornixdorf/pnc/releases/pnc-brass-maven/106/pnc-brass-maven-106.tar.gz
 			for (NexusNGArtifact current : xmlResult.getData()) {
-				final StringBuilder theDownloadURL = new StringBuilder();
+				final StringBuilder theBaseDownloadURL = new StringBuilder();
 				// theDownloadURL.append(repoURL);
-				theDownloadURL.append("/");
-				theDownloadURL.append(current.getGroupId().replace(".", "/"));
-				theDownloadURL.append("/");
-				theDownloadURL.append(current.getArtifactId());
-				theDownloadURL.append("/");
-				theDownloadURL.append(current.getVersion());
-				theDownloadURL.append("/");
-				theDownloadURL.append(current.getArtifactId());
-				theDownloadURL.append("-");
-				theDownloadURL.append(current.getVersion());
-				theDownloadURL.append(".");
+				theBaseDownloadURL.append("/");
+				theBaseDownloadURL.append(current.getGroupId().replace(".", "/"));
+				theBaseDownloadURL.append("/");
+				theBaseDownloadURL.append(current.getArtifactId());
+				theBaseDownloadURL.append("/");
+				theBaseDownloadURL.append(current.getVersion());
+				theBaseDownloadURL.append("/");
+				theBaseDownloadURL.append(current.getArtifactId());
+				theBaseDownloadURL.append("-");
+				theBaseDownloadURL.append(current.getVersion());
 
 				for (NexusNGArtifactHit currentHit : current.getArtifactHits()) {
 					for (NexusNGArtifactLink currentLink : currentHit.getArtifactLinks()) {
 						final String repo = repoURLs.get(currentHit.getRepositoryId());
 
-						final boolean addCurrentEntry;
-						if ("".equals(getPackaging())) {
-							addCurrentEntry = true;
-						} else if (currentLink.getExtension().equals(getPackaging())) {
-							addCurrentEntry = true;
-						} else {
-							addCurrentEntry = false;
+						boolean addCurrentEntry = true;
+
+						// if packaging configuration is set but does not match
+						if (!"".equals(getPackaging()) && !getPackaging().equals(currentLink.getExtension())) {
+							addCurrentEntry &= false;
 						}
 
-						if (addCurrentEntry)
-							retVal.add(repo + theDownloadURL.toString() + currentLink.getExtension());
+						// check the classifier. Can be explicit invalid, explicit valid 
+						if (getClassifier().isInvalid(currentLink.getClassifier())) {
+							addCurrentEntry &= false;
+						} else if (!getClassifier().isValid(currentLink.getClassifier())) {
+							addCurrentEntry &= false;
+						} else {
+							// yes, possible if something is not explicit invalid and not explicit valid
+						}
+
+						if (addCurrentEntry) {
+							final String classifier = (currentLink.getClassifier() == null ? ""
+									: "-" + currentLink.getClassifier());
+							retVal.add(repo + theBaseDownloadURL.toString() + classifier + "."
+									+ currentLink.getExtension());
+						}
 					}
 				}
-
 			}
+
 		}
 		return retVal;
 	}
@@ -151,6 +178,10 @@ public class NexusLuceneSearchService implements IVersionReader {
 
 	public String getPackaging() {
 		return mPackaging;
+	}
+
+	public ValidAndInvalidClassifier getClassifier() {
+		return mClassifier;
 	}
 
 	WebResource getInstance() {

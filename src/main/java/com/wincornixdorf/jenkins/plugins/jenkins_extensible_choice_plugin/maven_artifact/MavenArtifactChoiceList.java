@@ -25,14 +25,16 @@ public class MavenArtifactChoiceList extends ChoiceListProvider implements Exten
 	private final String groupId;
 	private final String artifactId;
 	private final String packaging;
+	private final String classifier;
 
 	@DataBoundConstructor
-	public MavenArtifactChoiceList(String url, String groupId, String artifactId, String packaging) {
+	public MavenArtifactChoiceList(String url, String groupId, String artifactId, String packaging, String classifier) {
 		super();
 		this.url = StringUtils.trim(url);
 		this.groupId = StringUtils.trim(groupId);
 		this.artifactId = StringUtils.trim(artifactId);
 		this.packaging = StringUtils.trim(packaging);
+		this.classifier = StringUtils.trim(classifier);
 	}
 
 	public String getUrl() {
@@ -51,16 +53,23 @@ public class MavenArtifactChoiceList extends ChoiceListProvider implements Exten
 		return packaging;
 	}
 
+	public String getClassifier() {
+		return classifier;
+	}
+
 	@Override
 	public List<String> getChoiceList() {
-		return readURL(getUrl(), getGroupId(), getArtifactId(), getPackaging());
+		return readURL(getUrl(), getGroupId(), getArtifactId(), getPackaging(), getClassifier());
 	}
 
 	static List<String> readURL(final String pURL, final String pGroupId, final String pArtifactId,
-			final String pPackaging) {
+			final String pPackaging, String pClassifier) {
 		List<String> retVal = new ArrayList<String>();
 		try {
-			IVersionReader mService = new NexusLuceneSearchService(pURL, pGroupId, pArtifactId, pPackaging);
+
+			ValidAndInvalidClassifier classifierBox = ValidAndInvalidClassifier.fromString(pClassifier);
+			IVersionReader mService = new NexusLuceneSearchService(pURL, pGroupId, pArtifactId, pPackaging,
+					classifierBox);
 			retVal = mService.retrieveVersions();
 		} catch (Exception e) {
 			retVal.add("ERROR: " + e.getMessage());
@@ -117,9 +126,10 @@ public class MavenArtifactChoiceList extends ChoiceListProvider implements Exten
 		 * @return
 		 */
 		public FormValidation doTest(@QueryParameter String url, @QueryParameter String groupId,
-				@QueryParameter String artifactId, @QueryParameter String packaging) {
+				@QueryParameter String artifactId, @QueryParameter String packaging,
+				@QueryParameter String classifier) {
 			try {
-				final List<String> entriesFromURL = readURL(url, groupId, artifactId, packaging);
+				final List<String> entriesFromURL = readURL(url, groupId, artifactId, packaging, classifier);
 
 				if (entriesFromURL.isEmpty()) {
 					return FormValidation.ok("(No Entries found)");

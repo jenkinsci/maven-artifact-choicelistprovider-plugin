@@ -34,11 +34,14 @@ THE SOFTWARE.
      <f:entry title="${%Packaging}" field="packaging">
         <f:textbox />
     </f:entry>
-  
+    <f:entry title="${%Classifier}" field="classifier">
+        <f:textbox />
+    </f:entry>
+    
     <f:validateButton
         method="test"
         title="${%List Files Now}"
         progress="${%Checking...}"
-        with="url,groupId,artifactId,packaging"
+        with="url,groupId,artifactId,packaging,classifier"
     />
 </j:jelly>
