@@ -6,10 +6,9 @@ import java.util.StringTokenizer;
 
 public class ValidAndInvalidClassifier {
 
-	public static final String DEFAULT_ACCEPTED_CLASSIFIER = "*";
-
 	final Set<String> mValid;
 	final Set<String> mInvalid;
+	
 	boolean mValidByDefault;
 
 	public ValidAndInvalidClassifier() {
@@ -32,12 +31,12 @@ public class ValidAndInvalidClassifier {
 		return mValid.add(e);
 	}
 
-	public boolean isInvalid(String e) {
-		return mInvalid.contains(e);
-	}
-
-	public boolean isValid(String e) {
-		return mValidByDefault || mValid.contains(e);
+	public boolean isValid(String toValidate) {
+		if(mInvalid.contains(toValidate))
+			return false;
+		if(mValid.contains(toValidate))
+			return true;
+		return mValidByDefault;
 	}
 
 	public Set<String> getValid() {
@@ -57,7 +56,7 @@ public class ValidAndInvalidClassifier {
 		if (pClassifier != null && !"".equals(pClassifier)) {
 			StringTokenizer tokenizer = new StringTokenizer(pClassifier, ",");
 			while (tokenizer.hasMoreTokens()) {
-				String current = tokenizer.nextToken();
+				String current = tokenizer.nextToken().trim();
 				if (current.startsWith("!")) {
 					// cut of the "!"
 					retVal.addInvalid(current.substring(1));

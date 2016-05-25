@@ -128,14 +128,10 @@ public class NexusLuceneSearchService implements IVersionReader {
 							addCurrentEntry &= false;
 						}
 
-						// check the classifier. Can be explicit invalid, explicit valid 
-						if (getClassifier().isInvalid(currentLink.getClassifier())) {
+						// check the classifier. 
+						if (!getClassifier().isValid(currentLink.getClassifier())) {
 							addCurrentEntry &= false;
-						} else if (!getClassifier().isValid(currentLink.getClassifier())) {
-							addCurrentEntry &= false;
-						} else {
-							// yes, possible if something is not explicit invalid and not explicit valid
-						}
+						} 
 
 						if (addCurrentEntry) {
 							final String classifier = (currentLink.getClassifier() == null ? ""

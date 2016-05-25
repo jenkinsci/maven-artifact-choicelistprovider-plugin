@@ -73,8 +73,8 @@ public class MavenArtifactChoiceList extends ChoiceListProvider implements Exten
 			retVal = mService.retrieveVersions();
 		} catch (Exception e) {
 			retVal.add("ERROR: " + e.getMessage());
-			LOGGER.log(Level.SEVERE, "failed to retrieve versions from nexus for r:" + pURL + ", g:" + pGroupId + ", a:"
-					+ pArtifactId + ", p:" + pPackaging, e);
+			LOGGER.log(Level.WARNING, "failed to retrieve versions from nexus for r:" + pURL + ", g:" + pGroupId + ", a:"
+					+ pArtifactId + ", p:" + pPackaging + ", c:" + pClassifier, e);
 		}
 		return retVal;
 	}
@@ -113,6 +113,13 @@ public class MavenArtifactChoiceList extends ChoiceListProvider implements Exten
 				return FormValidation.error("packaging must not start with a .");
 			}
 
+			return FormValidation.ok();
+		}
+		
+		public FormValidation doCheckClassifier(@QueryParameter String classifier) {
+			if (StringUtils.isBlank(classifier)) {
+				FormValidation.ok("OK, will not filter for any classifier");
+			}
 			return FormValidation.ok();
 		}
 
