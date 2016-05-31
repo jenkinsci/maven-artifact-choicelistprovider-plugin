@@ -1,4 +1,4 @@
-package com.wincornixdorf.jenkins.plugins.jenkins_extensible_choice_plugin.maven_artifact;
+package org.jenkinsci.plugins.maven_artifact_choicelistprovider;
 
 import java.util.List;
 

@@ -1,13 +1,13 @@
-package com.wincornixdorf.jenkins.plugins.jenkins_extensible_choice_plugin.maven_artifact.nexus;
+package org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus;
 
 import static org.junit.Assert.*;
 
 import java.util.List;
 
+import org.jenkinsci.plugins.maven_artifact_choicelistprovider.ValidAndInvalidClassifier;
+import org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus.NexusLuceneSearchService;
 import org.junit.After;
 import org.junit.Test;
-
-import com.wincornixdorf.jenkins.plugins.jenkins_extensible_choice_plugin.maven_artifact.ValidAndInvalidClassifier;
 
 public class NexusLuceneSearchServiceTest {
 

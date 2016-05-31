@@ -1,4 +1,4 @@
-package com.wincornixdorf.jenkins.plugins.jenkins_extensible_choice_plugin.maven_artifact;
+package org.jenkinsci.plugins.maven_artifact_choicelistprovider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,16 +6,17 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.commons.lang.StringUtils;
+import org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus.NexusLuceneSearchService;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 
-import com.wincornixdorf.jenkins.plugins.jenkins_extensible_choice_plugin.maven_artifact.nexus.NexusLuceneSearchService;
-
 import hudson.Extension;
 import hudson.ExtensionPoint;
+import hudson.model.AbstractProject;
 import hudson.model.Descriptor;
 import hudson.util.FormValidation;
 import jp.ikedam.jenkins.plugins.extensible_choice_parameter.ChoiceListProvider;
+import jp.ikedam.jenkins.plugins.extensible_choice_parameter.ExtensibleChoiceParameterDefinition;
 
 public class MavenArtifactChoiceList extends ChoiceListProvider implements ExtensionPoint {
 
@@ -58,6 +59,15 @@ public class MavenArtifactChoiceList extends ChoiceListProvider implements Exten
 	}
 
 	@Override
+	public void onBuildTriggeredWithValue(AbstractProject<?, ?> job, ExtensibleChoiceParameterDefinition def,
+			String value) {
+		LOGGER.log(Level.INFO, value);
+		System.out.println("the value is:" + value);
+		System.out.println("name:" + def.getName());
+		System.out.println("descriptor-name:" + def.getDescriptor().getDisplayName());
+	}
+
+	@Override
 	public List<String> getChoiceList() {
 		return readURL(getUrl(), getGroupId(), getArtifactId(), getPackaging(), getClassifier());
 	}
@@ -73,8 +83,8 @@ public class MavenArtifactChoiceList extends ChoiceListProvider implements Exten
 			retVal = mService.retrieveVersions();
 		} catch (Exception e) {
 			retVal.add("ERROR: " + e.getMessage());
-			LOGGER.log(Level.WARNING, "failed to retrieve versions from nexus for r:" + pURL + ", g:" + pGroupId + ", a:"
-					+ pArtifactId + ", p:" + pPackaging + ", c:" + pClassifier, e);
+			LOGGER.log(Level.WARNING, "failed to retrieve versions from nexus for r:" + pURL + ", g:" + pGroupId
+					+ ", a:" + pArtifactId + ", p:" + pPackaging + ", c:" + pClassifier, e);
 		}
 		return retVal;
 	}
@@ -115,7 +125,7 @@ public class MavenArtifactChoiceList extends ChoiceListProvider implements Exten
 
 			return FormValidation.ok();
 		}
-		
+
 		public FormValidation doCheckClassifier(@QueryParameter String classifier) {
 			if (StringUtils.isBlank(classifier)) {
 				FormValidation.ok("OK, will not filter for any classifier");

@@ -1,4 +1,4 @@
-package com.wincornixdorf.jenkins.plugins.jenkins_extensible_choice_plugin.maven_artifact.nexus;
+package org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus;
 
 import org.sonatype.nexus.rest.model.NexusIndexerResponse;
 import org.sonatype.nexus.rest.model.NexusNGArtifact;

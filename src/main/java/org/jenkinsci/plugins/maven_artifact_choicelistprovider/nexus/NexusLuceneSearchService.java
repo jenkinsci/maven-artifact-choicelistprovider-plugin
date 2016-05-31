@@ -1,4 +1,4 @@
-package com.wincornixdorf.jenkins.plugins.jenkins_extensible_choice_plugin.maven_artifact.nexus;
+package org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,6 +12,8 @@ import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriBuilder;
 
+import org.jenkinsci.plugins.maven_artifact_choicelistprovider.IVersionReader;
+import org.jenkinsci.plugins.maven_artifact_choicelistprovider.ValidAndInvalidClassifier;
 import org.sonatype.nexus.rest.model.NexusNGArtifact;
 import org.sonatype.nexus.rest.model.NexusNGArtifactHit;
 import org.sonatype.nexus.rest.model.NexusNGArtifactLink;
@@ -21,8 +23,6 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
-import com.wincornixdorf.jenkins.plugins.jenkins_extensible_choice_plugin.maven_artifact.IVersionReader;
-import com.wincornixdorf.jenkins.plugins.jenkins_extensible_choice_plugin.maven_artifact.ValidAndInvalidClassifier;
 
 public class NexusLuceneSearchService implements IVersionReader {
 

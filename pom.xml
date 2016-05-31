@@ -11,7 +11,7 @@
 	</parent>
 
 	<groupId>com.wincornixdorf.jenkins.plugins</groupId>
-	<artifactId>extensible-choice-parameter-mavenartifact-choicelistprovider</artifactId>
+	<artifactId>maven-artifact-choicelistprovider</artifactId>
 	<version>0.0.4</version>
 	<packaging>hpi</packaging>
 

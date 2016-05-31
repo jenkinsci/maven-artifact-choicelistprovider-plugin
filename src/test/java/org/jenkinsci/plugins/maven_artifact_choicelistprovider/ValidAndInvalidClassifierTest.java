@@ -1,7 +1,8 @@
-package com.wincornixdorf.jenkins.plugins.jenkins_extensible_choice_plugin.maven_artifact;
+package org.jenkinsci.plugins.maven_artifact_choicelistprovider;
 
 import static org.junit.Assert.*;
 
+import org.jenkinsci.plugins.maven_artifact_choicelistprovider.ValidAndInvalidClassifier;
 import org.junit.Test;
 
 public class ValidAndInvalidClassifierTest {
