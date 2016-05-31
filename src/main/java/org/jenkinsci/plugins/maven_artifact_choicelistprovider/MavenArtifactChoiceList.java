@@ -61,10 +61,12 @@ public class MavenArtifactChoiceList extends ChoiceListProvider implements Exten
 	@Override
 	public void onBuildTriggeredWithValue(AbstractProject<?, ?> job, ExtensibleChoiceParameterDefinition def,
 			String value) {
-		LOGGER.log(Level.INFO, value);
-		System.out.println("the value is:" + value);
-		System.out.println("name:" + def.getName());
-		System.out.println("descriptor-name:" + def.getDescriptor().getDisplayName());
+		// XXX: Feature: Once the SelectBox only contains the "short names" of the maven artifactds (without servername)
+		// Transform the short-value to the long value again.
+		
+		
+		super.onBuildTriggeredWithValue(job, def, value);
+//		LOGGER.log(Level.INFO, value);
 	}
 
 	@Override
