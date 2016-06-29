@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -25,6 +27,8 @@ import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 
 public class NexusLuceneSearchService implements IVersionReader {
+
+	private static final String PACKAGING_ALL = "*";
 
 	private static final String LUCENE_SEARCH_SERVICE_URI = "service/local/lucene/search";
 
@@ -71,7 +75,7 @@ public class NexusLuceneSearchService implements IVersionReader {
 	public List<String> retrieveVersions() {
 		if (LOGGER.isLoggable(Level.FINE)) {
 			LOGGER.fine("query nexus with arguments: r:" + mURL + ", g:" + getGroupId() + ", a:" + getArtifactId()
-					+ ", p:" + getPackaging()+ ", c: " + getClassifier().toString());
+					+ ", p:" + getPackaging() + ", c: " + getClassifier().toString());
 		}
 
 		MultivaluedMap<String, String> requestParams = new MultivaluedHashMap<String, String>();
@@ -79,7 +83,7 @@ public class NexusLuceneSearchService implements IVersionReader {
 			requestParams.putSingle("g", getGroupId());
 		if (getArtifactId() != "")
 			requestParams.putSingle("a", getArtifactId());
-		if (getPackaging() != "")
+		if (getPackaging() != "" && !PACKAGING_ALL.equals(getPackaging()))
 			requestParams.putSingle("p", getPackaging());
 		if (getClassifier() != null) {
 			// FIXME: There is of course a better way how to do it...
@@ -94,7 +98,9 @@ public class NexusLuceneSearchService implements IVersionReader {
 		final PatchedSearchNGResponse xmlResult = getInstance().queryParams(requestParams)
 				.accept(MediaType.APPLICATION_XML).get(PatchedSearchNGResponse.class);
 
-		List<String> retVal = new ArrayList<String>();
+		// Use a Map instead of a List to filter duplicated entries
+		Set<String> retVal = new TreeSet<String>();
+		
 		if (xmlResult == null) {
 			LOGGER.info("response from Nexus is NULL.");
 		} else if (xmlResult.getTotalCount() == 0) {
@@ -112,39 +118,52 @@ public class NexusLuceneSearchService implements IVersionReader {
 				theBaseDownloadURL.append(current.getArtifactId());
 				theBaseDownloadURL.append("/");
 				theBaseDownloadURL.append(current.getVersion());
-				theBaseDownloadURL.append("/");
-				theBaseDownloadURL.append(current.getArtifactId());
-				theBaseDownloadURL.append("-");
-				theBaseDownloadURL.append(current.getVersion());
+
+				final StringBuilder theArtifactSuffix = new StringBuilder();
+				theArtifactSuffix.append("/");
+				theArtifactSuffix.append(current.getArtifactId());
+				theArtifactSuffix.append("-");
+				theArtifactSuffix.append(current.getVersion());
 
 				for (NexusNGArtifactHit currentHit : current.getArtifactHits()) {
 					for (NexusNGArtifactLink currentLink : currentHit.getArtifactLinks()) {
 						final String repo = repoURLs.get(currentHit.getRepositoryId());
 
 						boolean addCurrentEntry = true;
+						boolean addCurrentyEntryAsFolder = false;
 
 						// if packaging configuration is set but does not match
-						if (!"".equals(getPackaging()) && !getPackaging().equals(currentLink.getExtension())) {
+						if ("".equals(getPackaging())) {
+							addCurrentyEntryAsFolder = true;
+						} else if (PACKAGING_ALL.equals(getPackaging())) {
+							// then always add
+						} else if (!getPackaging().equals(currentLink.getExtension())) {
 							addCurrentEntry &= false;
 						}
 
-						// check the classifier. 
+						// check the classifier.
 						if (!getClassifier().isValid(currentLink.getClassifier())) {
 							addCurrentEntry &= false;
-						} 
+						}
 
 						if (addCurrentEntry) {
+							final String baseUrl = repo + theBaseDownloadURL.toString();
+							final String artifactSuffix = theArtifactSuffix.toString();
 							final String classifier = (currentLink.getClassifier() == null ? ""
 									: "-" + currentLink.getClassifier());
-							retVal.add(repo + theBaseDownloadURL.toString() + classifier + "."
-									+ currentLink.getExtension());
+
+							if (addCurrentyEntryAsFolder) {
+								retVal.add(baseUrl);
+							} else {
+								retVal.add(baseUrl + artifactSuffix + classifier + "." + currentLink.getExtension());
+							}
 						}
 					}
 				}
 			}
 
 		}
-		return retVal;
+		return new ArrayList<String>(retVal);
 	}
 
 	Map<String, String> retrieveRepositoryURLs(final List<NexusNGRepositoryDetail> pRepoDetails) {

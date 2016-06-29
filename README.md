@@ -7,6 +7,10 @@ With this extension its possible to use the Lucene Service from a Nexus Reposito
 ![Alt text](/src/site/resources/project-config-1.jpg?raw=true "Example Project Configuration")
 
 ## Changelog
+### 29. June 2016
+* Added Checkbox to have the response list in reverse order
+* Changed Packaging-Textbox: Empty Value will only return the parent folder. The * character will return all entries for that artifact. Or use special entries like "tar.gz" or "zip" 
+
 ### 30. May 2016
 * Added Example Image showing the Project Configuration
 * Added Comment for the "onBuildTriggeredWith(...)" method which can maybe later extended to transform the provided parameter (which could be a short version of the name) into the correct working URL

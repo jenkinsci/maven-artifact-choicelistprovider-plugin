@@ -1,6 +1,7 @@
 package org.jenkinsci.plugins.maven_artifact_choicelistprovider;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,15 +28,18 @@ public class MavenArtifactChoiceList extends ChoiceListProvider implements Exten
 	private final String artifactId;
 	private final String packaging;
 	private final String classifier;
+	private final boolean reverseOrder;
 
 	@DataBoundConstructor
-	public MavenArtifactChoiceList(String url, String groupId, String artifactId, String packaging, String classifier) {
+	public MavenArtifactChoiceList(String url, String groupId, String artifactId, String packaging, String classifier,
+			boolean reverseOrder) {
 		super();
 		this.url = StringUtils.trim(url);
 		this.groupId = StringUtils.trim(groupId);
 		this.artifactId = StringUtils.trim(artifactId);
 		this.packaging = StringUtils.trim(packaging);
 		this.classifier = StringUtils.trim(classifier);
+		this.reverseOrder = reverseOrder;
 	}
 
 	public String getUrl() {
@@ -58,24 +62,27 @@ public class MavenArtifactChoiceList extends ChoiceListProvider implements Exten
 		return classifier;
 	}
 
+	public boolean getReverseOrder() {
+		return reverseOrder;
+	}
+
 	@Override
 	public void onBuildTriggeredWithValue(AbstractProject<?, ?> job, ExtensibleChoiceParameterDefinition def,
 			String value) {
 		// XXX: Feature: Once the SelectBox only contains the "short names" of the maven artifactds (without servername)
 		// Transform the short-value to the long value again.
-		
-		
+
 		super.onBuildTriggeredWithValue(job, def, value);
-//		LOGGER.log(Level.INFO, value);
+		// LOGGER.log(Level.INFO, value);
 	}
 
 	@Override
 	public List<String> getChoiceList() {
-		return readURL(getUrl(), getGroupId(), getArtifactId(), getPackaging(), getClassifier());
+		return readURL(getUrl(), getGroupId(), getArtifactId(), getPackaging(), getClassifier(), getReverseOrder());
 	}
 
 	static List<String> readURL(final String pURL, final String pGroupId, final String pArtifactId,
-			final String pPackaging, String pClassifier) {
+			final String pPackaging, String pClassifier, final boolean pReverseOrder) {
 		List<String> retVal = new ArrayList<String>();
 		try {
 
@@ -83,6 +90,9 @@ public class MavenArtifactChoiceList extends ChoiceListProvider implements Exten
 			IVersionReader mService = new NexusLuceneSearchService(pURL, pGroupId, pArtifactId, pPackaging,
 					classifierBox);
 			retVal = mService.retrieveVersions();
+
+			if (pReverseOrder)
+				Collections.reverse(retVal);
 		} catch (Exception e) {
 			retVal.add("ERROR: " + e.getMessage());
 			LOGGER.log(Level.WARNING, "failed to retrieve versions from nexus for r:" + pURL + ", g:" + pGroupId
@@ -145,10 +155,16 @@ public class MavenArtifactChoiceList extends ChoiceListProvider implements Exten
 		 * @return
 		 */
 		public FormValidation doTest(@QueryParameter String url, @QueryParameter String groupId,
-				@QueryParameter String artifactId, @QueryParameter String packaging,
-				@QueryParameter String classifier) {
+				@QueryParameter String artifactId, @QueryParameter String packaging, @QueryParameter String classifier,
+				@QueryParameter boolean reverseOrder) {
+			if (StringUtils.isEmpty(packaging) && !StringUtils.isEmpty(classifier)) {
+				return FormValidation.error(
+						"You have choosen an empty Packaging configuration but have configured a Classifier. Please either define a Packaging value or remove the Classifier");
+			}
+			
 			try {
-				final List<String> entriesFromURL = readURL(url, groupId, artifactId, packaging, classifier);
+				final List<String> entriesFromURL = readURL(url, groupId, artifactId, packaging, classifier,
+						reverseOrder);
 
 				if (entriesFromURL.isEmpty()) {
 					return FormValidation.ok("(Working, but no Entries found)");

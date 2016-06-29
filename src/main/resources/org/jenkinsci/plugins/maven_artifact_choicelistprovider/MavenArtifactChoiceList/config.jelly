@@ -37,11 +37,14 @@ THE SOFTWARE.
     <f:entry title="${%Classifier}" field="classifier">
         <f:textbox />
     </f:entry>
+     <f:entry title="${%Reverse Order}" field="reverseOrder">
+        <f:checkbox />
+    </f:entry>
     
     <f:validateButton
         method="test"
         title="${%List Files Now}"
         progress="${%Checking...}"
-        with="url,groupId,artifactId,packaging,classifier"
+        with="url,groupId,artifactId,packaging,classifier,reverseOrder"
     />
 </j:jelly>

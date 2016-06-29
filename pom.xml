@@ -12,7 +12,7 @@
 
 	<groupId>com.wincornixdorf.jenkins.plugins</groupId>
 	<artifactId>maven-artifact-choicelistprovider</artifactId>
-	<version>0.0.4</version>
+	<version>0.0.5</version>
 	<packaging>hpi</packaging>
 
 	<name>MavenArtifact ChoiceListProvider</name>
