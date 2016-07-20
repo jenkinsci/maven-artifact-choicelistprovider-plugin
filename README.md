@@ -7,6 +7,9 @@ With this extension its possible to use the Lucene Service from a Nexus Reposito
 ![Alt text](/src/site/resources/project-config-1.jpg?raw=true "Example Project Configuration")
 
 ## Changelog
+### 20. July 2016
+* Changed Implementation of Set containing the results from Nexus to LinkedHashSet as this implementation keeps the order as it is replied from Nexus and also makes sure that entries are only contained once.
+
 ### 29. June 2016
 * Added Checkbox to have the response list in reverse order
 * Changed Packaging-Textbox: Empty Value will only return the parent folder. The * character will return all entries for that artifact. Or use special entries like "tar.gz" or "zip" 

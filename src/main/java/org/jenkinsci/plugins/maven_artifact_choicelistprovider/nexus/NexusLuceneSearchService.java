@@ -2,10 +2,10 @@ package org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -69,7 +69,7 @@ public class NexusLuceneSearchService implements IVersionReader {
 	}
 
 	/**
-	 * Seach in Nexus for the artifact using the Lucene Service.
+	 * Search in Nexus for the artifact using the Lucene Service.
 	 * https://repository.sonatype.org/nexus-indexer-lucene-plugin/default/docs/path__lucene_search.html
 	 */
 	public List<String> retrieveVersions() {
@@ -98,8 +98,8 @@ public class NexusLuceneSearchService implements IVersionReader {
 		final PatchedSearchNGResponse xmlResult = getInstance().queryParams(requestParams)
 				.accept(MediaType.APPLICATION_XML).get(PatchedSearchNGResponse.class);
 
-		// Use a Map instead of a List to filter duplicated entries
-		Set<String> retVal = new TreeSet<String>();
+		// Use a Map instead of a List to filter duplicated entries and also linked to keep the order of XML response
+		Set<String> retVal = new LinkedHashSet<String>();
 		
 		if (xmlResult == null) {
 			LOGGER.info("response from Nexus is NULL.");
