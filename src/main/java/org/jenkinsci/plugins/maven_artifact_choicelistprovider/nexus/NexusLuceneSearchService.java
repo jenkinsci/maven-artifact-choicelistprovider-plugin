@@ -25,6 +25,7 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
+import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 
 public class NexusLuceneSearchService implements IVersionReader {
 
@@ -59,6 +60,9 @@ public class NexusLuceneSearchService implements IVersionReader {
 	void init() {
 		ClientConfig config = new DefaultClientConfig();
 		Client client = Client.create(config);
+
+		client.addFilter(new HTTPBasicAuthFilter("q+LII+/k", "MWjotd7d2MJgHvmWt+OAXYaZhphi5rMZe+3jB2y2mN2r"));
+
 		mInstance = client.resource(UriBuilder.fromUri(getURL()).build());
 		mInstance = mInstance.path(LUCENE_SEARCH_SERVICE_URI);
 		// String respAsString = service.path("nexus/service/local/lucene/search")
@@ -100,7 +104,7 @@ public class NexusLuceneSearchService implements IVersionReader {
 
 		// Use a Map instead of a List to filter duplicated entries and also linked to keep the order of XML response
 		Set<String> retVal = new LinkedHashSet<String>();
-		
+
 		if (xmlResult == null) {
 			LOGGER.info("response from Nexus is NULL.");
 		} else if (xmlResult.getTotalCount() == 0) {
