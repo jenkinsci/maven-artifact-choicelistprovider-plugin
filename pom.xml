@@ -26,6 +26,14 @@
 
 	<dependencies>
 
+		<!-- For Authentication Details -->
+		<dependency>
+			<artifactId>credentials</artifactId>
+			<version>RELEASE</version>
+			<groupId>org.jenkins-ci.plugins</groupId>
+		</dependency>
+		
+
 		<!-- Basic Dependency to allow Extension of the ChoiceListProvider -->
 		<dependency>
 			<groupId>jp.ikedam.jenkins.plugins</groupId>
