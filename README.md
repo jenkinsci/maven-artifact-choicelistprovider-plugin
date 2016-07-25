@@ -7,6 +7,9 @@ With this extension its possible to use the Lucene Service from a Nexus Reposito
 ![Alt text](/src/site/resources/project-config-1.jpg?raw=true "Example Project Configuration")
 
 ## Changelog
+### 25. July 2016 - 0.0.8
+* ADD: Added Configuration to configure UserCredentials for a Nexus Server. Could be a Token or a real Username.
+
 ### 25. July 2016 - 0.0.6
 * ADD: Quickfix to add user credentials for Nexus. Will be put into Jenkins-Credentials in the next version
 

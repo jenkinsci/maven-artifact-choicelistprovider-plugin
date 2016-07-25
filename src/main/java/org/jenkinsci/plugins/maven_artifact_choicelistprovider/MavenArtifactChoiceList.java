@@ -11,11 +11,21 @@ import org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus.NexusLucene
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 
+import com.cloudbees.plugins.credentials.CredentialsMatchers;
+import com.cloudbees.plugins.credentials.CredentialsProvider;
+import com.cloudbees.plugins.credentials.common.StandardCredentials;
+import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
+import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
+import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl;
+
 import hudson.Extension;
 import hudson.ExtensionPoint;
 import hudson.model.AbstractProject;
 import hudson.model.Descriptor;
+import hudson.security.ACL;
 import hudson.util.FormValidation;
+import hudson.util.ListBoxModel;
+import jenkins.model.Jenkins;
 import jp.ikedam.jenkins.plugins.extensible_choice_parameter.ChoiceListProvider;
 import jp.ikedam.jenkins.plugins.extensible_choice_parameter.ExtensibleChoiceParameterDefinition;
 
@@ -29,12 +39,14 @@ public class MavenArtifactChoiceList extends ChoiceListProvider implements Exten
 	private final String packaging;
 	private final String classifier;
 	private final boolean reverseOrder;
+	private final String credentialsId;
 
 	@DataBoundConstructor
-	public MavenArtifactChoiceList(String url, String groupId, String artifactId, String packaging, String classifier,
-			boolean reverseOrder) {
+	public MavenArtifactChoiceList(String url, String credentialsId, String groupId, String artifactId,
+			String packaging, String classifier, boolean reverseOrder) {
 		super();
 		this.url = StringUtils.trim(url);
+		this.credentialsId = credentialsId;
 		this.groupId = StringUtils.trim(groupId);
 		this.artifactId = StringUtils.trim(artifactId);
 		this.packaging = StringUtils.trim(packaging);
@@ -66,6 +78,10 @@ public class MavenArtifactChoiceList extends ChoiceListProvider implements Exten
 		return reverseOrder;
 	}
 
+	public String getCredentialsId() {
+		return credentialsId;
+	}
+
 	@Override
 	public void onBuildTriggeredWithValue(AbstractProject<?, ?> job, ExtensibleChoiceParameterDefinition def,
 			String value) {
@@ -78,31 +94,58 @@ public class MavenArtifactChoiceList extends ChoiceListProvider implements Exten
 
 	@Override
 	public List<String> getChoiceList() {
-		return readURL(getUrl(), getGroupId(), getArtifactId(), getPackaging(), getClassifier(), getReverseOrder());
+		return readURL(getUrl(), getCredentialsId(), getGroupId(), getArtifactId(), getPackaging(), getClassifier(),
+				getReverseOrder());
 	}
 
-	static List<String> readURL(final String pURL, final String pGroupId, final String pArtifactId,
-			final String pPackaging, String pClassifier, final boolean pReverseOrder) {
+	static List<String> readURL(final String pURL, final String pCredentialsId, final String pGroupId,
+			final String pArtifactId, final String pPackaging, String pClassifier, final boolean pReverseOrder) {
 		List<String> retVal = new ArrayList<String>();
 		try {
-
 			ValidAndInvalidClassifier classifierBox = ValidAndInvalidClassifier.fromString(pClassifier);
+
 			IVersionReader mService = new NexusLuceneSearchService(pURL, pGroupId, pArtifactId, pPackaging,
 					classifierBox);
+
+			// Set User Credentials if configured
+			final UsernamePasswordCredentialsImpl c = getCredentials(pCredentialsId);
+			if (c != null) {
+				mService.setUserName(c.getUsername());
+				mService.setUserPassword(c.getPassword().getPlainText());
+			}
+
 			retVal = mService.retrieveVersions();
 
 			if (pReverseOrder)
 				Collections.reverse(retVal);
+		} catch (VersionReaderException e) {
+			LOGGER.log(Level.INFO, "failed to retrieve versions from nexus for r:" + pURL + ", g:" + pGroupId + ", a:"
+					+ pArtifactId + ", p:" + pPackaging + ", c:" + pClassifier, e);
+			retVal.add(e.getMessage());
 		} catch (Exception e) {
-			retVal.add("ERROR: " + e.getMessage());
 			LOGGER.log(Level.WARNING, "failed to retrieve versions from nexus for r:" + pURL + ", g:" + pGroupId
 					+ ", a:" + pArtifactId + ", p:" + pPackaging + ", c:" + pClassifier, e);
+			retVal.add("Unexpected Error: " + e.getMessage());
 		}
 		return retVal;
 	}
 
+	/**
+	 * 
+	 * @param pCredentialId
+	 * @return the credentials for the ID or NULL
+	 */
+	static UsernamePasswordCredentialsImpl getCredentials(final String pCredentialId) {
+		return CredentialsMatchers
+				.firstOrNull(
+						CredentialsProvider.lookupCredentials(UsernamePasswordCredentialsImpl.class,
+								Jenkins.getInstance(), ACL.SYSTEM),
+						CredentialsMatchers.allOf(CredentialsMatchers.withId(pCredentialId)));
+	}
+
 	@Extension
 	public static class DescriptorImpl extends Descriptor<ChoiceListProvider> {
+
 		/**
 		 * the display name shown in the dropdown to select a choice provider.
 		 * 
@@ -112,6 +155,14 @@ public class MavenArtifactChoiceList extends ChoiceListProvider implements Exten
 		@Override
 		public String getDisplayName() {
 			return "Maven Artifact Choice Parameter";
+		}
+
+		public ListBoxModel doFillCredentialsIdItems() {
+			return new StandardListBoxModel().withEmptySelection().withMatching(
+					CredentialsMatchers
+							.anyOf(CredentialsMatchers.instanceOf(StandardUsernamePasswordCredentials.class)),
+					CredentialsProvider.lookupCredentials(StandardCredentials.class, Jenkins.getInstance(),
+							ACL.SYSTEM));
 		}
 
 		public FormValidation doCheckUrl(@QueryParameter String url) {
@@ -154,17 +205,17 @@ public class MavenArtifactChoiceList extends ChoiceListProvider implements Exten
 		 * @param scanType
 		 * @return
 		 */
-		public FormValidation doTest(@QueryParameter String url, @QueryParameter String groupId,
-				@QueryParameter String artifactId, @QueryParameter String packaging, @QueryParameter String classifier,
-				@QueryParameter boolean reverseOrder) {
+		public FormValidation doTest(@QueryParameter String url, @QueryParameter String credentialsId,
+				@QueryParameter String groupId, @QueryParameter String artifactId, @QueryParameter String packaging,
+				@QueryParameter String classifier, @QueryParameter boolean reverseOrder) {
 			if (StringUtils.isEmpty(packaging) && !StringUtils.isEmpty(classifier)) {
 				return FormValidation.error(
 						"You have choosen an empty Packaging configuration but have configured a Classifier. Please either define a Packaging value or remove the Classifier");
 			}
-			
+
 			try {
-				final List<String> entriesFromURL = readURL(url, groupId, artifactId, packaging, classifier,
-						reverseOrder);
+				final List<String> entriesFromURL = readURL(url, credentialsId, groupId, artifactId, packaging,
+						classifier, reverseOrder);
 
 				if (entriesFromURL.isEmpty()) {
 					return FormValidation.ok("(Working, but no Entries found)");
@@ -175,4 +226,5 @@ public class MavenArtifactChoiceList extends ChoiceListProvider implements Exten
 			}
 		}
 	}
+
 }

@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.util.List;
 
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.ValidAndInvalidClassifier;
+import org.jenkinsci.plugins.maven_artifact_choicelistprovider.VersionReaderException;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus.NexusLuceneSearchService;
 import org.junit.After;
 import org.junit.Test;
@@ -17,7 +18,7 @@ public class NexusLuceneSearchServiceTest {
 	}
 
 	@Test
-	public void testWithoutExplicitQualifier() {
+	public void testWithoutExplicitQualifier() throws VersionReaderException {
 		NexusLuceneSearchService s = new NexusLuceneSearchService("https://davis.wincor-nixdorf.com/nexus",
 				"com.wincornixdorf.pnc.releases", "pnc-brass-maven", "tar.gz");
 		List<String> retrieveVersions = s.retrieveVersions();
@@ -27,7 +28,7 @@ public class NexusLuceneSearchServiceTest {
 	}
 
 	@Test
-	public void testWithQualifier() {
+	public void testWithQualifier() throws VersionReaderException {
 		NexusLuceneSearchService s = new NexusLuceneSearchService("https://davis.wincor-nixdorf.com/nexus",
 				"com.wincornixdorf.pnc.releases", "pnc-brass-maven", "tar.gz",
 				ValidAndInvalidClassifier.fromString("preinstalled"));
@@ -38,7 +39,7 @@ public class NexusLuceneSearchServiceTest {
 	}
 
 	@Test
-	public void testWithNegativeQualifier() {
+	public void testWithNegativeQualifier() throws VersionReaderException {
 		NexusLuceneSearchService s = new NexusLuceneSearchService("https://davis.wincor-nixdorf.com/nexus",
 				"com.wincornixdorf.pnc.releases", "pnc-brass-maven", "tar.gz",
 				ValidAndInvalidClassifier.fromString("!preinstalled"));
@@ -49,7 +50,7 @@ public class NexusLuceneSearchServiceTest {
 	}
 
 	@Test
-	public void testWithNotExistentQualifier() {
+	public void testWithNotExistentQualifier() throws VersionReaderException {
 		NexusLuceneSearchService s = new NexusLuceneSearchService("https://davis.wincor-nixdorf.com/nexus",
 				"com.wincornixdorf.pnc.releases", "pnc-brass-maven", "tar.gz",
 				ValidAndInvalidClassifier.fromString("dontexists"));

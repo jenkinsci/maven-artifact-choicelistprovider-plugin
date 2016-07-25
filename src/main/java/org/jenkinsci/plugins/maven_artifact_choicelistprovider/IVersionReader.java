@@ -4,5 +4,9 @@ import java.util.List;
 
 public interface IVersionReader {
 
-	public List<String> retrieveVersions();
+	public List<String> retrieveVersions() throws VersionReaderException;
+	
+	public void setUserName(final String pUserName);
+	
+	public void setUserPassword(final String pUserName);
 }

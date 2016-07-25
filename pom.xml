@@ -6,13 +6,13 @@
 	<parent>
 		<groupId>org.jenkins-ci.plugins</groupId>
 		<artifactId>plugin</artifactId>
-		<version>1.466</version>
+		<version>1.609.3</version>
 		<relativePath />
 	</parent>
 
 	<groupId>com.wincornixdorf.jenkins.plugins</groupId>
 	<artifactId>maven-artifact-choicelistprovider</artifactId>
-	<version>0.0.6</version>
+	<version>0.0.8</version>
 	<packaging>hpi</packaging>
 
 	<name>MavenArtifact ChoiceListProvider</name>
@@ -22,6 +22,8 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<jenkins.version>1.609.3</jenkins.version>
+		<java.level>6</java.level>
 	</properties>
 
 	<dependencies>
@@ -32,7 +34,7 @@
 			<version>RELEASE</version>
 			<groupId>org.jenkins-ci.plugins</groupId>
 		</dependency>
-		
+
 
 		<!-- Basic Dependency to allow Extension of the ChoiceListProvider -->
 		<dependency>
