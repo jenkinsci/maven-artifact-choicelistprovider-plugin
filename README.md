@@ -7,6 +7,9 @@ With this extension its possible to use the Lucene Service from a Nexus Reposito
 ![Alt text](/src/site/resources/project-config-1.jpg?raw=true "Example Project Configuration")
 
 ## Changelog
+### 25. July 2016 - 0.0.6
+* ADD: Quickfix to add user credentials for Nexus. Will be put into Jenkins-Credentials in the next version
+
 ### 20. July 2016
 * Changed Implementation of Set containing the results from Nexus to LinkedHashSet as this implementation keeps the order as it is replied from Nexus and also makes sure that entries are only contained once.
 
