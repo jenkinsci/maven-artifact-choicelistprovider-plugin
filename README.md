@@ -8,6 +8,7 @@ With this extension its possible to use the Lucene Service from a Nexus Reposito
 
 ## Links
 * Thanks for the hint, but this plugin is very simliar to mine https://github.com/jenkinsci/repository-connector-plugin
+
 ## Changelog
 ### 25. July 2016 - 0.0.8
 * ADD: Added Configuration to configure UserCredentials for a Nexus Server. Could be a Token or a real Username.
