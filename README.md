@@ -4,9 +4,10 @@ This Plugin adds an additional ChoiceListProvider to famous <a href="https://wik
 
 With this extension its possible to use the Lucene Service from a Nexus Repository to search for artifacts using groupId, artifactId and the packaging.
 
-This plugin provides a build parameter and will let the user choose a version from the available artifact versions in Nexus. The Plugin will return the full URL of the choosen artifact, so that it will be available in the build.
+This plugin provides a build parameter and will let the user choose a version from the available artifact versions in Nexus. The Plugin will return the full URL of the choosen artifact, so that it will be available during the build, i.E. you can retrieve the artifact by using "wget"
 
-We are using this plugin to let our QA department choose between the available versions of our software which should then be downloaded and installed on the testserver.
+### Example
+We are using this plugin to let our QA department choose between the various available versions of our software which then is downloaded and installed on the testserver.
 
 ## Configuration Example
 ![Alt text](/src/site/resources/project-config-1.jpg?raw=true "Example Project Configuration")
