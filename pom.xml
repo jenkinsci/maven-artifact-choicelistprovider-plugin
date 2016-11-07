@@ -15,7 +15,7 @@
 	<version>0.0.8</version>
 	<packaging>hpi</packaging>
 
-	<name>MavenArtifact ChoiceListProvider</name>
+	<name>Maven Artifact ChoiceListProvider (Nexus)</name>
 	<description>A ChoiceListProvider to read Maven artifact information from a Nexus repository</description>
 	<url>https://github.com/phreakadelle/jenkins-extensible-choiceprovider-url-provider/blob/master/README.md</url>
 
