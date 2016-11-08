@@ -2,7 +2,9 @@ package org.jenkinsci.plugins.maven_artifact_choicelistprovider;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -21,7 +23,10 @@ import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl;
 import hudson.Extension;
 import hudson.ExtensionPoint;
 import hudson.model.AbstractProject;
+import hudson.model.Action;
 import hudson.model.Descriptor;
+import hudson.model.JobProperty;
+import hudson.model.ParameterDefinition;
 import hudson.security.ACL;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
@@ -40,6 +45,8 @@ public class MavenArtifactChoiceList extends ChoiceListProvider implements Exten
 	private final String classifier;
 	private final boolean reverseOrder;
 	private final String credentialsId;
+
+	private Map<String, String> mChoices;
 
 	@DataBoundConstructor
 	public MavenArtifactChoiceList(String url, String credentialsId, String groupId, String artifactId,
@@ -83,49 +90,58 @@ public class MavenArtifactChoiceList extends ChoiceListProvider implements Exten
 	}
 
 	@Override
-	public void onBuildTriggeredWithValue(AbstractProject<?, ?> job, ExtensibleChoiceParameterDefinition def,
-			String value) {
-		// XXX: Feature: Once the SelectBox only contains the "short names" of the maven artifactds (without servername)
-		// Transform the short-value to the long value again.
-
-		super.onBuildTriggeredWithValue(job, def, value);
-		// LOGGER.log(Level.INFO, value);
+	public void onBuildTriggeredWithValue(AbstractProject<?, ?> pJob, ExtensibleChoiceParameterDefinition pDef,
+			String pOldValue) {
+		// FIXME: CHANGE-1: Get the choosen parameter (key-value) and retrieve the matching `value`from the list. 
+		String newValue = pOldValue;
+		if (mChoices != null) {
+			// FIXME: CHANGE-1: How to update the build environment variables to replace the current parameter? I dont know... 
+			LOGGER.log(Level.INFO, "get full url for item:" + pOldValue);
+			newValue = mChoices.get(pOldValue);
+		}
+		LOGGER.log(Level.INFO, "target value is: " + newValue);
 	}
 
 	@Override
 	public List<String> getChoiceList() {
-		return readURL(getUrl(), getCredentialsId(), getGroupId(), getArtifactId(), getPackaging(), getClassifier(),
-				getReverseOrder());
+		if (mChoices == null) {
+			mChoices = readURL(getUrl(), getCredentialsId(), getGroupId(), getArtifactId(), getPackaging(),
+					getClassifier(), getReverseOrder());
+		}
+		// FIXME: CHANGE-1: Return only the keys, that are shorter then the values
+//		return new ArrayList<String>(mChoices.keySet());
+		return new ArrayList<String>(mChoices.values());
 	}
 
-	static List<String> readURL(final String pURL, final String pCredentialsId, final String pGroupId,
+	static Map<String, String> readURL(final String pURL, final String pCredentialsId, final String pGroupId,
 			final String pArtifactId, final String pPackaging, String pClassifier, final boolean pReverseOrder) {
-		List<String> retVal = new ArrayList<String>();
+		Map<String, String> retVal = new LinkedHashMap<String, String>();
 		try {
 			ValidAndInvalidClassifier classifierBox = ValidAndInvalidClassifier.fromString(pClassifier);
 
 			IVersionReader mService = new NexusLuceneSearchService(pURL, pGroupId, pArtifactId, pPackaging,
 					classifierBox);
 
-			// Set User Credentials if configured
+			// If configured, set User Credentials
 			final UsernamePasswordCredentialsImpl c = getCredentials(pCredentialsId);
 			if (c != null) {
-				mService.setUserName(c.getUsername());
-				mService.setUserPassword(c.getPassword().getPlainText());
+				mService.setCredentials(c.getUsername(), c.getPassword().getPlainText());
 			}
 
-			retVal = mService.retrieveVersions();
+			List<String> choices = mService.retrieveVersions();
 
 			if (pReverseOrder)
-				Collections.reverse(retVal);
+				Collections.reverse(choices);
+
+			retVal = toMap(choices);
 		} catch (VersionReaderException e) {
 			LOGGER.log(Level.INFO, "failed to retrieve versions from nexus for r:" + pURL + ", g:" + pGroupId + ", a:"
 					+ pArtifactId + ", p:" + pPackaging + ", c:" + pClassifier, e);
-			retVal.add(e.getMessage());
+			retVal.put("error", e.getMessage());
 		} catch (Exception e) {
 			LOGGER.log(Level.WARNING, "failed to retrieve versions from nexus for r:" + pURL + ", g:" + pGroupId
 					+ ", a:" + pArtifactId + ", p:" + pPackaging + ", c:" + pClassifier, e);
-			retVal.add("Unexpected Error: " + e.getMessage());
+			retVal.put("error", "Unexpected Error: " + e.getMessage());
 		}
 		return retVal;
 	}
@@ -214,17 +230,32 @@ public class MavenArtifactChoiceList extends ChoiceListProvider implements Exten
 			}
 
 			try {
-				final List<String> entriesFromURL = readURL(url, credentialsId, groupId, artifactId, packaging,
+				final Map<String, String> entriesFromURL = readURL(url, credentialsId, groupId, artifactId, packaging,
 						classifier, reverseOrder);
 
 				if (entriesFromURL.isEmpty()) {
 					return FormValidation.ok("(Working, but no Entries found)");
 				}
-				return FormValidation.ok(StringUtils.join(entriesFromURL, '\n'));
+				return FormValidation.ok(StringUtils.join(entriesFromURL.keySet(), '\n'));
 			} catch (Exception e) {
 				return FormValidation.error("error reading versions from url:" + e.getMessage());
 			}
 		}
+	}
+
+	/**
+	 * Cuts of the first parts of the URL and only returns a smaller set of items.
+	 * 
+	 * @param pChoices
+	 *            the list which is transformed to a map
+	 * @return the map containing the short url as Key and the long url as value.
+	 */
+	public static Map<String, String> toMap(List<String> pChoices) {
+		Map<String, String> retVal = new LinkedHashMap<String, String>();
+		for (String current : pChoices) {
+			retVal.put(current.substring(current.lastIndexOf("/") + 1), current);
+		}
+		return retVal;
 	}
 
 }

@@ -260,4 +260,11 @@ public class NexusLuceneSearchService implements IVersionReader {
 		this.mUserPassword = mUserPassword;
 	}
 
+	@Override
+	public void setCredentials(String pUserName, String pUserPassword) {
+		this.setUserName(pUserName);
+		this.setUserPassword(pUserPassword);
+		
+	}
+
 }

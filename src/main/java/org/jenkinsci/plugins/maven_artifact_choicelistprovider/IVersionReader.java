@@ -8,5 +8,7 @@ public interface IVersionReader {
 	
 	public void setUserName(final String pUserName);
 	
-	public void setUserPassword(final String pUserName);
+	public void setUserPassword(final String pUserPassword);
+	
+	public void setCredentials(final String pUserName, final String pUserPassword);
 }
