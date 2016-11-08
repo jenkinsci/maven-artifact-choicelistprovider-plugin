@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.jenkins-ci.plugins</groupId>
 		<artifactId>plugin</artifactId>
-		<version>1.609.3</version>
+		<version>2.11</version>
 		<relativePath />
 	</parent>
 
@@ -23,7 +23,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<jenkins.version>1.609.3</jenkins.version>
-		<java.level>6</java.level>
+		<java.level>7</java.level>
 	</properties>
 
 	<dependencies>
@@ -101,7 +101,7 @@
 	<scm>
 		<connection>scm:git:git://github.com/phreakadelle/jenkins-extensible-choiceprovider-url-provider.git</connection>
 		<developerConnection>scm:git:git@phreakadelle/jenkins-extensible-choiceprovider-url-provider.git</developerConnection>
-		<url>https://github.com/phreakadelle/jenkins-extensible-choiceprovider-url-provider</url>
+		<url>https://github.com/phreakadelle/${$project.artifactId}</url>
 	</scm>
 	<repositories>
 		<repository>
