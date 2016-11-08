@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus.NexusLuceneSearchService;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 
 import com.cloudbees.plugins.credentials.CredentialsMatchers;
@@ -23,10 +24,7 @@ import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl;
 import hudson.Extension;
 import hudson.ExtensionPoint;
 import hudson.model.AbstractProject;
-import hudson.model.Action;
 import hudson.model.Descriptor;
-import hudson.model.JobProperty;
-import hudson.model.ParameterDefinition;
 import hudson.security.ACL;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
@@ -38,68 +36,39 @@ public class MavenArtifactChoiceList extends ChoiceListProvider implements Exten
 
 	private static final Logger LOGGER = Logger.getLogger(MavenArtifactChoiceList.class.getName());
 
-	private final String url;
-	private final String groupId;
-	private final String artifactId;
-	private final String packaging;
-	private final String classifier;
-	private final boolean reverseOrder;
-	private final String credentialsId;
+	private String url;
+	private String groupId;
+	private String artifactId;
+	private String packaging;
+	private String classifier;
+	private boolean reverseOrder;
+	private String credentialsId;
 
 	private Map<String, String> mChoices;
 
 	@DataBoundConstructor
-	public MavenArtifactChoiceList(String url, String credentialsId, String groupId, String artifactId,
-			String packaging, String classifier, boolean reverseOrder) {
+	public MavenArtifactChoiceList(String url, String artifactId) {
 		super();
-		this.url = StringUtils.trim(url);
-		this.credentialsId = credentialsId;
-		this.groupId = StringUtils.trim(groupId);
-		this.artifactId = StringUtils.trim(artifactId);
-		this.packaging = StringUtils.trim(packaging);
-		this.classifier = StringUtils.trim(classifier);
-		this.reverseOrder = reverseOrder;
+		this.setArtifactId(artifactId);
+		this.setUrl(url);
 	}
 
-	public String getUrl() {
-		return url;
-	}
-
-	public String getGroupId() {
-		return groupId;
-	}
-
-	public String getArtifactId() {
-		return artifactId;
-	}
-
-	public String getPackaging() {
-		return packaging;
-	}
-
-	public String getClassifier() {
-		return classifier;
-	}
-
-	public boolean getReverseOrder() {
-		return reverseOrder;
-	}
-
-	public String getCredentialsId() {
-		return credentialsId;
-	}
-
+	/**
+	 * FIXME: CHANGE-1: Needs to be implemented. But currently i dont know how to update the environment variable to use
+	 * the new value.
+	 */
 	@Override
 	public void onBuildTriggeredWithValue(AbstractProject<?, ?> pJob, ExtensibleChoiceParameterDefinition pDef,
 			String pOldValue) {
-		// FIXME: CHANGE-1: Get the choosen parameter (key-value) and retrieve the matching `value`from the list. 
 		String newValue = pOldValue;
 		if (mChoices != null) {
-			// FIXME: CHANGE-1: How to update the build environment variables to replace the current parameter? I dont know... 
 			LOGGER.log(Level.INFO, "get full url for item:" + pOldValue);
-			newValue = mChoices.get(pOldValue);
+			if (mChoices.containsKey(pOldValue)) {
+				newValue = mChoices.get(pOldValue);
+			}
 		}
 		LOGGER.log(Level.INFO, "target value is: " + newValue);
+		// FIXME: CHANGE-1: How to update the build env variables to replace the current parameter? I dont know...
 	}
 
 	@Override
@@ -109,7 +78,7 @@ public class MavenArtifactChoiceList extends ChoiceListProvider implements Exten
 					getClassifier(), getReverseOrder());
 		}
 		// FIXME: CHANGE-1: Return only the keys, that are shorter then the values
-//		return new ArrayList<String>(mChoices.keySet());
+		// return new ArrayList<String>(mChoices.keySet());
 		return new ArrayList<String>(mChoices.values());
 	}
 
@@ -213,13 +182,23 @@ public class MavenArtifactChoiceList extends ChoiceListProvider implements Exten
 		}
 
 		/**
-		 * Test what files will be listed.
+		 * Perfom testing of the parameter.
 		 * 
-		 * @param baseDirPath
-		 * @param includePattern
-		 * @param excludePattern
-		 * @param scanType
-		 * @return
+		 * @param url
+		 *            the URL
+		 * @param credentialsId
+		 *            the choosen credentials
+		 * @param groupId
+		 *            the groupId to search for
+		 * @param artifactId
+		 *            the artifactId to search for
+		 * @param packaging
+		 *            results will be limited to that packaging, i.E. tar.gz
+		 * @param classifier
+		 *            results will be limited to that classifier, i.E. sources
+		 * @param reverseOrder
+		 *            results in reversed order.
+		 * @return {@link FormValidation#ok()} if validation went fine.
 		 */
 		public FormValidation doTest(@QueryParameter String url, @QueryParameter String credentialsId,
 				@QueryParameter String groupId, @QueryParameter String artifactId, @QueryParameter String packaging,
@@ -256,6 +235,69 @@ public class MavenArtifactChoiceList extends ChoiceListProvider implements Exten
 			retVal.put(current.substring(current.lastIndexOf("/") + 1), current);
 		}
 		return retVal;
+	}
+
+	@DataBoundSetter
+	public void setUrl(String url) {
+		this.url = StringUtils.trim(url);
+	}
+
+	@DataBoundSetter
+	public void setGroupId(String groupId) {
+		this.groupId = StringUtils.trim(groupId);
+	}
+
+	@DataBoundSetter
+	public void setArtifactId(String artifactId) {
+		this.artifactId = StringUtils.trim(artifactId);
+	}
+
+	@DataBoundSetter
+	public void setPackaging(String packaging) {
+		this.packaging = StringUtils.trim(packaging);
+	}
+
+	@DataBoundSetter
+	public void setClassifier(String classifier) {
+		this.classifier = StringUtils.trim(classifier);
+	}
+
+	@DataBoundSetter
+	public void setReverseOrder(boolean reverseOrder) {
+		this.reverseOrder = reverseOrder;
+	}
+
+	@DataBoundSetter
+	public void setCredentialsId(String credentialsId) {
+		this.credentialsId = credentialsId;
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public String getGroupId() {
+		return groupId;
+	}
+
+	public String getArtifactId() {
+		return artifactId;
+	}
+
+	public String getPackaging() {
+		return packaging;
+	}
+
+	public String getClassifier() {
+		return classifier;
+	}
+
+	public boolean getReverseOrder() {
+		return reverseOrder;
+	}
+
+	public String getCredentialsId() {
+		return credentialsId;
 	}
 
 }

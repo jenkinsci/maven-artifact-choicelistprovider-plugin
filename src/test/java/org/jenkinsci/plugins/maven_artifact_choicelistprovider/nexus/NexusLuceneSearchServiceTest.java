@@ -18,6 +18,20 @@ public class NexusLuceneSearchServiceTest {
 	}
 
 	@Test
+	public void testWithNull() throws VersionReaderException {
+		NexusLuceneSearchService s = new NexusLuceneSearchService(null, null, null, null, null);
+
+		try {
+			s.retrieveVersions();
+			fail("shouldn work");
+		} catch (VersionReaderException e) {
+			// expected
+		} catch(Exception e) {
+			fail(e.getMessage());
+		}
+	}
+
+	@Test
 	public void testWithoutExplicitQualifier() throws VersionReaderException {
 		NexusLuceneSearchService s = new NexusLuceneSearchService("https://davis.wincor-nixdorf.com/nexus",
 				"com.wincornixdorf.pnc.releases", "pnc-brass-maven", "tar.gz");
