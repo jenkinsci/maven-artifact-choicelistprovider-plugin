@@ -26,7 +26,8 @@ import org.jenkinsci.plugins.maven_artifact_choicelistprovider.VersionReaderExce
  * As the API is public, but Maven Central is the only service offering it, there is no reason to modify the URLs for
  * searching and retrieving the artifacts. <br/>
  * Anyway, if there should be another repository using the same API, this class
- * can be inherited and {@link #getSearchURL()} and {@link #getRetrieveURL()} and {@link #createItemURLs(ResponseDoc)} can be
+ * can be inherited and {@link #getSearchURL()} and {@link #getRetrieveURL()} and {@link #createItemURLs(ResponseDoc)}
+ * can be
  * overriden.
  *
  * @author stephan.watermeyer, Diebold Nixdorf
@@ -41,28 +42,17 @@ public class MavenCentralSearchService implements IVersionReader {
 
 	private static final String USER_AGENT = "Mozilla/5.0";
 
-	private final String mGroupId;
-	private final String mArtifactId;
-	private final String mPackaging;
-	private final ValidAndInvalidClassifier mClassifier;
-
-	public MavenCentralSearchService(String pGroupId, String pArtifactId, String pPackaging) {
-		this(pGroupId, pArtifactId, pPackaging, ValidAndInvalidClassifier.getDefault());
-	}
-
-	public MavenCentralSearchService(String pGroupId, String pArtifactId, String pPackaging,
-			ValidAndInvalidClassifier pAcceptedClassifier) {
-		super();
-		this.mGroupId = pGroupId;
-		this.mArtifactId = pArtifactId;
-		this.mPackaging = pPackaging;
-		this.mClassifier = pAcceptedClassifier;
+	@Override
+	public List<String> retrieveVersions(String pGroupId, String pArtifactId, String pPackaging)
+			throws VersionReaderException {
+		return retrieveVersions(pGroupId, pArtifactId, pPackaging, ValidAndInvalidClassifier.getDefault());
 	}
 
 	@Override
-	public List<String> retrieveVersions() throws VersionReaderException {
+	public List<String> retrieveVersions(String pGroupId, String pArtifactId, String pPackaging,
+			ValidAndInvalidClassifier pClassifier) throws VersionReaderException {
 		try {
-			String targetURL = createURL();
+			String targetURL = createURL(pGroupId, pArtifactId, pPackaging, pClassifier);
 
 			String response = sendAndReceive(targetURL.toString());
 			if (LOGGER.isLoggable(Level.FINEST)) {
@@ -73,7 +63,7 @@ public class MavenCentralSearchService implements IVersionReader {
 			Set<String> retVal = new LinkedHashSet<String>();
 			if (containsResponses(responseObj)) {
 				for (ResponseDoc current : responseObj.getResponse().getDocs()) {
-					retVal.addAll(createItemURLs(current));
+					retVal.addAll(createItemURLs(current, pPackaging));
 				}
 			}
 
@@ -82,13 +72,13 @@ public class MavenCentralSearchService implements IVersionReader {
 			throw e;
 		} catch (Exception e) {
 			throw new VersionReaderException(
-					"failed to retrieve versions from maven-central for r:" + getSearchURL() + ", g:" + getGroupId() + ", a:"
-							+ getArtifactId() + ", p:" + getPackaging() + ", c:" + getClassifier() + e.getMessage(),
+					"failed to retrieve versions from maven-central for r:" + getSearchURL() + ", g:" + pGroupId
+							+ ", a:" + pArtifactId + ", p:" + pPackaging + ", c:" + pClassifier + e.getMessage(),
 					e);
 		}
 	}
 
-	List<String> createItemURLs(final ResponseDoc pResponseEntry) {
+	List<String> createItemURLs(final ResponseDoc pResponseEntry, final String pRequestedPackaging) {
 		List<String> retVal = new ArrayList<String>();
 		StringBuilder sb = new StringBuilder();
 
@@ -104,7 +94,7 @@ public class MavenCentralSearchService implements IVersionReader {
 
 		// packaging
 		for (String currentEC : pResponseEntry.getEc()) {
-			if (getPackaging() == "" || getPackaging().equalsIgnoreCase(currentEC)) {
+			if (pRequestedPackaging == "" || pRequestedPackaging.equalsIgnoreCase(currentEC)) {
 				retVal.add(sb.toString() + currentEC);
 			} else {
 				LOGGER.fine("packaging is explictly set and thus ignore current: " + currentEC);
@@ -160,22 +150,23 @@ public class MavenCentralSearchService implements IVersionReader {
 		}
 	}
 
-	private String createURL() {
+	private String createURL(String pGroupId, String pArtifactId, String pPackaging,
+			ValidAndInvalidClassifier pClassifier) {
 		StringBuilder targetURL = new StringBuilder();
 		targetURL.append(getSearchURL());
 		targetURL.append("select?q=");
 
-		if (!"".equals(mGroupId)) {
-			targetURL.append("g:\"" + mGroupId + "\"+AND+");
+		if (!"".equals(pGroupId)) {
+			targetURL.append("g:\"" + pGroupId + "\"+AND+");
 		}
 
-		if (!"".equals(mArtifactId)) {
-			targetURL.append("a:\"" + mArtifactId + "\"+AND+");
+		if (!"".equals(pArtifactId)) {
+			targetURL.append("a:\"" + pArtifactId + "\"+AND+");
 		}
 
-		if (!"".equals(mClassifier) && !mClassifier.getValid().isEmpty()) {
+		if (!"".equals(pClassifier) && !pClassifier.getValid().isEmpty()) {
 			targetURL.append("c:\"");
-			for (String currentClassifier : mClassifier.getValid()) {
+			for (String currentClassifier : pClassifier.getValid()) {
 				targetURL.append(currentClassifier);
 			}
 			targetURL.append("\"+AND+");
@@ -212,22 +203,6 @@ public class MavenCentralSearchService implements IVersionReader {
 
 	public String getSearchURL() {
 		return REPO_SEARCH_SERVICE_URL;
-	}
-
-	public String getGroupId() {
-		return mGroupId;
-	}
-
-	public String getArtifactId() {
-		return mArtifactId;
-	}
-
-	public String getPackaging() {
-		return mPackaging;
-	}
-
-	public ValidAndInvalidClassifier getClassifier() {
-		return mClassifier;
 	}
 
 	/**
