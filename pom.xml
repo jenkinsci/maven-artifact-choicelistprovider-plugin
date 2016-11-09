@@ -43,7 +43,9 @@
 			<version>1.3.2</version>
 		</dependency>
 
-		<!-- All JaxWS/RS, Jersey and Glassfish Dependencies to allow RESTful Service calls -->
+
+		<!-- All JaxWS/RS, Jersey and Glassfish Dependencies to allow RESTful Service 
+			calls -->
 		<dependency>
 			<groupId>javax.ws.rs</groupId>
 			<artifactId>javax.ws.rs-api</artifactId>
@@ -81,6 +83,14 @@
 			<artifactId>nexus-indexer-lucene-model</artifactId>
 			<version>2.13.0-01</version>
 		</dependency>
+
+		<!-- Necessary to parse JSON from Maven Central -->
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.8.0</version>
+		</dependency>
+
 
 	</dependencies>
 	<licenses>

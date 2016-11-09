@@ -182,12 +182,12 @@ public class MavenArtifactChoiceList extends ChoiceListProvider implements Exten
 		}
 
 		/**
-		 * Perfom testing of the parameter.
+		 * Perform testing of the parameter.
 		 * 
 		 * @param url
 		 *            the URL
 		 * @param credentialsId
-		 *            the choosen credentials
+		 *            the chosen credentials
 		 * @param groupId
 		 *            the groupId to search for
 		 * @param artifactId
