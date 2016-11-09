@@ -31,11 +31,12 @@ public class MavenCentralChoiceListProvider extends AbstractMavenArtifactChoiceL
 		}
 
 		@Override
-		protected Map<String, String> wrapReadURL(String pCredentialsId, String pGroupId, String pArtifactId,
-				String pPackaging, String pClassifier, boolean pReverseOrder) {
-			return readURL(getStaticServiceInstance(), pCredentialsId, pGroupId, pArtifactId, pPackaging, pClassifier,
-					pReverseOrder);
+		protected Map<String, String> wrapTestConnection(IVersionReader service, String pCredentialsId, String pGroupId,
+				String pArtifactId, String pPackaging, String pClassifier, boolean pReverseOrder) {
+			return readURL(new MavenCentralSearchService(), pCredentialsId, pGroupId, pArtifactId, pPackaging,
+					pClassifier, pReverseOrder);
 		}
+
 	}
 
 	public static IVersionReader getStaticServiceInstance() {

@@ -7,8 +7,10 @@ import org.jenkinsci.plugins.maven_artifact_choicelistprovider.AbstractMavenArti
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.AbstractMavenArtifactDescriptorImpl;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.IVersionReader;
 import org.kohsuke.stapler.DataBoundSetter;
+import org.kohsuke.stapler.QueryParameter;
 
 import hudson.Extension;
+import hudson.util.FormValidation;
 
 public class NexusChoiceListProvider extends AbstractMavenArtifactChoiceListProvider {
 
@@ -32,11 +34,25 @@ public class NexusChoiceListProvider extends AbstractMavenArtifactChoiceListProv
 			return "Nexus Artifact Choice Parameter";
 		}
 
+		public FormValidation doTest(@QueryParameter String url, @QueryParameter String credentialsId,
+				@QueryParameter String groupId, @QueryParameter String artifactId, @QueryParameter String packaging,
+				@QueryParameter String classifier, @QueryParameter boolean reverseOrder) {
+			final IVersionReader service = new NexusLuceneSearchService(url);
+			return super.performTest(service, credentialsId, groupId, artifactId, packaging, classifier, reverseOrder);
+		}
+
 		@Override
-		protected Map<String, String> wrapReadURL(String pCredentialsId, String pGroupId, String pArtifactId,
-				String pPackaging, String pClassifier, boolean pReverseOrder) {
-			return readURL(getStaticServiceInstance(), pCredentialsId, pGroupId, pArtifactId, pPackaging, pClassifier,
-					pReverseOrder);
+		protected Map<String, String> wrapTestConnection(IVersionReader pService, String pCredentialsId, String pGroupId,
+				String pArtifactId, String pPackaging, String pClassifier, boolean pReverseOrder) {
+			return readURL(pService, pCredentialsId, pGroupId, pArtifactId, pPackaging, pClassifier, pReverseOrder);
+		}
+
+		public FormValidation doCheckUrl(@QueryParameter String url) {
+			if (StringUtils.isBlank(url)) {
+				return FormValidation.error("The nexus URL cannot be empty");
+			}
+
+			return FormValidation.ok();
 		}
 	}
 
@@ -49,12 +65,9 @@ public class NexusChoiceListProvider extends AbstractMavenArtifactChoiceListProv
 		this.url = StringUtils.trim(url);
 	}
 
-	public static IVersionReader getStaticServiceInstance() {
-		return new NexusLuceneSearchService("");
-	}
-
+	@Override
 	public IVersionReader getServiceInstance() {
-		return getStaticServiceInstance();
+		return new NexusLuceneSearchService(url);
 	}
 
 }

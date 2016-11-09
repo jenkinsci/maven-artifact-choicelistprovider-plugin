@@ -3,7 +3,10 @@ package org.jenkinsci.plugins.maven_artifact_choicelistprovider;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus.NexusLuceneSearchService;
 import org.kohsuke.stapler.QueryParameter;
+
+import com.cloudbees.plugins.credentials.CredentialsParameterDefinition.DescriptorImpl;
 
 import hudson.model.Descriptor;
 import hudson.util.FormValidation;
@@ -42,7 +45,7 @@ public abstract class AbstractMavenArtifactDescriptorImpl extends Descriptor<Cho
 		return FormValidation.ok();
 	}
 
-	public FormValidation doTest(@QueryParameter String credentialsId,
+	public FormValidation performTest(final IVersionReader pService, @QueryParameter String credentialsId,
 			@QueryParameter String groupId, @QueryParameter String artifactId, @QueryParameter String packaging,
 			@QueryParameter String classifier, @QueryParameter boolean reverseOrder) {
 		if (StringUtils.isEmpty(packaging) && !StringUtils.isEmpty(classifier)) {
@@ -51,8 +54,8 @@ public abstract class AbstractMavenArtifactDescriptorImpl extends Descriptor<Cho
 		}
 
 		try {
-			final Map<String, String> entriesFromURL = wrapReadURL(credentialsId, groupId, artifactId, packaging,
-					classifier, reverseOrder);
+			final Map<String, String> entriesFromURL = wrapTestConnection(pService, credentialsId, groupId, artifactId,
+					packaging, classifier, reverseOrder);
 
 			if (entriesFromURL.isEmpty()) {
 				return FormValidation.ok("(Working, but no Entries found)");
@@ -63,7 +66,22 @@ public abstract class AbstractMavenArtifactDescriptorImpl extends Descriptor<Cho
 		}
 	}
 
-	protected abstract Map<String, String> wrapReadURL(String credentialsId, String groupId, String artifactId,
-			String packaging, String classifier, boolean reverseOrder);
+	/**
+	 * Own implementations of this {@link DescriptorImpl} do this normally as a static inner class. The surround class
+	 * then has to extend {@link AbstractMavenArtifactChoiceListProvider} and thus this wrapper method can forward to
+	 * the implementation of
+	 * {@link AbstractMavenArtifactChoiceListProvider#readURL(IVersionReader, String, String, String, String, String, boolean)}
+	 * 
+	 * @param service
+	 * @param credentialsId
+	 * @param groupId
+	 * @param artifactId
+	 * @param packaging
+	 * @param classifier
+	 * @param reverseOrder
+	 * @return
+	 */
+	protected abstract Map<String, String> wrapTestConnection(IVersionReader service, String credentialsId,
+			String groupId, String artifactId, String packaging, String classifier, boolean reverseOrder);
 
 }
