@@ -9,7 +9,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.commons.lang.StringUtils;
-import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 
 import com.cloudbees.plugins.credentials.CredentialsMatchers;
@@ -36,7 +35,6 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
 
 	protected Map<String, String> mChoices;
 
-	@DataBoundConstructor
 	public AbstractMavenArtifactChoiceListProvider(String artifactId) {
 		super();
 		this.setArtifactId(artifactId);

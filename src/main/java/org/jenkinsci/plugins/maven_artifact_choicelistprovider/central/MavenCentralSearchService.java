@@ -12,6 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletResponse;
+import org.apache.commons.lang.StringUtils;
 
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.IVersionReader;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.ValidAndInvalidClassifier;
@@ -63,7 +64,9 @@ public class MavenCentralSearchService implements IVersionReader {
 			Set<String> retVal = new LinkedHashSet<String>();
 			if (containsResponses(responseObj)) {
 				for (ResponseDoc current : responseObj.getResponse().getDocs()) {
-					retVal.addAll(createItemURLs(current, pPackaging));
+
+					// Packaging from MavenCentral services always start with a "."
+					retVal.addAll(createItemURLs(current, "." + pPackaging));
 				}
 			}
 
@@ -94,10 +97,10 @@ public class MavenCentralSearchService implements IVersionReader {
 
 		// packaging
 		for (String currentEC : pResponseEntry.getEc()) {
-			if (pRequestedPackaging == "" || pRequestedPackaging.equalsIgnoreCase(currentEC)) {
+			if (StringUtils.isEmpty(pRequestedPackaging.trim()) || pRequestedPackaging.equalsIgnoreCase(currentEC)) {
 				retVal.add(sb.toString() + currentEC);
 			} else {
-				LOGGER.fine("packaging is explictly set and thus ignore current: " + currentEC);
+				LOGGER.fine("ignoring packaging '" + currentEC + "', accepted is: '" + pRequestedPackaging + "'");
 			}
 		}
 
