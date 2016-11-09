@@ -16,6 +16,12 @@ We are using this plugin to let our QA department choose between the various ava
 * Thanks for the hint, but this plugin is very simliar to mine https://github.com/jenkinsci/repository-connector-plugin
 
 ## Changelog
+
+### 09. November 2016 - 1.0.0
+* ADD: Plugin is released as an official Jenkins Plugin
+* FIX: Changed unit tests to use a public nexus for testing
+* ADD: Prepartion to use shorter artifact names in SelectBox that will be resolved once the build has been started (onBuildTriggeredWith(...)). Only preparation, as i dont have a solution how to change build environments once the build has been started.
+
 ### 25. July 2016 - 0.0.8
 * ADD: Added Configuration to configure UserCredentials for a Nexus Server. Could be a Token or a real Username.
 
