@@ -10,6 +10,14 @@ import org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus.NexusLucene
 import org.junit.After;
 import org.junit.Test;
 
+/**
+ * 
+ * Integration Test that verifies the retrieval works as expected. Don't forget to set a proxy, if you are using one.
+ * 
+ * The alfreso nexus is used, as it is available in public domain.
+ *
+ * @author stephan.watermeyer, Diebold Nixdorf
+ */
 public class NexusLuceneSearchServiceTest {
 
 	@After
@@ -26,15 +34,15 @@ public class NexusLuceneSearchServiceTest {
 			fail("shouldn work");
 		} catch (VersionReaderException e) {
 			// expected
-		} catch(Exception e) {
+		} catch (Exception e) {
 			fail(e.getMessage());
 		}
 	}
 
 	@Test
 	public void testWithoutExplicitQualifier() throws VersionReaderException {
-		NexusLuceneSearchService s = new NexusLuceneSearchService("https://davis.wincor-nixdorf.com/nexus",
-				"com.wincornixdorf.pnc.releases", "pnc-brass-maven", "tar.gz");
+		NexusLuceneSearchService s = new NexusLuceneSearchService("https://artifacts.alfresco.com/nexus/",
+				"org.apache.tomcat", "tomcat", "");
 		List<String> retrieveVersions = s.retrieveVersions();
 		for (String current : retrieveVersions) {
 			System.out.println(current);
@@ -43,31 +51,31 @@ public class NexusLuceneSearchServiceTest {
 
 	@Test
 	public void testWithQualifier() throws VersionReaderException {
-		NexusLuceneSearchService s = new NexusLuceneSearchService("https://davis.wincor-nixdorf.com/nexus",
-				"com.wincornixdorf.pnc.releases", "pnc-brass-maven", "tar.gz",
-				ValidAndInvalidClassifier.fromString("preinstalled"));
+		NexusLuceneSearchService s = new NexusLuceneSearchService("https://artifacts.alfresco.com/nexus/",
+				"org.apache.tomcat", "tomcat", "tgz", ValidAndInvalidClassifier.fromString("linux"));
 		List<String> retrieveVersions = s.retrieveVersions();
 		for (String current : retrieveVersions) {
 			System.out.println(current);
+			assertTrue(current.endsWith("linux.tgz"));
 		}
 	}
 
 	@Test
 	public void testWithNegativeQualifier() throws VersionReaderException {
-		NexusLuceneSearchService s = new NexusLuceneSearchService("https://davis.wincor-nixdorf.com/nexus",
-				"com.wincornixdorf.pnc.releases", "pnc-brass-maven", "tar.gz",
-				ValidAndInvalidClassifier.fromString("!preinstalled"));
+		NexusLuceneSearchService s = new NexusLuceneSearchService("https://artifacts.alfresco.com/nexus/",
+				"org.apache.tomcat", "tomcat", "tgz", ValidAndInvalidClassifier.fromString("!linux,!osx"));
 		List<String> retrieveVersions = s.retrieveVersions();
 		for (String current : retrieveVersions) {
 			System.out.println(current);
+			assertFalse(current.endsWith("linux.tgz"));
+			assertFalse(current.endsWith("osx.tgz"));
 		}
 	}
 
 	@Test
 	public void testWithNotExistentQualifier() throws VersionReaderException {
-		NexusLuceneSearchService s = new NexusLuceneSearchService("https://davis.wincor-nixdorf.com/nexus",
-				"com.wincornixdorf.pnc.releases", "pnc-brass-maven", "tar.gz",
-				ValidAndInvalidClassifier.fromString("dontexists"));
+		NexusLuceneSearchService s = new NexusLuceneSearchService("https://artifacts.alfresco.com/nexus/",
+				"org.apache.tomcat", "tomcat", "tgz", ValidAndInvalidClassifier.fromString("foobar"));
 		List<String> retrieveVersions = s.retrieveVersions();
 		for (String current : retrieveVersions) {
 			System.out.println(current);
