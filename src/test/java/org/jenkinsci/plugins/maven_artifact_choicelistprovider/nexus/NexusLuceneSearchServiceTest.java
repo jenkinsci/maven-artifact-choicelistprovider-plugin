@@ -27,10 +27,10 @@ public class NexusLuceneSearchServiceTest {
 
 	@Test
 	public void testWithNull() throws VersionReaderException {
-		NexusLuceneSearchService s = new NexusLuceneSearchService(null, null, null, null, null);
+		NexusLuceneSearchService s = new NexusLuceneSearchService(null);
 
 		try {
-			s.retrieveVersions();
+			s.retrieveVersions(null, null, null, null);
 			fail("shouldn work");
 		} catch (VersionReaderException e) {
 			// expected
@@ -41,9 +41,9 @@ public class NexusLuceneSearchServiceTest {
 
 	@Test
 	public void testWithoutExplicitQualifier() throws VersionReaderException {
-		NexusLuceneSearchService s = new NexusLuceneSearchService("https://artifacts.alfresco.com/nexus/",
-				"org.apache.tomcat", "tomcat", "");
-		List<String> retrieveVersions = s.retrieveVersions();
+		NexusLuceneSearchService s = new NexusLuceneSearchService("https://artifacts.alfresco.com/nexus/");
+		List<String> retrieveVersions = s.retrieveVersions("org.apache.tomcat", "tomcat", "",
+				ValidAndInvalidClassifier.getDefault());
 		for (String current : retrieveVersions) {
 			System.out.println(current);
 		}
@@ -51,9 +51,9 @@ public class NexusLuceneSearchServiceTest {
 
 	@Test
 	public void testWithQualifier() throws VersionReaderException {
-		NexusLuceneSearchService s = new NexusLuceneSearchService("https://artifacts.alfresco.com/nexus/",
-				"org.apache.tomcat", "tomcat", "tgz", ValidAndInvalidClassifier.fromString("linux"));
-		List<String> retrieveVersions = s.retrieveVersions();
+		NexusLuceneSearchService s = new NexusLuceneSearchService("https://artifacts.alfresco.com/nexus/");
+		List<String> retrieveVersions = s.retrieveVersions("org.apache.tomcat", "tomcat", "tgz",
+				ValidAndInvalidClassifier.fromString("linux"));
 		for (String current : retrieveVersions) {
 			System.out.println(current);
 			assertTrue(current.endsWith("linux.tgz"));
@@ -62,9 +62,9 @@ public class NexusLuceneSearchServiceTest {
 
 	@Test
 	public void testWithNegativeQualifier() throws VersionReaderException {
-		NexusLuceneSearchService s = new NexusLuceneSearchService("https://artifacts.alfresco.com/nexus/",
-				"org.apache.tomcat", "tomcat", "tgz", ValidAndInvalidClassifier.fromString("!linux,!osx"));
-		List<String> retrieveVersions = s.retrieveVersions();
+		NexusLuceneSearchService s = new NexusLuceneSearchService("https://artifacts.alfresco.com/nexus/");
+		List<String> retrieveVersions = s.retrieveVersions("org.apache.tomcat", "tomcat", "tgz",
+				ValidAndInvalidClassifier.fromString("!linux,!osx"));
 		for (String current : retrieveVersions) {
 			System.out.println(current);
 			assertFalse(current.endsWith("linux.tgz"));
@@ -74,9 +74,9 @@ public class NexusLuceneSearchServiceTest {
 
 	@Test
 	public void testWithNotExistentQualifier() throws VersionReaderException {
-		NexusLuceneSearchService s = new NexusLuceneSearchService("https://artifacts.alfresco.com/nexus/",
-				"org.apache.tomcat", "tomcat", "tgz", ValidAndInvalidClassifier.fromString("foobar"));
-		List<String> retrieveVersions = s.retrieveVersions();
+		NexusLuceneSearchService s = new NexusLuceneSearchService("https://artifacts.alfresco.com/nexus/");
+		List<String> retrieveVersions = s.retrieveVersions("org.apache.tomcat", "tomcat", "tgz",
+				ValidAndInvalidClassifier.fromString("foobar"));
 		for (String current : retrieveVersions) {
 			System.out.println(current);
 		}
