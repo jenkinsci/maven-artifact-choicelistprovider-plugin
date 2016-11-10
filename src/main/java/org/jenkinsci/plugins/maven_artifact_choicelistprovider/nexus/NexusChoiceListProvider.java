@@ -10,8 +10,17 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 
+import com.cloudbees.plugins.credentials.CredentialsMatchers;
+import com.cloudbees.plugins.credentials.CredentialsProvider;
+import com.cloudbees.plugins.credentials.common.StandardCredentials;
+import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
+import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
+
 import hudson.Extension;
+import hudson.security.ACL;
 import hudson.util.FormValidation;
+import hudson.util.ListBoxModel;
+import jenkins.model.Jenkins;
 
 public class NexusChoiceListProvider extends AbstractMavenArtifactChoiceListProvider {
 
@@ -36,6 +45,14 @@ public class NexusChoiceListProvider extends AbstractMavenArtifactChoiceListProv
 			return "Nexus Artifact Choice Parameter";
 		}
 
+		public ListBoxModel doFillCredentialsIdItems() {
+			return new StandardListBoxModel().withEmptySelection().withMatching(
+					CredentialsMatchers
+							.anyOf(CredentialsMatchers.instanceOf(StandardUsernamePasswordCredentials.class)),
+					CredentialsProvider.lookupCredentials(StandardCredentials.class, Jenkins.getInstance(),
+							ACL.SYSTEM));
+		}
+		
 		public FormValidation doTest(@QueryParameter String url, @QueryParameter String credentialsId,
 				@QueryParameter String groupId, @QueryParameter String artifactId, @QueryParameter String packaging,
 				@QueryParameter String classifier, @QueryParameter boolean reverseOrder) {

@@ -32,6 +32,11 @@ import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 
 public class NexusLuceneSearchService implements IVersionReader {
 
+	/**
+	 * Default Read Timeout when connecting to Nexus
+	 */
+	private static final int NEXUS_READ_TIMEOUT = 20000;
+
 	private static final String PACKAGING_ALL = "*";
 
 	private static final String LUCENE_SEARCH_SERVICE_URI = "service/local/lucene/search";
@@ -55,11 +60,13 @@ public class NexusLuceneSearchService implements IVersionReader {
 		Client client = Client.create(config);
 
 		if (StringUtils.isNotEmpty(mUserName) && StringUtils.isNotEmpty(mUserPassword)) {
+			LOGGER.fine("setting username to: " + mUserName);
 			client.addFilter(new HTTPBasicAuthFilter(mUserName, mUserPassword));
 		} else {
 			LOGGER.fine("no username AND password provided");
 		}
 
+		client.setReadTimeout(getTimeout());
 		mInstance = client.resource(UriBuilder.fromUri(getURL()).build());
 		mInstance = mInstance.path(LUCENE_SEARCH_SERVICE_URI);
 		// String respAsString = service.path("nexus/service/local/lucene/search")
@@ -105,7 +112,7 @@ public class NexusLuceneSearchService implements IVersionReader {
 		Set<String> retVal = new LinkedHashSet<String>();
 
 		try {
-			// Call the Service
+			LOGGER.info("call nexus service");
 			final PatchedSearchNGResponse xmlResult = getInstance().queryParams(requestParams)
 					.accept(MediaType.APPLICATION_XML).get(PatchedSearchNGResponse.class);
 
@@ -133,8 +140,14 @@ public class NexusLuceneSearchService implements IVersionReader {
 			}
 			throw new VersionReaderException(msg, e);
 		} catch (Exception e) {
-			throw new VersionReaderException("failed to retrieve versions from nexus for r:" + getURL() + ", g:"
-					+ pGroupId + ", a:" + pArtifactId + ", p:" + pPackaging + ", c:" + pClassifier + e.getMessage(), e);
+			if (e instanceof com.sun.jersey.api.client.ClientHandlerException) {
+				throw new VersionReaderException(
+						"Timeout while connecting to your Nexus. Please consider the Jenkins-Proxy settings. If using HTTPs also invalid certificates can be the root cause.",
+						e);
+			} else {
+				throw new VersionReaderException("failed to retrieve versions from nexus for r:" + getURL() + ", g:"
+						+ pGroupId + ", a:" + pArtifactId + ", p:" + pPackaging + ", c:" + pClassifier, e);
+			}
 		}
 		return new ArrayList<String>(retVal);
 	}
@@ -243,4 +256,12 @@ public class NexusLuceneSearchService implements IVersionReader {
 
 	}
 
+	/**
+	 * Return the configured read timeout in milliseconds. Can be overriden in super classes.
+	 * 
+	 * @return timeout in milliseconds
+	 */
+	protected int getTimeout() {
+		return NEXUS_READ_TIMEOUT;
+	}
 }

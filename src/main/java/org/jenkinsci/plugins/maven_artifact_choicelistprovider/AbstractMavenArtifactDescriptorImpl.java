@@ -3,7 +3,6 @@ package org.jenkinsci.plugins.maven_artifact_choicelistprovider;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
-import org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus.NexusLuceneSearchService;
 import org.kohsuke.stapler.QueryParameter;
 
 import com.cloudbees.plugins.credentials.CredentialsParameterDefinition.DescriptorImpl;
@@ -13,14 +12,6 @@ import hudson.util.FormValidation;
 import jp.ikedam.jenkins.plugins.extensible_choice_parameter.ChoiceListProvider;
 
 public abstract class AbstractMavenArtifactDescriptorImpl extends Descriptor<ChoiceListProvider> {
-
-	public FormValidation doCheckUrl(@QueryParameter String url) {
-		if (StringUtils.isBlank(url)) {
-			return FormValidation.error("The server URL cannot be empty");
-		}
-
-		return FormValidation.ok();
-	}
 
 	public FormValidation doCheckArtifactId(@QueryParameter String artifactId) {
 		if (StringUtils.isBlank(artifactId)) {
@@ -60,7 +51,7 @@ public abstract class AbstractMavenArtifactDescriptorImpl extends Descriptor<Cho
 			if (entriesFromURL.isEmpty()) {
 				return FormValidation.ok("(Working, but no Entries found)");
 			}
-			return FormValidation.ok(StringUtils.join(entriesFromURL.keySet(), '\n'));
+			return FormValidation.ok(StringUtils.join(entriesFromURL.values(), '\n'));
 		} catch (Exception e) {
 			return FormValidation.error("error reading versions from url:" + e.getMessage());
 		}
