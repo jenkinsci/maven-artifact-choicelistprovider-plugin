@@ -6,6 +6,7 @@ import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.AbstractMavenArtifactChoiceListProvider;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.AbstractMavenArtifactDescriptorImpl;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.IVersionReader;
+import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 
@@ -16,6 +17,7 @@ public class NexusChoiceListProvider extends AbstractMavenArtifactChoiceListProv
 
 	private String url;
 
+	@DataBoundConstructor
 	public NexusChoiceListProvider(String artifactId) {
 		super(artifactId);
 	}

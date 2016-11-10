@@ -64,9 +64,7 @@ public class MavenCentralSearchService implements IVersionReader {
 			Set<String> retVal = new LinkedHashSet<String>();
 			if (containsResponses(responseObj)) {
 				for (ResponseDoc current : responseObj.getResponse().getDocs()) {
-
-					// Packaging from MavenCentral services always start with a "."
-					retVal.addAll(createItemURLs(current, "." + pPackaging));
+					retVal.addAll(createItemURLs(current, pPackaging));
 				}
 			}
 
@@ -97,7 +95,11 @@ public class MavenCentralSearchService implements IVersionReader {
 
 		// packaging
 		for (String currentEC : pResponseEntry.getEc()) {
-			if (StringUtils.isEmpty(pRequestedPackaging.trim()) || pRequestedPackaging.equalsIgnoreCase(currentEC)) {
+
+			// in case the packaging is not empty, the equals has to check the given package plus "."
+			// as mavencentral is returning packages with a leading dot.
+			if (StringUtils.isEmpty(pRequestedPackaging.trim())
+					|| currentEC.equalsIgnoreCase("." + pRequestedPackaging)) {
 				retVal.add(sb.toString() + currentEC);
 			} else {
 				LOGGER.fine("ignoring packaging '" + currentEC + "', accepted is: '" + pRequestedPackaging + "'");

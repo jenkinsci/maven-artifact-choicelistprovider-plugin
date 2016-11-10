@@ -6,8 +6,10 @@ import org.jenkinsci.plugins.maven_artifact_choicelistprovider.AbstractMavenArti
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.AbstractMavenArtifactDescriptorImpl;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.IVersionReader;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.QueryParameter;
 
 import hudson.Extension;
+import hudson.util.FormValidation;
 
 public class MavenCentralChoiceListProvider extends AbstractMavenArtifactChoiceListProvider {
 
@@ -28,6 +30,13 @@ public class MavenCentralChoiceListProvider extends AbstractMavenArtifactChoiceL
 		@Override
 		public String getDisplayName() {
 			return "MavenCentral Artifact Choice Parameter";
+		}
+		
+		public FormValidation doTest(@QueryParameter String url, @QueryParameter String credentialsId,
+				@QueryParameter String groupId, @QueryParameter String artifactId, @QueryParameter String packaging,
+				@QueryParameter String classifier, @QueryParameter boolean reverseOrder) {
+			final IVersionReader service = new MavenCentralSearchService();
+			return super.performTest(service, credentialsId, groupId, artifactId, packaging, classifier, reverseOrder);
 		}
 
 		@Override
