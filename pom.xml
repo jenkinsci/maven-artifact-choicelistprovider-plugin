@@ -110,7 +110,7 @@
 	<scm>
 		<connection>scm:git:git://github.com/phreakadelle/jenkins-extensible-choiceprovider-url-provider.git</connection>
 		<developerConnection>scm:git:git@phreakadelle/jenkins-extensible-choiceprovider-url-provider.git</developerConnection>
-		<url>https://github.com/phreakadelle/${$project.artifactId}</url>
+		<url>https://github.com/phreakadelle/${project.artifactId}-plugin</url>
 	</scm>
 	<repositories>
 		<repository>
