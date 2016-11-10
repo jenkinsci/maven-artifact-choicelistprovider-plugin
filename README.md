@@ -23,6 +23,10 @@ Licensed under the [MIT License (MIT)](https://github.com/heremaps/buildrotator-
 
 ## Changelog
 
+### 10. November 2016 - 1.0.1
+* ADD: New Feature to use the search.maven.org REST API to display artifacts in Jenkins
+* FIX: Some changes to support the official release of this software
+
 ### 09. November 2016 - 1.0.0
 * ADD: Plugin is released as an official Jenkins Plugin
 * FIX: Changed unit tests to use a public nexus for testing
