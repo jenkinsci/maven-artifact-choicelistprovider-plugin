@@ -15,6 +15,12 @@ We are using this plugin to let our QA department choose between the various ava
 ## Links
 * Thanks for the hint, but this plugin is very simliar to mine https://github.com/jenkinsci/repository-connector-plugin
 
+## Authors
+Stephan Watermeyer
+
+## License
+Licensed under the [MIT License (MIT)](https://github.com/heremaps/buildrotator-plugin/blob/master/LICENSE).
+
 ## Changelog
 
 ### 09. November 2016 - 1.0.0
