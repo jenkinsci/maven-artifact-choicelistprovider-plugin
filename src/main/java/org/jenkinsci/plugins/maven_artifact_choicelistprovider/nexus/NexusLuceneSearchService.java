@@ -35,7 +35,7 @@ public class NexusLuceneSearchService implements IVersionReader {
 	/**
 	 * Default Read Timeout when connecting to Nexus
 	 */
-	private static final int NEXUS_READ_TIMEOUT = 20000;
+	private static final int NEXUS_READ_TIMEOUT = 5000;
 
 	private static final String PACKAGING_ALL = "*";
 
@@ -66,14 +66,10 @@ public class NexusLuceneSearchService implements IVersionReader {
 			LOGGER.fine("no username AND password provided");
 		}
 
-		client.setReadTimeout(getTimeout());
+//		client.setReadTimeout(getTimeout());
 		mInstance = client.resource(UriBuilder.fromUri(getURL()).build());
 		mInstance = mInstance.path(LUCENE_SEARCH_SERVICE_URI);
-		// String respAsString = service.path("nexus/service/local/lucene/search")
-		// .queryParam("g", "com.wincornixdorf.pnc.releases").queryParam("a", "pnc-brass-maven")
-		// .accept(MediaType.APPLICATION_XML).get(String.class);
-		// System.out.println(respAsString);
-		//
+		LOGGER.info("lucene search service at: " + mInstance.getURI().toString());
 	}
 
 	public List<String> retrieveVersions(String pGroupId, String pArtifactId, String pPackaging)
@@ -257,7 +253,7 @@ public class NexusLuceneSearchService implements IVersionReader {
 	}
 
 	/**
-	 * Return the configured read timeout in milliseconds. Can be overriden in super classes.
+	 * Return the configured read timeout in milliseconds. Can be overwritten in super classes.
 	 * 
 	 * @return timeout in milliseconds
 	 */

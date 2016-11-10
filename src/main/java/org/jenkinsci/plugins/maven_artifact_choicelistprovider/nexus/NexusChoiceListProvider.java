@@ -26,6 +26,7 @@ import jenkins.model.Jenkins;
 public class NexusChoiceListProvider extends AbstractMavenArtifactChoiceListProvider {
 
 	private String url;
+	private String credentialsId;
 
 	@DataBoundConstructor
 	public NexusChoiceListProvider(String artifactId) {
@@ -73,19 +74,6 @@ public class NexusChoiceListProvider extends AbstractMavenArtifactChoiceListProv
 			return readURL(pService, pGroupId, pArtifactId, pPackaging, pClassifier, pReverseOrder);
 		}
 
-		/**
-		 * 
-		 * @param pCredentialId
-		 * @return the credentials for the ID or NULL
-		 */
-		static UsernamePasswordCredentialsImpl getCredentials(final String pCredentialId) {
-			return CredentialsMatchers
-					.firstOrNull(
-							CredentialsProvider.lookupCredentials(UsernamePasswordCredentialsImpl.class,
-									Jenkins.getInstance(), ACL.SYSTEM),
-							CredentialsMatchers.allOf(CredentialsMatchers.withId(pCredentialId)));
-		}
-
 		public FormValidation doCheckUrl(@QueryParameter String url) {
 			if (StringUtils.isBlank(url)) {
 				return FormValidation.error("The nexus URL cannot be empty");
@@ -95,8 +83,36 @@ public class NexusChoiceListProvider extends AbstractMavenArtifactChoiceListProv
 		}
 	}
 
-	public String getUrl() {
-		return url;
+	/**
+	 * 
+	 * @param pCredentialId
+	 * @return the credentials for the ID or NULL
+	 */
+	static UsernamePasswordCredentialsImpl getCredentials(final String pCredentialId) {
+		return CredentialsMatchers
+				.firstOrNull(
+						CredentialsProvider.lookupCredentials(UsernamePasswordCredentialsImpl.class,
+								Jenkins.getInstance(), ACL.SYSTEM),
+						CredentialsMatchers.allOf(CredentialsMatchers.withId(pCredentialId)));
+	}
+
+	@Override
+	public IVersionReader createServiceInstance() {
+		final IVersionReader retVal = new NexusLuceneSearchService(url);
+		final UsernamePasswordCredentialsImpl c = getCredentials(getCredentialsId());
+		if (c != null) {
+			retVal.setCredentials(c.getUsername(), c.getPassword().getPlainText());
+		}
+		return retVal;
+	}
+
+	@DataBoundSetter
+	public void setCredentialsId(String credentialsId) {
+		this.credentialsId = credentialsId;
+	}
+
+	public String getCredentialsId() {
+		return credentialsId;
 	}
 
 	@DataBoundSetter
@@ -104,9 +120,8 @@ public class NexusChoiceListProvider extends AbstractMavenArtifactChoiceListProv
 		this.url = StringUtils.trim(url);
 	}
 
-	@Override
-	public IVersionReader getServiceInstance() {
-		return new NexusLuceneSearchService(url);
+	public String getUrl() {
+		return url;
 	}
 
 }

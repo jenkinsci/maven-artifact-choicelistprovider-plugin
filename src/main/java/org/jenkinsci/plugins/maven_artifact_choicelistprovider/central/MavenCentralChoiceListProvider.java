@@ -48,7 +48,7 @@ public class MavenCentralChoiceListProvider extends AbstractMavenArtifactChoiceL
 
 	}
 
-	public IVersionReader getServiceInstance() {
+	public IVersionReader createServiceInstance() {
 		return new MavenCentralSearchService();
 	}
 

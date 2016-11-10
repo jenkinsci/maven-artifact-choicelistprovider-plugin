@@ -25,7 +25,6 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
 	private String packaging;
 	private String classifier;
 	private boolean reverseOrder;
-	private String credentialsId;
 
 	protected Map<String, String> mChoices;
 
@@ -37,7 +36,7 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
 	@Override
 	public List<String> getChoiceList() {
 		if (mChoices == null) {
-			mChoices = readURL(getServiceInstance(), getGroupId(), getArtifactId(), getPackaging(), getClassifier(),
+			mChoices = readURL(createServiceInstance(), getGroupId(), getArtifactId(), getPackaging(), getClassifier(),
 					getReverseOrder());
 		}
 		// FIXME: CHANGE-1: Return only the keys, that are shorter then the values
@@ -45,7 +44,7 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
 		return new ArrayList<String>(mChoices.values());
 	}
 
-	public abstract IVersionReader getServiceInstance();
+	public abstract IVersionReader createServiceInstance();
 
 	/**
 	 * FIXME: CHANGE-1: Needs to be implemented. But currently i dont know how to update the environment variable to use
@@ -89,8 +88,6 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
 		return retVal;
 	}
 
-	
-
 	/**
 	 * Cuts of the first parts of the URL and only returns a smaller set of items.
 	 * 
@@ -131,11 +128,6 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
 		this.reverseOrder = reverseOrder;
 	}
 
-	@DataBoundSetter
-	public void setCredentialsId(String credentialsId) {
-		this.credentialsId = credentialsId;
-	}
-
 	public String getGroupId() {
 		return groupId;
 	}
@@ -154,10 +146,6 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
 
 	public boolean getReverseOrder() {
 		return reverseOrder;
-	}
-
-	public String getCredentialsId() {
-		return credentialsId;
 	}
 
 }
