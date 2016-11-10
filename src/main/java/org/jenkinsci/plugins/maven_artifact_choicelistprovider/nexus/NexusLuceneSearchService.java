@@ -66,15 +66,10 @@ public class NexusLuceneSearchService implements IVersionReader {
 			LOGGER.fine("no username AND password provided");
 		}
 
-//		client.setReadTimeout(getTimeout());
+		client.setReadTimeout(getTimeout());
 		mInstance = client.resource(UriBuilder.fromUri(getURL()).build());
 		mInstance = mInstance.path(LUCENE_SEARCH_SERVICE_URI);
 		LOGGER.info("lucene search service at: " + mInstance.getURI().toString());
-	}
-
-	public List<String> retrieveVersions(String pGroupId, String pArtifactId, String pPackaging)
-			throws VersionReaderException {
-		return retrieveVersions(pGroupId, pArtifactId, pPackaging, ValidAndInvalidClassifier.getDefault());
 	}
 
 	/**

@@ -19,7 +19,6 @@ import org.jenkinsci.plugins.maven_artifact_choicelistprovider.ValidAndInvalidCl
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.VersionReaderException;
 
 /**
- * 
  * Maven Central offers a search service located at {@link #REPO_SEARCH_SERVICE_URL} which can be used to query the
  * maven central repository via a RESTful interface. This class makes use of this API and return a list of artifacts.
  * <br/>
@@ -28,8 +27,7 @@ import org.jenkinsci.plugins.maven_artifact_choicelistprovider.VersionReaderExce
  * searching and retrieving the artifacts. <br/>
  * Anyway, if there should be another repository using the same API, this class
  * can be inherited and {@link #getSearchURL()} and {@link #getRetrieveURL()} and {@link #createItemURLs(ResponseDoc)}
- * can be
- * overriden.
+ * can be overriden.
  *
  * @author stephan.watermeyer, Diebold Nixdorf
  */
@@ -41,27 +39,26 @@ public class MavenCentralSearchService implements IVersionReader {
 
 	private static final Logger LOGGER = Logger.getLogger(MavenCentralSearchService.class.getName());
 
+	/** A valid header needs to be set */
 	private static final String USER_AGENT = "Mozilla/5.0";
 
-	@Override
-	public List<String> retrieveVersions(String pGroupId, String pArtifactId, String pPackaging)
-			throws VersionReaderException {
-		return retrieveVersions(pGroupId, pArtifactId, pPackaging, ValidAndInvalidClassifier.getDefault());
-	}
+	/** Number of results returned from the API */
+	private static final int MAX_SEARCH_RESULTS = 100;
 
 	@Override
 	public List<String> retrieveVersions(String pGroupId, String pArtifactId, String pPackaging,
 			ValidAndInvalidClassifier pClassifier) throws VersionReaderException {
 		try {
-			String targetURL = createURL(pGroupId, pArtifactId, pPackaging, pClassifier);
+			final String targetURL = createURL(pGroupId, pArtifactId, pPackaging, pClassifier);
+			LOGGER.fine("target url:" + targetURL);
 
-			String response = sendAndReceive(targetURL.toString());
+			final String response = sendAndReceive(targetURL.toString());
 			if (LOGGER.isLoggable(Level.FINEST)) {
 				LOGGER.finest(response);
 			}
 
-			MavenCentralResponseModel responseObj = MavenCentralResponseParser.parse(response);
-			Set<String> retVal = new LinkedHashSet<String>();
+			final MavenCentralResponseModel responseObj = MavenCentralResponseParser.parse(response);
+			final Set<String> retVal = new LinkedHashSet<String>();
 			if (containsResponses(responseObj)) {
 				for (ResponseDoc current : responseObj.getResponse().getDocs()) {
 					retVal.addAll(createItemURLs(current, pPackaging));
@@ -202,7 +199,7 @@ public class MavenCentralSearchService implements IVersionReader {
 		// targetURL.append("p:\"" + mPackaging + "\"+AND+");
 		// }
 
-		targetURL.append("&rows=20&core=gav");
+		targetURL.append("&rows=" + getSearchLimit() + "&core=gav");
 
 		// Replace too many AND
 		String retVal = targetURL.toString();
@@ -237,6 +234,15 @@ public class MavenCentralSearchService implements IVersionReader {
 	 */
 	public String getRetrieveURL() {
 		return REPO_RETRIEVE_URL;
+	}
+
+	/**
+	 * The maximum number of results that are displayed.
+	 * 
+	 * @return
+	 */
+	int getSearchLimit() {
+		return MAX_SEARCH_RESULTS;
 	}
 
 }

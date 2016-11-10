@@ -4,9 +4,6 @@ import java.util.List;
 
 public interface IVersionReader {
 
-	public List<String> retrieveVersions(String pGroupId, String pArtifactId, String pPackaging)
-			throws VersionReaderException;
-
 	public List<String> retrieveVersions(String pGroupId, String pArtifactId, String pPackaging,
 			ValidAndInvalidClassifier pAcceptedClassifier) throws VersionReaderException;
 

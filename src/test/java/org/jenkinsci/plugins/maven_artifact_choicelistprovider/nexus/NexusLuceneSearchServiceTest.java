@@ -42,7 +42,8 @@ public class NexusLuceneSearchServiceTest {
 	@Test
 	public void testWithoutExplicitQualifier() throws VersionReaderException {
 		NexusLuceneSearchService s = new NexusLuceneSearchService("https://artifacts.alfresco.com/nexus/");
-		List<String> retrieveVersions = s.retrieveVersions("org.apache.tomcat", "tomcat", "");
+		List<String> retrieveVersions = s.retrieveVersions("org.apache.tomcat", "tomcat", "",
+				ValidAndInvalidClassifier.getDefault());
 		for (String current : retrieveVersions) {
 			System.out.println(current);
 		}
