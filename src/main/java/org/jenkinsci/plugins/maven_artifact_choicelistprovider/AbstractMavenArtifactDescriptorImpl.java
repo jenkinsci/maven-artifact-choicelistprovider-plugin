@@ -36,17 +36,17 @@ public abstract class AbstractMavenArtifactDescriptorImpl extends Descriptor<Cho
 		return FormValidation.ok();
 	}
 
-	public FormValidation performTest(final IVersionReader pService, @QueryParameter String credentialsId,
-			@QueryParameter String groupId, @QueryParameter String artifactId, @QueryParameter String packaging,
-			@QueryParameter String classifier, @QueryParameter boolean reverseOrder) {
+	public FormValidation performTest(final IVersionReader pService, @QueryParameter String groupId,
+			@QueryParameter String artifactId, @QueryParameter String packaging, @QueryParameter String classifier,
+			@QueryParameter boolean reverseOrder) {
 		if (StringUtils.isEmpty(packaging) && !StringUtils.isEmpty(classifier)) {
 			return FormValidation.error(
 					"You have choosen an empty Packaging configuration but have configured a Classifier. Please either define a Packaging value or remove the Classifier");
 		}
 
 		try {
-			final Map<String, String> entriesFromURL = wrapTestConnection(pService, credentialsId, groupId, artifactId,
-					packaging, classifier, reverseOrder);
+			final Map<String, String> entriesFromURL = wrapTestConnection(pService, groupId, artifactId, packaging,
+					classifier, reverseOrder);
 
 			if (entriesFromURL.isEmpty()) {
 				return FormValidation.ok("(Working, but no Entries found)");
@@ -72,7 +72,7 @@ public abstract class AbstractMavenArtifactDescriptorImpl extends Descriptor<Cho
 	 * @param reverseOrder
 	 * @return
 	 */
-	protected abstract Map<String, String> wrapTestConnection(IVersionReader service, String credentialsId,
-			String groupId, String artifactId, String packaging, String classifier, boolean reverseOrder);
+	protected abstract Map<String, String> wrapTestConnection(IVersionReader service, String groupId, String artifactId,
+			String packaging, String classifier, boolean reverseOrder);
 
 }

@@ -31,29 +31,25 @@ public class MavenCentralChoiceListProvider extends AbstractMavenArtifactChoiceL
 		public String getDisplayName() {
 			return "MavenCentral Artifact Choice Parameter";
 		}
-		
-		public FormValidation doTest(@QueryParameter String url, @QueryParameter String credentialsId,
-				@QueryParameter String groupId, @QueryParameter String artifactId, @QueryParameter String packaging,
-				@QueryParameter String classifier, @QueryParameter boolean reverseOrder) {
+
+		public FormValidation doTest(@QueryParameter String url, @QueryParameter String groupId,
+				@QueryParameter String artifactId, @QueryParameter String packaging, @QueryParameter String classifier,
+				@QueryParameter boolean reverseOrder) {
 			final IVersionReader service = new MavenCentralSearchService();
-			return super.performTest(service, credentialsId, groupId, artifactId, packaging, classifier, reverseOrder);
+			return super.performTest(service, groupId, artifactId, packaging, classifier, reverseOrder);
 		}
 
 		@Override
-		protected Map<String, String> wrapTestConnection(IVersionReader service, String pCredentialsId, String pGroupId,
-				String pArtifactId, String pPackaging, String pClassifier, boolean pReverseOrder) {
-			return readURL(new MavenCentralSearchService(), pCredentialsId, pGroupId, pArtifactId, pPackaging,
-					pClassifier, pReverseOrder);
+		protected Map<String, String> wrapTestConnection(IVersionReader service, String pGroupId, String pArtifactId,
+				String pPackaging, String pClassifier, boolean pReverseOrder) {
+			return readURL(new MavenCentralSearchService(), pGroupId, pArtifactId, pPackaging, pClassifier,
+					pReverseOrder);
 		}
 
 	}
 
-	public static IVersionReader getStaticServiceInstance() {
-		return new MavenCentralSearchService();
-	}
-
 	public IVersionReader getServiceInstance() {
-		return getStaticServiceInstance();
+		return new MavenCentralSearchService();
 	}
 
 }

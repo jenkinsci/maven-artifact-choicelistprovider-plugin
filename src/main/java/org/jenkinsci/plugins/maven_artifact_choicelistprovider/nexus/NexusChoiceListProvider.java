@@ -15,6 +15,7 @@ import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.common.StandardCredentials;
 import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
+import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl;
 
 import hudson.Extension;
 import hudson.security.ACL;
@@ -52,18 +53,37 @@ public class NexusChoiceListProvider extends AbstractMavenArtifactChoiceListProv
 					CredentialsProvider.lookupCredentials(StandardCredentials.class, Jenkins.getInstance(),
 							ACL.SYSTEM));
 		}
-		
+
 		public FormValidation doTest(@QueryParameter String url, @QueryParameter String credentialsId,
 				@QueryParameter String groupId, @QueryParameter String artifactId, @QueryParameter String packaging,
 				@QueryParameter String classifier, @QueryParameter boolean reverseOrder) {
 			final IVersionReader service = new NexusLuceneSearchService(url);
-			return super.performTest(service, credentialsId, groupId, artifactId, packaging, classifier, reverseOrder);
+
+			// If configured, set User Credentials
+			final UsernamePasswordCredentialsImpl c = getCredentials(credentialsId);
+			if (c != null) {
+				service.setCredentials(c.getUsername(), c.getPassword().getPlainText());
+			}
+			return super.performTest(service, groupId, artifactId, packaging, classifier, reverseOrder);
 		}
 
 		@Override
-		protected Map<String, String> wrapTestConnection(IVersionReader pService, String pCredentialsId, String pGroupId,
-				String pArtifactId, String pPackaging, String pClassifier, boolean pReverseOrder) {
-			return readURL(pService, pCredentialsId, pGroupId, pArtifactId, pPackaging, pClassifier, pReverseOrder);
+		protected Map<String, String> wrapTestConnection(IVersionReader pService, String pGroupId, String pArtifactId,
+				String pPackaging, String pClassifier, boolean pReverseOrder) {
+			return readURL(pService, pGroupId, pArtifactId, pPackaging, pClassifier, pReverseOrder);
+		}
+
+		/**
+		 * 
+		 * @param pCredentialId
+		 * @return the credentials for the ID or NULL
+		 */
+		static UsernamePasswordCredentialsImpl getCredentials(final String pCredentialId) {
+			return CredentialsMatchers
+					.firstOrNull(
+							CredentialsProvider.lookupCredentials(UsernamePasswordCredentialsImpl.class,
+									Jenkins.getInstance(), ACL.SYSTEM),
+							CredentialsMatchers.allOf(CredentialsMatchers.withId(pCredentialId)));
 		}
 
 		public FormValidation doCheckUrl(@QueryParameter String url) {

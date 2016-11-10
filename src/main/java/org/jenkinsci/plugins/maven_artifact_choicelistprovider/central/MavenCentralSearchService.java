@@ -79,9 +79,15 @@ public class MavenCentralSearchService implements IVersionReader {
 		}
 	}
 
+	/**
+	 * 
+	 * @param pResponseEntry
+	 * @param pRequestedPackaging
+	 * @return The items to add, but never NULL.
+	 */
 	List<String> createItemURLs(final ResponseDoc pResponseEntry, final String pRequestedPackaging) {
-		List<String> retVal = new ArrayList<String>();
-		StringBuilder sb = new StringBuilder();
+		final List<String> retVal = new ArrayList<String>();
+		final StringBuilder sb = new StringBuilder();
 
 		// base url
 		sb.append(getRetrieveURL());
@@ -95,11 +101,7 @@ public class MavenCentralSearchService implements IVersionReader {
 
 		// packaging
 		for (String currentEC : pResponseEntry.getEc()) {
-
-			// in case the packaging is not empty, the equals has to check the given package plus "."
-			// as mavencentral is returning packages with a leading dot.
-			if (StringUtils.isEmpty(pRequestedPackaging.trim())
-					|| currentEC.equalsIgnoreCase("." + pRequestedPackaging)) {
+			if (validPackaging(currentEC, pRequestedPackaging)) {
 				retVal.add(sb.toString() + currentEC);
 			} else {
 				LOGGER.fine("ignoring packaging '" + currentEC + "', accepted is: '" + pRequestedPackaging + "'");
@@ -107,6 +109,24 @@ public class MavenCentralSearchService implements IVersionReader {
 		}
 
 		return retVal;
+	}
+
+	/**
+	 * Validates the given packaging and will figure out if the packaging is accepted.
+	 * 
+	 * @param pRequestedPackaging
+	 * @param pCurrentPackaging
+	 * @return TRUE if pRequestedPackaging is empty or pRequestedPackaging equals pCurrentPackaging. Will add a leading
+	 *         "." to pCurrentPackaging
+	 */
+	boolean validPackaging(final String pCurrentPackaging, final String pRequestedPackaging) {
+		if (StringUtils.isEmpty(pRequestedPackaging.trim())) {
+			return true;
+		}
+
+		// in case the packaging is not empty, the equals has to check the given package plus "."
+		// as MavenCentral API is returning packages with a leading dot.
+		return pCurrentPackaging.equalsIgnoreCase("." + pRequestedPackaging);
 	}
 
 	boolean containsResponses(final MavenCentralResponseModel pResponse) {

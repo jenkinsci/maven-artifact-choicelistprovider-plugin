@@ -11,14 +11,8 @@ import java.util.logging.Logger;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundSetter;
 
-import com.cloudbees.plugins.credentials.CredentialsMatchers;
-import com.cloudbees.plugins.credentials.CredentialsProvider;
-import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl;
-
 import hudson.ExtensionPoint;
 import hudson.model.AbstractProject;
-import hudson.security.ACL;
-import jenkins.model.Jenkins;
 import jp.ikedam.jenkins.plugins.extensible_choice_parameter.ChoiceListProvider;
 import jp.ikedam.jenkins.plugins.extensible_choice_parameter.ExtensibleChoiceParameterDefinition;
 
@@ -43,14 +37,14 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
 	@Override
 	public List<String> getChoiceList() {
 		if (mChoices == null) {
-			mChoices = readURL(getServiceInstance(), getCredentialsId(), getGroupId(), getArtifactId(), getPackaging(),
-					getClassifier(), getReverseOrder());
+			mChoices = readURL(getServiceInstance(), getGroupId(), getArtifactId(), getPackaging(), getClassifier(),
+					getReverseOrder());
 		}
 		// FIXME: CHANGE-1: Return only the keys, that are shorter then the values
 		// return new ArrayList<String>(mChoices.keySet());
 		return new ArrayList<String>(mChoices.values());
 	}
-	
+
 	public abstract IVersionReader getServiceInstance();
 
 	/**
@@ -71,18 +65,11 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
 		// FIXME: CHANGE-1: How to update the build env variables to replace the current parameter? I dont know...
 	}
 
-	public static Map<String, String> readURL(final IVersionReader pInstance, final String pCredentialsId,
-			final String pGroupId, final String pArtifactId, final String pPackaging, String pClassifier,
-			final boolean pReverseOrder) {
+	public static Map<String, String> readURL(final IVersionReader pInstance, final String pGroupId,
+			final String pArtifactId, final String pPackaging, String pClassifier, final boolean pReverseOrder) {
 		Map<String, String> retVal = new LinkedHashMap<String, String>();
 		try {
 			ValidAndInvalidClassifier classifierBox = ValidAndInvalidClassifier.fromString(pClassifier);
-
-			// If configured, set User Credentials
-			final UsernamePasswordCredentialsImpl c = getCredentials(pCredentialsId);
-			if (c != null) {
-				pInstance.setCredentials(c.getUsername(), c.getPassword().getPlainText());
-			}
 
 			List<String> choices = pInstance.retrieveVersions(pGroupId, pArtifactId, pPackaging, classifierBox);
 
@@ -102,18 +89,7 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
 		return retVal;
 	}
 
-	/**
-	 * 
-	 * @param pCredentialId
-	 * @return the credentials for the ID or NULL
-	 */
-	static UsernamePasswordCredentialsImpl getCredentials(final String pCredentialId) {
-		return CredentialsMatchers
-				.firstOrNull(
-						CredentialsProvider.lookupCredentials(UsernamePasswordCredentialsImpl.class,
-								Jenkins.getInstance(), ACL.SYSTEM),
-						CredentialsMatchers.allOf(CredentialsMatchers.withId(pCredentialId)));
-	}
+	
 
 	/**
 	 * Cuts of the first parts of the URL and only returns a smaller set of items.
