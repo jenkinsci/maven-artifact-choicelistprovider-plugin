@@ -7,7 +7,7 @@ With this extension its possible to use the Lucene Service from a Nexus Reposito
 This plugin provides a build parameter and will let the user choose a version from the available artifact versions in Nexus. The Plugin will return the full URL of the choosen artifact, so that it will be available during the build, i.E. you can retrieve the artifact by using "wget"
 
 ### Example
-We are using this plugin to let our QA department choose between the various available versions of our software which then is downloaded and installed on the testserver.
+We are using this plugin to let our QA department choose between the various available versions of our software. In combination with the "Publish via SSH" plugin the choosen artifact URL is passed to the testserver which is then able to retrieve the artifact and install it.
 
 ## Configuration Example
 ![Alt text](/src/site/resources/project-config-1.jpg?raw=true "Example Project Configuration")
@@ -16,12 +16,16 @@ We are using this plugin to let our QA department choose between the various ava
 * Thanks for the hint, but this plugin is very simliar to mine https://github.com/jenkinsci/repository-connector-plugin
 
 ## Authors
-Stephan Watermeyer
+Stephan Watermeyer <stephan@phreakadelle.de>
 
 ## License
 Licensed under the [MIT License (MIT)](https://github.com/heremaps/buildrotator-plugin/blob/master/LICENSE).
 
 ## Changelog
+
+### 11. November 2016 - 1.0.2
+* ADD: New dependency to extensible-choice-plugin in version 1.3.3
+* FIX: POM Update 
 
 ### 10. November 2016 - 1.0.1
 * ADD: New Feature to use the search.maven.org REST API to display artifacts in Jenkins
