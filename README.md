@@ -1,4 +1,7 @@
 # MavenArtifact ChoiceListProvider
+## Official Documentation
+* https://wiki.jenkins-ci.org/display/JENKINS/Maven+Artifact+ChoiceListProvider+Plugin
+
 ## What is this?
 This Plugin adds an additional ChoiceListProvider to famous <a href="https://wiki.jenkins-ci.org/display/JENKINS/Extensible+Choice+Parameter+plugin">Extensible Choice Parameter</a> Plugin.
 
