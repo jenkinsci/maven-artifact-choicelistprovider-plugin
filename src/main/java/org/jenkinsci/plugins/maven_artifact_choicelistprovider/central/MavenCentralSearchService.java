@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -33,7 +34,11 @@ import org.jenkinsci.plugins.maven_artifact_choicelistprovider.VersionReaderExce
  */
 public class MavenCentralSearchService implements IVersionReader {
 
+
 	public static final String REPO_RETRIEVE_URL = "https://repo1.maven.org/maven2/";
+	
+	/** Expected Charset for MavenCentral response */
+	private static final Charset UTF8 = Charset.forName("UTF-8");
 
 	public static final String REPO_SEARCH_SERVICE_URL = "http://search.maven.org/solrsearch/";
 
@@ -155,7 +160,7 @@ public class MavenCentralSearchService implements IVersionReader {
 				throw new VersionReaderException("server replied with an error: " + responseCode);
 			}
 
-			BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+			BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(),  UTF8));
 			String inputLine;
 			StringBuffer retVal = new StringBuffer();
 
@@ -172,8 +177,8 @@ public class MavenCentralSearchService implements IVersionReader {
 		}
 	}
 
-	private String createURL(String pGroupId, String pArtifactId, String pPackaging,
-			ValidAndInvalidClassifier pClassifier) {
+	private String createURL(final String pGroupId, final String pArtifactId, final String pPackaging,
+			final ValidAndInvalidClassifier pClassifier) {
 		StringBuilder targetURL = new StringBuilder();
 		targetURL.append(getSearchURL());
 		targetURL.append("select?q=");
@@ -186,7 +191,7 @@ public class MavenCentralSearchService implements IVersionReader {
 			targetURL.append("a:\"" + pArtifactId + "\"+AND+");
 		}
 
-		if (!"".equals(pClassifier) && !pClassifier.getValid().isEmpty()) {
+		if (pClassifier != null && !pClassifier.getValid().isEmpty()) {
 			targetURL.append("c:\"");
 			for (String currentClassifier : pClassifier.getValid()) {
 				targetURL.append(currentClassifier);
