@@ -40,6 +40,28 @@ public class NexusLuceneSearchServiceTest {
 	}
 
 	@Test
+	public void testWithDavis() throws VersionReaderException {
+		try {
+			NexusLuceneSearchService s = new NexusLuceneSearchService("https://davis.wincor-nixdorf.com/nexus");
+			s.setCredentials("q+LII+/k", "MWjotd7d2MJgHvmWt+OAXYaZhphi5rMZe+3jB2y2mN2r");
+			List<String> retrieveVersions = s.retrieveVersions("com.wincornixdorf.lbg.releases",
+					"lbg-devkit-ci", "tar.gz", ValidAndInvalidClassifier.getDefault());
+			for (String current : retrieveVersions) {
+				System.out.println(current);
+			}
+			
+			System.out.println("---");
+			retrieveVersions = s.retrieveVersions("com.wincornixdorf.hsbc.releases",
+					"hsbc-maven-release", "tar.gz", ValidAndInvalidClassifier.getDefault());
+			for (String current : retrieveVersions) {
+				System.out.println(current);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Test
 	public void testWithoutExplicitQualifier() throws VersionReaderException {
 		NexusLuceneSearchService s = new NexusLuceneSearchService("https://artifacts.alfresco.com/nexus/");
 		List<String> retrieveVersions = s.retrieveVersions("org.apache.tomcat", "tomcat", "",

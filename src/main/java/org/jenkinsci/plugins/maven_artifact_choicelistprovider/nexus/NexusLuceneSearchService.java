@@ -1,10 +1,8 @@
 package org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -21,7 +19,6 @@ import org.jenkinsci.plugins.maven_artifact_choicelistprovider.VersionReaderExce
 import org.sonatype.nexus.rest.model.NexusNGArtifact;
 import org.sonatype.nexus.rest.model.NexusNGArtifactHit;
 import org.sonatype.nexus.rest.model.NexusNGArtifactLink;
-import org.sonatype.nexus.rest.model.NexusNGRepositoryDetail;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.UniformInterfaceException;
@@ -112,8 +109,7 @@ public class NexusLuceneSearchService implements IVersionReader {
 			} else if (xmlResult.getTotalCount() == 0) {
 				LOGGER.info("response from Nexus does not contain any results.");
 			} else {
-				final Map<String, String> repoURLs = retrieveRepositoryURLs(xmlResult.getRepoDetails());
-				retVal = parseResponse(xmlResult, repoURLs, pPackaging, pClassifier);
+				retVal = parseResponse(xmlResult, pPackaging, pClassifier);
 			}
 		} catch (UniformInterfaceException e) {
 			final String msg;
@@ -143,32 +139,30 @@ public class NexusLuceneSearchService implements IVersionReader {
 		return new ArrayList<String>(retVal);
 	}
 
-	Set<String> parseResponse(final PatchedSearchNGResponse pXMLResult, final Map<String, String> pRepoURLs,
-			final String pPackaging, final ValidAndInvalidClassifier pClassifier) {
+	/**
+	 * Parses the XML response from Nexus and creates a list of links where the artifacts can be downloadad.
+	 * 
+	 * @param pXMLResult
+	 * @param pPackaging
+	 * @param pClassifier
+	 * @return a unique list of URLs that are matching the search criteria, sorted by the order of the Nexus service.
+	 */
+	Set<String> parseResponse(final PatchedSearchNGResponse pXMLResult, final String pPackaging,
+			final ValidAndInvalidClassifier pClassifier) {
 		// Use a Map instead of a List to filter duplicated entries and also linked to keep the order of XML response
 		final Set<String> retVal = new LinkedHashSet<String>();
 
-		// https://davis.wincor-nixdorf.com/nexus/content/repositories/wn-ps-us-pnc/com/wincornixdorf/pnc/releases/pnc-brass-maven/106/pnc-brass-maven-106.tar.gz
 		for (NexusNGArtifact current : pXMLResult.getData()) {
-			final StringBuilder theBaseDownloadURL = new StringBuilder();
-			// theDownloadURL.append(repoURL);
-			theBaseDownloadURL.append("/");
-			theBaseDownloadURL.append(current.getGroupId().replace(".", "/"));
-			theBaseDownloadURL.append("/");
-			theBaseDownloadURL.append(current.getArtifactId());
-			theBaseDownloadURL.append("/");
-			theBaseDownloadURL.append(current.getVersion());
-
-			final StringBuilder theArtifactSuffix = new StringBuilder();
-			theArtifactSuffix.append("/");
-			theArtifactSuffix.append(current.getArtifactId());
-			theArtifactSuffix.append("-");
-			theArtifactSuffix.append(current.getVersion());
+			final IArtifactURLBuilder artifactURL = /* new DirectArtifactURLBuilder() */new NexusContentServiceArtifactURLBuilder()
+					.setNexusURL(getURL()).setGroupId(current.getGroupId()).setArtifactId(current.getArtifactId())
+					.setVersion(current.getVersion());
 
 			for (NexusNGArtifactHit currentHit : current.getArtifactHits()) {
-				for (NexusNGArtifactLink currentLink : currentHit.getArtifactLinks()) {
-					final String repo = pRepoURLs.get(currentHit.getRepositoryId());
 
+				// RepositoryId from the ArtifactHit
+				artifactURL.setRepositoryId(currentHit.getRepositoryId());
+
+				for (NexusNGArtifactLink currentLink : currentHit.getArtifactLinks()) {
 					boolean addCurrentEntry = true;
 					boolean addCurrentyEntryAsFolder = false;
 
@@ -187,32 +181,11 @@ public class NexusLuceneSearchService implements IVersionReader {
 					}
 
 					if (addCurrentEntry) {
-						final String baseUrl = repo + theBaseDownloadURL.toString();
-						final String artifactSuffix = theArtifactSuffix.toString();
-						final String classifier = (currentLink.getClassifier() == null ? ""
-								: "-" + currentLink.getClassifier());
-
-						if (addCurrentyEntryAsFolder) {
-							retVal.add(baseUrl);
-						} else {
-							retVal.add(baseUrl + artifactSuffix + classifier + "." + currentLink.getExtension());
-						}
+						artifactURL.setClassifier(currentLink.getClassifier()).setPackaging(currentLink.getExtension());
+						retVal.add(artifactURL.build(addCurrentyEntryAsFolder));
 					}
 				}
 			}
-		}
-		return retVal;
-	}
-
-	Map<String, String> retrieveRepositoryURLs(final List<NexusNGRepositoryDetail> pRepoDetails) {
-		Map<String, String> retVal = new HashMap<String, String>();
-
-		for (NexusNGRepositoryDetail currentRepo : pRepoDetails) {
-			String theURL = currentRepo.getRepositoryURL();
-
-			// FIXME: Repository URL can be retrieved somehow...
-			theURL = theURL.replace("service/local", "content");
-			retVal.put(currentRepo.getRepositoryId(), theURL);
 		}
 		return retVal;
 	}
@@ -244,7 +217,6 @@ public class NexusLuceneSearchService implements IVersionReader {
 	public void setCredentials(String pUserName, String pUserPassword) {
 		this.setUserName(pUserName);
 		this.setUserPassword(pUserPassword);
-
 	}
 
 	/**
