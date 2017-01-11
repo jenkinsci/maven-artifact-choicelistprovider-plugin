@@ -2,7 +2,8 @@ package org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus;
 
 /**
  * 
- * This class provides basic functionality to allow the creation of a valid download link for a given artifact.
+ * This class provides basic functionality to allow the creation of a valid download link for a given artifact. All
+ * Getters never return NULL. Trying to set a NULL value will result in a {@link NullPointerException}.
  *
  * @author stephan.watermeyer, Diebold Nixdorf
  */
@@ -18,6 +19,23 @@ public abstract class AbstractArtifactURLBuilder implements IArtifactURLBuilder 
 	private String classifier;
 	private String packaging;
 
+	public AbstractArtifactURLBuilder() {
+		nexusURL = "";
+		repositoryId = "";
+		groupId = "";
+		artifactId = "";
+		version = "";
+		classifier = "";
+		packaging = "";
+	}
+
+	void checkNull(String pField, String pValue) {
+		if (pValue == null) {
+			throw new NullPointerException("Field " + pField + " must not be null");
+		}
+
+	}
+
 	@Override
 	public String build() {
 		return build(false);
@@ -28,8 +46,12 @@ public abstract class AbstractArtifactURLBuilder implements IArtifactURLBuilder 
 	}
 
 	@Override
-	public IArtifactURLBuilder setNexusURL(String repoURL) {
+	public IArtifactURLBuilder setNexusURL(final String repoURL) {
+		checkNull("NexusURL", repoURL);
 		this.nexusURL = repoURL;
+		if (!this.nexusURL.endsWith(SLASH)) {
+			this.nexusURL = this.nexusURL + SLASH;
+		}
 		return this;
 	}
 
@@ -59,12 +81,14 @@ public abstract class AbstractArtifactURLBuilder implements IArtifactURLBuilder 
 
 	@Override
 	public AbstractArtifactURLBuilder setRepositoryId(String repositoryId) {
+		checkNull("RepositoryId", repositoryId);
 		this.repositoryId = repositoryId;
 		return this;
 	}
 
 	@Override
 	public IArtifactURLBuilder setPackaging(String packaging) {
+		checkNull("Packaging", packaging);
 		this.packaging = packaging;
 		return this;
 	}
@@ -77,6 +101,7 @@ public abstract class AbstractArtifactURLBuilder implements IArtifactURLBuilder 
 	 */
 	@Override
 	public IArtifactURLBuilder setClassifier(String classifier) {
+		checkNull("Classifier", classifier);
 		this.classifier = classifier;
 		return this;
 	}
@@ -89,6 +114,7 @@ public abstract class AbstractArtifactURLBuilder implements IArtifactURLBuilder 
 	 */
 	@Override
 	public IArtifactURLBuilder setArtifactId(String artifactId) {
+		checkNull("ArtifactId", artifactId);
 		this.artifactId = artifactId;
 		return this;
 	}
@@ -101,6 +127,7 @@ public abstract class AbstractArtifactURLBuilder implements IArtifactURLBuilder 
 	 */
 	@Override
 	public IArtifactURLBuilder setGroupId(String groupId) {
+		checkNull("GroupId", groupId);
 		this.groupId = groupId;
 		return this;
 	}
@@ -113,6 +140,7 @@ public abstract class AbstractArtifactURLBuilder implements IArtifactURLBuilder 
 	 */
 	@Override
 	public IArtifactURLBuilder setVersion(String version) {
+		checkNull("Version", version);
 		this.version = version;
 		return this;
 	}

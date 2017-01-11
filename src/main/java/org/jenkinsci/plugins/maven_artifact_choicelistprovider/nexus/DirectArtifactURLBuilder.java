@@ -15,7 +15,7 @@ public class DirectArtifactURLBuilder extends AbstractArtifactURLBuilder impleme
 	public String build(boolean pOnlyBaseURL) {
 		final StringBuilder retVal = new StringBuilder();
 
-		retVal.append(getNexusURL()).append(SLASH);
+		retVal.append(getNexusURL()); // No Slash, is already set on setter-call
 		retVal.append("content/repositories").append(SLASH);
 		retVal.append(getRepositoryId()).append(SLASH);
 		retVal.append(getGroupId().replace(".", SLASH)).append(SLASH);
