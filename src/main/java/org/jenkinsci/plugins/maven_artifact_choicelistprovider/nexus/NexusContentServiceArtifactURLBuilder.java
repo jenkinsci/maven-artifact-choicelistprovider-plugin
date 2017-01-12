@@ -25,19 +25,24 @@ public class NexusContentServiceArtifactURLBuilder extends AbstractArtifactURLBu
 	 */
 	static final String SERVICE_URI = "service/local/artifact/maven/content?";
 
+	/**
+	 * Separator for URL parameters.
+	 */
+	static final String AMPERSAND = "&";
+
 	@Override
 	public String build(boolean pOnlyBaseURL) {
 		final StringBuilder retVal = new StringBuilder();
 		retVal.append(getNexusURL()).append(SLASH);
 		retVal.append(SERVICE_URI);
-		retVal.append("r=").append(getRepositoryId()).append("&");
-		retVal.append("g=").append(getGroupId()).append("&");
-		retVal.append("a=").append(getArtifactId()).append("&");
+		retVal.append("r=").append(getRepositoryId()).append(AMPERSAND);
+		retVal.append("g=").append(getGroupId()).append(AMPERSAND);
+		retVal.append("a=").append(getArtifactId()).append(AMPERSAND);
 		if (getPackaging() != null) {
-			retVal.append("p=").append(getPackaging()).append("&");
+			retVal.append("p=").append(getPackaging()).append(AMPERSAND);
 		}
 		if (getClassifier() != null) {
-			retVal.append("c=").append(getClassifier()).append("&");
+			retVal.append("c=").append(getClassifier()).append(AMPERSAND);
 		}
 		if (getVersion() != null) {
 			retVal.append("v=").append(getVersion());
