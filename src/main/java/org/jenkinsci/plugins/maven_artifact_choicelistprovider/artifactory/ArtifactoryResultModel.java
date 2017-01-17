@@ -23,22 +23,4 @@ public class ArtifactoryResultModel {
 
 }
 
-/**
- * Helper Class to parse the JSON
- *
- * @author stephan.watermeyer, Diebold Nixdorf
- */
-class ArtifactoryResultEntryModel {
 
-	@SerializedName("uri")
-	public String uri;
-
-	public String getUri() {
-		return uri;
-	}
-
-	public void setUri(String uri) {
-		this.uri = uri;
-	}
-
-}

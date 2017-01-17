@@ -1,7 +1,6 @@
 package org.jenkinsci.plugins.maven_artifact_choicelistprovider;
 
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -19,7 +18,8 @@ import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 
 /**
  * 
- * Basic Class for perform artifact searches against an RESTful service API, like Nexus and Artifactory.
+ * Basic Class for perform artifact searches against an RESTful service API,
+ * like Nexus and Artifactory.
  *
  * @author stephan.watermeyer, Diebold Nixdorf
  */
@@ -65,20 +65,19 @@ public abstract class AbstractRESTfulVersionReader implements IVersionReader {
 
 	public List<String> retrieveVersions(String pGroupId, String pArtifactId, String pPackaging,
 			ValidAndInvalidClassifier pClassifier) throws VersionReaderException {
-		Set<String> retVal = new LinkedHashSet<String>();
-
 		try {
-			retVal = callService(pGroupId, pArtifactId, pPackaging, pClassifier);
+			final Set<String> callService = callService(pGroupId, pArtifactId, pPackaging, pClassifier);
+			return new ArrayList<String>(callService);
 		} catch (UniformInterfaceException e) {
 			final String msg;
 			if (e.getResponse() != null) {
 				switch (e.getResponse().getStatus()) {
-					case 401:
-						msg = "Your repository requires user-authentication. Please configure a username and a password to list the content of this repository";
-						break;
-					default:
-						msg = "HTTP Server Error: " + e.getResponse().getStatus() + ": " + e.getMessage();
-						break;
+				case 401:
+					msg = "Your repository requires user-authentication. Please configure a username and a password to list the content of this repository";
+					break;
+				default:
+					msg = "HTTP Server Error: " + e.getResponse().getStatus() + ": " + e.getMessage();
+					break;
 				}
 			} else {
 				msg = "General Error:" + e.getMessage();
@@ -94,7 +93,6 @@ public abstract class AbstractRESTfulVersionReader implements IVersionReader {
 						+ ", g:" + pGroupId + ", a:" + pArtifactId + ", p:" + pPackaging + ", c:" + pClassifier, e);
 			}
 		}
-		return new ArrayList<String>(retVal);
 	}
 
 	public String getURL() {
@@ -127,7 +125,8 @@ public abstract class AbstractRESTfulVersionReader implements IVersionReader {
 	}
 
 	/**
-	 * Return the configured read timeout in milliseconds. Can be overwritten in super classes.
+	 * Return the configured read timeout in milliseconds. Can be overwritten in
+	 * super classes.
 	 * 
 	 * @return timeout in milliseconds
 	 */
