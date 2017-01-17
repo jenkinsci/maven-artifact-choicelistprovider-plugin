@@ -15,11 +15,14 @@ import org.jenkinsci.plugins.maven_artifact_choicelistprovider.RESTfulParameterB
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.ValidAndInvalidClassifier;
 
 import com.google.gson.Gson;
+import com.google.gson.annotations.SerializedName;
 
 /**
  * 
- * Class utilizes the RESTful Search API from jFrog Artifactory to search for items. <br/>
- * Documentation {@link https://www.jfrog.com/confluence/display/RTF/Artifactory+REST+API}<br/>
+ * Class utilizes the RESTful Search API from jFrog Artifactory to search for
+ * items. <br/>
+ * Documentation
+ * {@link https://www.jfrog.com/confluence/display/RTF/Artifactory+REST+API}<br/>
  * 
  * @author stephan.watermeyer, Diebold Nixdorf
  */
@@ -41,8 +44,8 @@ public class ArtifactorySearchService extends AbstractRESTfulVersionReader imple
 	@Override
 	public Set<String> callService(String pGroupId, String pArtifactId, String pPackaging,
 			ValidAndInvalidClassifier pClassifier) {
-		final MultivaluedMap<String, String> requestParams = RESTfulParameterBuilder.create(pGroupId, pArtifactId, pPackaging,
-				pClassifier);
+		final MultivaluedMap<String, String> requestParams = RESTfulParameterBuilder.create(pGroupId, pArtifactId,
+				pPackaging, pClassifier);
 
 		Set<String> retVal = new LinkedHashSet<String>();
 		LOGGER.info("call artifactory service");
@@ -65,7 +68,8 @@ public class ArtifactorySearchService extends AbstractRESTfulVersionReader imple
 			final ArtifactoryResultModel fromJson = new Gson().fromJson(pContent, ArtifactoryResultModel.class);
 			for (ArtifactoryResultEntryModel current : fromJson.getResults()) {
 
-				// XXX: As the Artifactory Service is not able to filter on packaging level, we do it in the code.
+				// XXX: As the Artifactory Service is not able to filter on
+				// packaging level, we do it in the code.
 				if (validPackaging(current.getUri(), pPackaging)) {
 					retVal.add(current.getUri());
 				}
@@ -81,8 +85,40 @@ public class ArtifactorySearchService extends AbstractRESTfulVersionReader imple
 			return true;
 		}
 
-		// in case the packaging is not empty, the equals has to check the given package
+		// in case the packaging is not empty, the equals has to check the given
+		// package
 		return pArtifactURL.endsWith(pRequestedPackaging);
+	}
+
+}
+
+/**
+ * Helper Class to parse the JSON
+ *
+ * @author stephan.watermeyer, Diebold Nixdorf
+ */
+class ArtifactoryResultEntryModel {
+
+	@SerializedName("uri")
+	public String uri;
+
+	public String getUri() {
+		return uri;
+	}
+
+	public void setUri(String uri) {
+		this.uri = uri;
+	}
+
+}
+
+class ArtifactoryResultModel {
+
+	@SerializedName("results")
+	public ArtifactoryResultEntryModel[] results = new ArtifactoryResultEntryModel[] {};
+
+	public ArtifactoryResultEntryModel[] getResults() {
+		return results;
 	}
 
 }
