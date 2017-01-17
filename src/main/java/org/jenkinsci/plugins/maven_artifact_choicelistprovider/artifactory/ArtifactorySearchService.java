@@ -100,7 +100,11 @@ public class ArtifactorySearchService extends AbstractRESTfulVersionReader imple
 class ArtifactoryResultEntryModel {
 
 	@SerializedName("uri")
-	public String uri;
+	String uri;
+
+	public ArtifactoryResultEntryModel() {
+		// Important to do nothing
+	}
 
 	public String getUri() {
 		return uri;
@@ -115,7 +119,11 @@ class ArtifactoryResultEntryModel {
 class ArtifactoryResultModel {
 
 	@SerializedName("results")
-	public ArtifactoryResultEntryModel[] results = new ArtifactoryResultEntryModel[] {};
+	ArtifactoryResultEntryModel[] results = new ArtifactoryResultEntryModel[] {};
+
+	public ArtifactoryResultModel() {
+		// Important to do nothing
+	}
 
 	public ArtifactoryResultEntryModel[] getResults() {
 		return results;
