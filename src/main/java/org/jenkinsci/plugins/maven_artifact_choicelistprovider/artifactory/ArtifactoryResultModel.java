@@ -17,10 +17,6 @@ public class ArtifactoryResultModel {
 		return results;
 	}
 
-	public void setResults(ArtifactoryResultEntryModel[] results) {
-		this.results = results;
-	}
-
 }
 
 
