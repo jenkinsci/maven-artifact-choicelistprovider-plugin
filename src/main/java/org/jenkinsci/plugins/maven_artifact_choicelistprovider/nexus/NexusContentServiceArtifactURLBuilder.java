@@ -33,7 +33,7 @@ public class NexusContentServiceArtifactURLBuilder extends AbstractArtifactURLBu
 	@Override
 	public String build(boolean pOnlyBaseURL) {
 		final StringBuilder retVal = new StringBuilder();
-		retVal.append(getNexusURL()).append(SLASH);
+		retVal.append(getNexusURL()); // No-Slash. Is already defined on getter call
 		retVal.append(SERVICE_URI);
 		retVal.append("r=").append(getRepositoryId()).append(AMPERSAND);
 		retVal.append("g=").append(getGroupId()).append(AMPERSAND);
