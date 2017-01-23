@@ -9,14 +9,31 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.commons.lang.StringUtils;
+import org.jenkinsci.plugins.maven_artifact_choicelistprovider.artifactory.ArtifactoryChoiceListProvider;
+import org.jenkinsci.plugins.maven_artifact_choicelistprovider.central.MavenCentralChoiceListProvider;
+import org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus.NexusChoiceListProvider;
 import org.kohsuke.stapler.DataBoundSetter;
 
-import hudson.ExtensionPoint;
-import hudson.model.AbstractProject;
-import jp.ikedam.jenkins.plugins.extensible_choice_parameter.ChoiceListProvider;
-import jp.ikedam.jenkins.plugins.extensible_choice_parameter.ExtensibleChoiceParameterDefinition;
+import com.cloudbees.plugins.credentials.CredentialsMatchers;
+import com.cloudbees.plugins.credentials.CredentialsProvider;
+import com.cloudbees.plugins.credentials.domains.DomainRequirement;
+import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl;
 
+import hudson.ExtensionPoint;
+import hudson.security.ACL;
+import jenkins.model.Jenkins;
+import jp.ikedam.jenkins.plugins.extensible_choice_parameter.ChoiceListProvider;
+
+/**
+ * 
+ * Base Class for different {@link ChoiceListProvider} that can display information from an artifact repository, like
+ * {@link NexusChoiceListProvider}, {@link MavenCentralChoiceListProvider} and {@link ArtifactoryChoiceListProvider}
+ *
+ * @author stephan.watermeyer, Diebold Nixdorf
+ */
 public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceListProvider implements ExtensionPoint {
+
+	private static final long serialVersionUID = -6055763342458172275L;
 
 	private static final Logger LOGGER = Logger.getLogger(AbstractMavenArtifactChoiceListProvider.class.getName());
 
@@ -28,7 +45,13 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
 
 	protected Map<String, String> mChoices;
 
-	public AbstractMavenArtifactChoiceListProvider(String artifactId) {
+	/**
+	 * Initializes the choiceliste with at the artifactId.
+	 * 
+	 * @param artifactId
+	 *            the artifactId is the minimum required information.
+	 */
+	public AbstractMavenArtifactChoiceListProvider(final String artifactId) {
 		super();
 		this.setArtifactId(artifactId);
 	}
@@ -44,26 +67,44 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
 		return new ArrayList<String>(mChoices.values());
 	}
 
+	/**
+	 * Different implementation will return different {@link IVersionReader} instances.
+	 * 
+	 * @return the source of the artifacts.
+	 */
 	public abstract IVersionReader createServiceInstance();
 
 	/**
-	 * FIXME: CHANGE-1: Needs to be implemented. But currently i dont know how to update the environment variable to use
-	 * the new value.
+	 * Returns the {@link UsernamePasswordCredentialsImpl} for the given CredentialId
+	 * 
+	 * @param pCredentialId
+	 *            the internal jenkins id for the credentials
+	 * @return the credentials for the ID or NULL
 	 */
-	@Override
-	public void onBuildTriggeredWithValue(AbstractProject<?, ?> pJob, ExtensibleChoiceParameterDefinition pDef,
-			String pOldValue) {
-		String newValue = pOldValue;
-		if (mChoices != null) {
-			LOGGER.log(Level.INFO, "get full url for item:" + pOldValue);
-			if (mChoices.containsKey(pOldValue)) {
-				newValue = mChoices.get(pOldValue);
-			}
-		}
-		LOGGER.log(Level.INFO, "target value is: " + newValue);
-		// FIXME: CHANGE-1: How to update the build env variables to replace the current parameter? I dont know...
+	public static UsernamePasswordCredentialsImpl getCredentials(final String pCredentialId) {
+		return CredentialsMatchers.firstOrNull(
+				CredentialsProvider.lookupCredentials(UsernamePasswordCredentialsImpl.class, Jenkins.getInstance(),
+						ACL.SYSTEM, Collections.<DomainRequirement> emptyList()),
+				CredentialsMatchers.allOf(CredentialsMatchers.withId(pCredentialId)));
 	}
 
+	/**
+	 * Retrieves the versions from the given source.
+	 * 
+	 * @param pInstance
+	 *            the artifact repository service.
+	 * @param pGroupId
+	 *            the groupId of the artifact
+	 * @param pArtifactId
+	 *            the artifactId
+	 * @param pPackaging
+	 *            the packaginging
+	 * @param pClassifier
+	 *            the classifier
+	 * @param pReverseOrder
+	 *            <code>true</code> if the result should be reversed.
+	 * @return never null
+	 */
 	public static Map<String, String> readURL(final IVersionReader pInstance, final String pGroupId,
 			final String pArtifactId, final String pPackaging, String pClassifier, final boolean pReverseOrder) {
 		Map<String, String> retVal = new LinkedHashMap<String, String>();

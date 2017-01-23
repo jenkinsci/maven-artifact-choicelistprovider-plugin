@@ -85,8 +85,7 @@ public class ArtifactorySearchService extends AbstractRESTfulVersionReader imple
 			return true;
 		}
 
-		// in case the packaging is not empty, the equals has to check the given
-		// package
+		// in case the packaging is not empty, the equals has to check the given package
 		return pArtifactURL.endsWith(pRequestedPackaging);
 	}
 
