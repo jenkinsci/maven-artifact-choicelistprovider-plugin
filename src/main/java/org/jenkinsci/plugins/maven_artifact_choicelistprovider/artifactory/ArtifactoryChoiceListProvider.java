@@ -7,6 +7,7 @@ import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.AbstractMavenArtifactChoiceListProvider;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.AbstractMavenArtifactDescriptorImpl;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.IVersionReader;
+import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
@@ -18,10 +19,10 @@ import com.cloudbees.plugins.credentials.domains.DomainRequirement;
 import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl;
 
 import hudson.Extension;
+import hudson.model.Item;
 import hudson.security.ACL;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
-import jenkins.model.Jenkins;
 
 public class ArtifactoryChoiceListProvider extends AbstractMavenArtifactChoiceListProvider {
 
@@ -49,8 +50,8 @@ public class ArtifactoryChoiceListProvider extends AbstractMavenArtifactChoiceLi
 			return "Artifactory Artifact Choice Parameter";
 		}
 
-		public ListBoxModel doFillCredentialsIdItems() {
-			return new StandardListBoxModel().includeEmptyValue().includeMatchingAs(ACL.SYSTEM, Jenkins.getInstance(),
+		public ListBoxModel doFillCredentialsIdItems(@AncestorInPath Item instance) {
+			return new StandardListBoxModel().includeEmptyValue().includeMatchingAs(ACL.SYSTEM, instance,
 					StandardUsernamePasswordCredentials.class, Collections.<DomainRequirement> emptyList(),
 					CredentialsMatchers.instanceOf(StandardUsernamePasswordCredentials.class));
 		}

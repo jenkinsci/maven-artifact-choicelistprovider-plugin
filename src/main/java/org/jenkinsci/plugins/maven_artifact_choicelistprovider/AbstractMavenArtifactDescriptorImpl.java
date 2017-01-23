@@ -69,13 +69,12 @@ public abstract class AbstractMavenArtifactDescriptorImpl extends Descriptor<Cho
 	 * can forward to the implementation of readURL.
 	 * 
 	 * @param service
-	 * @param credentialsId
 	 * @param groupId
 	 * @param artifactId
 	 * @param packaging
 	 * @param classifier
 	 * @param reverseOrder
-	 * @return the list of found artifacts.
+	 * @return the list of found items.
 	 */
 	protected abstract Map<String, String> wrapTestConnection(IVersionReader service, String groupId, String artifactId,
 			String packaging, String classifier, boolean reverseOrder);
