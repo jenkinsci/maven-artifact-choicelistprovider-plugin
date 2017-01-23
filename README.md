@@ -23,6 +23,9 @@ We are using this plugin to let our QA department choose between the various ava
 The user documentation is available here
 * https://wiki.jenkins-ci.org/display/JENKINS/Maven+Artifact+ChoiceListProvider+Plugin
 
+# Continouos Delivery
+https://jenkins.ci.cloudbees.com/job/plugins/job/maven-artifact-choicelistprovider-plugin/
+
 ## Authors
 Stephan Watermeyer <stephan@phreakadelle.de>
 
