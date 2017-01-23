@@ -34,8 +34,8 @@ public class NexusLuceneSearchService extends AbstractRESTfulVersionReader imple
 	public Set<String> callService(final String pGroupId, final String pArtifactId, final String pPackaging,
 			final ValidAndInvalidClassifier pClassifier) {
 
-		final MultivaluedMap<String, String> requestParams = RESTfulParameterBuilder.create(pGroupId, pArtifactId, pPackaging,
-				pClassifier);
+		final MultivaluedMap<String, String> requestParams = RESTfulParameterBuilder.create(pGroupId, pArtifactId,
+				pPackaging, pClassifier);
 
 		Set<String> retVal = new LinkedHashSet<String>();
 		LOGGER.info("call nexus service");
@@ -106,7 +106,7 @@ public class NexusLuceneSearchService extends AbstractRESTfulVersionReader imple
 	/**
 	 * Return the configured service endpoint in this repository.
 	 * 
-	 * @return
+	 * @return the configured service endpoint in this repository.
 	 */
 	@Override
 	public String getRESTfulServiceEndpoint() {

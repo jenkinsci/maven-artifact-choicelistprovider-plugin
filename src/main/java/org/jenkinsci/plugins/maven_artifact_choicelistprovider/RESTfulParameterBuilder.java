@@ -35,7 +35,7 @@ public class RESTfulParameterBuilder {
 	 * @param pArtifactId
 	 * @param pPackaging
 	 * @param pClassifier
-	 * @return
+	 * @return the parameters to be used for the request.
 	 */
 	public static MultivaluedMap<String, String> create(final String pGroupId, final String pArtifactId,
 			final String pPackaging, final ValidAndInvalidClassifier pClassifier) {

@@ -66,8 +66,7 @@ public abstract class AbstractMavenArtifactDescriptorImpl extends Descriptor<Cho
 	/**
 	 * Own implementations of this {@link DescriptorImpl} might do this normally as a static inner class. The
 	 * surrounding class then has to extend {@link AbstractMavenArtifactChoiceListProvider} and thus this wrapper method
-	 * can forward to the implementation of
-	 * {@link AbstractMavenArtifactChoiceListProvider#readURL(IVersionReader, String, String, String, String, String, boolean)}
+	 * can forward to the implementation of readURL.
 	 * 
 	 * @param service
 	 * @param credentialsId
@@ -76,7 +75,7 @@ public abstract class AbstractMavenArtifactDescriptorImpl extends Descriptor<Cho
 	 * @param packaging
 	 * @param classifier
 	 * @param reverseOrder
-	 * @return
+	 * @return the list of found artifacts.
 	 */
 	protected abstract Map<String, String> wrapTestConnection(IVersionReader service, String groupId, String artifactId,
 			String packaging, String classifier, boolean reverseOrder);
