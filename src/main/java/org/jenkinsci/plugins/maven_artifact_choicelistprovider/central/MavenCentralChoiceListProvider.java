@@ -10,8 +10,17 @@ import org.kohsuke.stapler.QueryParameter;
 
 import hudson.Extension;
 import hudson.util.FormValidation;
+import jp.ikedam.jenkins.plugins.extensible_choice_parameter.ChoiceListProvider;
 
+/**
+ * 
+ * The implementation of the {@link ChoiceListProvider} for MavenCentral repository.
+ *
+ * @author stephan.watermeyer, Diebold Nixdorf
+ */
 public class MavenCentralChoiceListProvider extends AbstractMavenArtifactChoiceListProvider {
+
+	private static final long serialVersionUID = -4215624253720954168L;
 
 	@DataBoundConstructor
 	public MavenCentralChoiceListProvider(String artifactId) {

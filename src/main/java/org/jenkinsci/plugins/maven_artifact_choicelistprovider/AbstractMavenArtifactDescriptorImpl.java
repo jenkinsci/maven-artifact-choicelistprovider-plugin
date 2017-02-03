@@ -11,6 +11,12 @@ import hudson.model.Descriptor;
 import hudson.util.FormValidation;
 import jp.ikedam.jenkins.plugins.extensible_choice_parameter.ChoiceListProvider;
 
+/**
+ * 
+ * Base Class for a Descriptor.
+ *
+ * @author stephan.watermeyer, Diebold Nixdorf
+ */
 public abstract class AbstractMavenArtifactDescriptorImpl extends Descriptor<ChoiceListProvider> {
 
 	public FormValidation doCheckArtifactId(@QueryParameter String artifactId) {
@@ -58,19 +64,17 @@ public abstract class AbstractMavenArtifactDescriptorImpl extends Descriptor<Cho
 	}
 
 	/**
-	 * Own implementations of this {@link DescriptorImpl} do this normally as a static inner class. The surround class
-	 * then has to extend {@link AbstractMavenArtifactChoiceListProvider} and thus this wrapper method can forward to
-	 * the implementation of
-	 * {@link AbstractMavenArtifactChoiceListProvider#readURL(IVersionReader, String, String, String, String, String, boolean)}
+	 * Own implementations of this {@link DescriptorImpl} might do this normally as a static inner class. The
+	 * surrounding class then has to extend {@link AbstractMavenArtifactChoiceListProvider} and thus this wrapper method
+	 * can forward to the implementation of readURL.
 	 * 
 	 * @param service
-	 * @param credentialsId
 	 * @param groupId
 	 * @param artifactId
 	 * @param packaging
 	 * @param classifier
 	 * @param reverseOrder
-	 * @return
+	 * @return the list of found items.
 	 */
 	protected abstract Map<String, String> wrapTestConnection(IVersionReader service, String groupId, String artifactId,
 			String packaging, String classifier, boolean reverseOrder);

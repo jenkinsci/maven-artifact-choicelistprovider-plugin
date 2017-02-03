@@ -21,8 +21,7 @@ import com.google.gson.annotations.SerializedName;
  * 
  * Class utilizes the RESTful Search API from jFrog Artifactory to search for
  * items. <br/>
- * Documentation
- * {@link https://www.jfrog.com/confluence/display/RTF/Artifactory+REST+API}<br/>
+ * <a href="https://www.jfrog.com/confluence/display/RTF/Artifactory+REST+API">Documentation</a>
  * 
  * @author stephan.watermeyer, Diebold Nixdorf
  */
@@ -85,8 +84,7 @@ public class ArtifactorySearchService extends AbstractRESTfulVersionReader imple
 			return true;
 		}
 
-		// in case the packaging is not empty, the equals has to check the given
-		// package
+		// in case the packaging is not empty, the equals has to check the given package
 		return pArtifactURL.endsWith(pRequestedPackaging);
 	}
 

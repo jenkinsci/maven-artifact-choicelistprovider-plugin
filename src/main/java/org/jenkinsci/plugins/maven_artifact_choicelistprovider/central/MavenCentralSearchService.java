@@ -27,16 +27,15 @@ import org.jenkinsci.plugins.maven_artifact_choicelistprovider.VersionReaderExce
  * As the API is public, but Maven Central is the only service offering it, there is no reason to modify the URLs for
  * searching and retrieving the artifacts. <br/>
  * Anyway, if there should be another repository using the same API, this class
- * can be inherited and {@link #getSearchURL()} and {@link #getRetrieveURL()} and {@link #createItemURLs(ResponseDoc)}
+ * can be inherited and {@link #getSearchURL()} and {@link #getRetrieveURL()} and {@link #createItemURLs(ResponseDoc, String)}
  * can be overriden.
  *
  * @author stephan.watermeyer, Diebold Nixdorf
  */
 public class MavenCentralSearchService implements IVersionReader {
 
-
 	public static final String REPO_RETRIEVE_URL = "https://repo1.maven.org/maven2/";
-	
+
 	/** Expected Charset for MavenCentral response */
 	private static final Charset UTF8 = Charset.forName("UTF-8");
 
@@ -160,7 +159,7 @@ public class MavenCentralSearchService implements IVersionReader {
 				throw new VersionReaderException("server replied with an error: " + responseCode);
 			}
 
-			BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(),  UTF8));
+			BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), UTF8));
 			String inputLine;
 			StringBuffer retVal = new StringBuffer();
 
@@ -244,7 +243,7 @@ public class MavenCentralSearchService implements IVersionReader {
 	/**
 	 * The maximum number of results that are displayed.
 	 * 
-	 * @return
+	 * @return the maximum number of results that are returned.
 	 */
 	int getSearchLimit() {
 		return MAX_SEARCH_RESULTS;

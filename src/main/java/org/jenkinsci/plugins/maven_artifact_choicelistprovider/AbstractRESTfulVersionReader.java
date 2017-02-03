@@ -72,12 +72,12 @@ public abstract class AbstractRESTfulVersionReader implements IVersionReader {
 			final String msg;
 			if (e.getResponse() != null) {
 				switch (e.getResponse().getStatus()) {
-				case 401:
-					msg = "Your repository requires user-authentication. Please configure a username and a password to list the content of this repository";
-					break;
-				default:
-					msg = "HTTP Server Error: " + e.getResponse().getStatus() + ": " + e.getMessage();
-					break;
+					case 401:
+						msg = "Your repository requires user-authentication. Please configure a username and a password to list the content of this repository";
+						break;
+					default:
+						msg = "HTTP Server Error: " + e.getResponse().getStatus() + ": " + e.getMessage();
+						break;
 				}
 			} else {
 				msg = "General Error:" + e.getMessage();
@@ -137,7 +137,7 @@ public abstract class AbstractRESTfulVersionReader implements IVersionReader {
 	/**
 	 * Return the configured service endpoint in this repository.
 	 * 
-	 * @return
+	 * @return the service endpoint URI.
 	 */
 	public abstract String getRESTfulServiceEndpoint();
 
