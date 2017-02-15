@@ -3,6 +3,7 @@ package org.jenkinsci.plugins.maven_artifact_choicelistprovider;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.ws.rs.core.UriBuilder;
@@ -66,8 +67,15 @@ public abstract class AbstractRESTfulVersionReader implements IVersionReader {
 	public List<String> retrieveVersions(String pGroupId, String pArtifactId, String pPackaging,
 			ValidAndInvalidClassifier pClassifier) throws VersionReaderException {
 		try {
-			final Set<String> callService = callService(pGroupId, pArtifactId, pPackaging, pClassifier);
-			return new ArrayList<String>(callService);
+			final Set<String> result = callService(pGroupId, pArtifactId, pPackaging, pClassifier);
+			if(LOGGER.isLoggable(Level.FINE)) {
+				LOGGER.log(Level.FINE, "result: " + result.size());
+				for(String current : result) {
+					LOGGER.log(Level.FINE, current);
+				}
+			}
+			
+			return new ArrayList<String>(result);
 		} catch (UniformInterfaceException e) {
 			final String msg;
 			if (e.getResponse() != null) {
