@@ -20,7 +20,7 @@ import com.google.gson.annotations.SerializedName;
 /**
  * 
  * Class utilizes the RESTful Search API from jFrog Artifactory to search for
- * items. <br/>
+ * items. <br>
  * <a href="https://www.jfrog.com/confluence/display/RTF/Artifactory+REST+API">Documentation</a>
  * 
  * @author stephan.watermeyer, Diebold Nixdorf

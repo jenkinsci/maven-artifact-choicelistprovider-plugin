@@ -32,9 +32,13 @@ public class RESTfulParameterBuilder {
 	 * Creates the parameter list for the RESTful service.
 	 * 
 	 * @param pGroupId
+	 *            the GroupId
 	 * @param pArtifactId
+	 *            the ArtifactId
 	 * @param pPackaging
+	 *            the Packaging
 	 * @param pClassifier
+	 *            the Classifier
 	 * @return the parameters to be used for the request.
 	 */
 	public static MultivaluedMap<String, String> create(final String pGroupId, final String pArtifactId,

@@ -21,6 +21,7 @@ public interface IArtifactURLBuilder {
 	 * Based on the given details the URL for the artifact is created.
 	 * 
 	 * @param pOnlyBaseURL
+	 *            <code>true</code> if only the URI should be returned.
 	 * @return the URL or the folder where the artifact can be found or downloaded.
 	 */
 	String build(boolean pOnlyBaseURL);

@@ -72,7 +72,7 @@ public class PatchedSearchNGResponse extends NexusIndexerResponse implements jav
 	/**
 	 * Method addData.
 	 * 
-	 * @param nexusNGArtifact
+	 * @param nexusNGArtifact TBD
 	 */
 	public void addData(NexusNGArtifact nexusNGArtifact) {
 		getData().add(nexusNGArtifact);
@@ -81,7 +81,7 @@ public class PatchedSearchNGResponse extends NexusIndexerResponse implements jav
 	/**
 	 * Method addRepoDetail.
 	 * 
-	 * @param nexusNGRepositoryDetail
+	 * @param nexusNGRepositoryDetail TBD
 	 */
 	public void addRepoDetail(NexusNGRepositoryDetail nexusNGRepositoryDetail) {
 		getRepoDetails().add(nexusNGRepositoryDetail);
@@ -153,7 +153,7 @@ public class PatchedSearchNGResponse extends NexusIndexerResponse implements jav
 	/**
 	 * Get flag that states if too many results were found.
 	 * 
-	 * @return boolean
+	 * @return boolean TBD
 	 */
 	public boolean isTooManyResults() {
 		return this.tooManyResults;
@@ -162,7 +162,7 @@ public class PatchedSearchNGResponse extends NexusIndexerResponse implements jav
 	/**
 	 * Method removeData.
 	 * 
-	 * @param nexusNGArtifact
+	 * @param nexusNGArtifact TBD
 	 */
 	public void removeData(NexusNGArtifact nexusNGArtifact) {
 		getData().remove(nexusNGArtifact);
@@ -171,7 +171,7 @@ public class PatchedSearchNGResponse extends NexusIndexerResponse implements jav
 	/**
 	 * Method removeRepoDetail.
 	 * 
-	 * @param nexusNGRepositoryDetail
+	 * @param nexusNGRepositoryDetail TBD
 	 */
 	public void removeRepoDetail(NexusNGRepositoryDetail nexusNGRepositoryDetail) {
 		getRepoDetails().remove(nexusNGRepositoryDetail);
@@ -181,7 +181,7 @@ public class PatchedSearchNGResponse extends NexusIndexerResponse implements jav
 	 * Set flag that states if result set is collapsed, and shows
 	 * latest versions only.
 	 * 
-	 * @param collapsed
+	 * @param collapsed TBD
 	 */
 	public void setCollapsed(boolean collapsed) {
 		this.collapsed = collapsed;
@@ -190,7 +190,7 @@ public class PatchedSearchNGResponse extends NexusIndexerResponse implements jav
 	/**
 	 * Set the number of results in this response.
 	 * 
-	 * @param count
+	 * @param count TBD
 	 */
 	public void setCount(int count) {
 		this.count = count;
@@ -199,7 +199,7 @@ public class PatchedSearchNGResponse extends NexusIndexerResponse implements jav
 	/**
 	 * Set list of found artifacts.
 	 * 
-	 * @param data
+	 * @param data TBD
 	 */
 	public void setData(java.util.List<NexusNGArtifact> data) {
 		this.data = data;
@@ -208,7 +208,7 @@ public class PatchedSearchNGResponse extends NexusIndexerResponse implements jav
 	/**
 	 * Set the starting index of the results.
 	 * 
-	 * @param from
+	 * @param from TBD
 	 */
 	public void setFrom(int from) {
 		this.from = from;
@@ -217,7 +217,7 @@ public class PatchedSearchNGResponse extends NexusIndexerResponse implements jav
 	/**
 	 * Set list of repositories artifacts found in.
 	 * 
-	 * @param repoDetails
+	 * @param repoDetails TBD
 	 */
 	public void setRepoDetails(java.util.List<NexusNGRepositoryDetail> repoDetails) {
 		this.repoDetails = repoDetails;
@@ -226,7 +226,7 @@ public class PatchedSearchNGResponse extends NexusIndexerResponse implements jav
 	/**
 	 * Set flag that states if too many results were found.
 	 * 
-	 * @param tooManyResults
+	 * @param tooManyResults TBD
 	 */
 	public void setTooManyResults(boolean tooManyResults) {
 		this.tooManyResults = tooManyResults;
@@ -235,7 +235,7 @@ public class PatchedSearchNGResponse extends NexusIndexerResponse implements jav
 	/**
 	 * Set the grand total number of results found on index.
 	 * 
-	 * @param totalCount
+	 * @param totalCount TBD
 	 */
 	public void setTotalCount(int totalCount) {
 		this.totalCount = totalCount;

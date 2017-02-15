@@ -5,12 +5,12 @@ package org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus;
  * This implementation creates a download link for the given artifact by using an inbuild Nexus service. So this
  * implementation uses the RESTful interface of Nexus to submit the artifact details to the service, and the Nexus
  * service will return the artifact.
- * <br/>
+ * <br>
  * Example:
- * <code>
- * https://server/service/local/artifact/maven/content?r=repositoryId&g=groupId&a=artifactId&p=packaging&v=versionId
- * </code>
- * <br/>
+ * <a href=
+ * "https://server/service/local/artifact/maven/content?r=repositoryId&g=groupId&a=artifactId&p=packaging&v=versionId">
+ * Example</a>
+ * <br>
  * Further documentation:
  * <a href=
  * "https://support.sonatype.com/hc/en-us/articles/213465488-How-can-I-retrieve-a-snapshot-if-I-don-t-know-the-exact-filename-">

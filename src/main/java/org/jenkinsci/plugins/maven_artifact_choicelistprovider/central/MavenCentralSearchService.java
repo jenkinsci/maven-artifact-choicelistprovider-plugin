@@ -22,10 +22,10 @@ import org.jenkinsci.plugins.maven_artifact_choicelistprovider.VersionReaderExce
 /**
  * Maven Central offers a search service located at {@link #REPO_SEARCH_SERVICE_URL} which can be used to query the
  * maven central repository via a RESTful interface. This class makes use of this API and return a list of artifacts.
- * <br/>
- * <br/>
+ * <br>
+ * <br>
  * As the API is public, but Maven Central is the only service offering it, there is no reason to modify the URLs for
- * searching and retrieving the artifacts. <br/>
+ * searching and retrieving the artifacts. <br>
  * Anyway, if there should be another repository using the same API, this class
  * can be inherited and {@link #getSearchURL()} and {@link #getRetrieveURL()} and {@link #createItemURLs(ResponseDoc, String)}
  * can be overriden.
