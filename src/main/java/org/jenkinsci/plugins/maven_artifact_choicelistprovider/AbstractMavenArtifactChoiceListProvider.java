@@ -43,8 +43,6 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
 	private String classifier;
 	private boolean reverseOrder;
 
-	protected Map<String, String> mChoices;
-
 	/**
 	 * Initializes the choiceliste with at the artifactId.
 	 * 
@@ -58,10 +56,10 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
 
 	@Override
 	public List<String> getChoiceList() {
-		if (mChoices == null) {
-			mChoices = readURL(createServiceInstance(), getGroupId(), getArtifactId(), getPackaging(), getClassifier(),
-					getReverseOrder());
-		}
+
+		LOGGER.log(Level.FINE, "retrieve the versions from the repository");
+		final Map<String, String> mChoices = readURL(createServiceInstance(), getGroupId(), getArtifactId(),
+				getPackaging(), getClassifier(), getReverseOrder());
 		// FIXME: CHANGE-1: Return only the keys, that are shorter then the values
 		// return new ArrayList<String>(mChoices.keySet());
 		return new ArrayList<String>(mChoices.values());
