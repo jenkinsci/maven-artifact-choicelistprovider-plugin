@@ -27,7 +27,8 @@ The user documentation is available here
 https://jenkins.ci.cloudbees.com/job/plugins/job/maven-artifact-choicelistprovider-plugin/
 
 ## Authors
-Stephan Watermeyer <stephan@phreakadelle.de>
+Stephan Watermeyer
+* https://github.com/phreakadelle
 
 ## License
 Licensed under the [MIT License (MIT)](https://github.com/heremaps/buildrotator-plugin/blob/master/LICENSE).
