@@ -24,7 +24,7 @@ The user documentation is available here
 * https://plugins.jenkins.io/maven-artifact-choicelistprovider
 
 # Continouos Delivery
-https://jenkins.ci.cloudbees.com/job/plugins/job/maven-artifact-choicelistprovider-plugin/
+https://ci.jenkins.io/job/Plugins/job/maven-artifact-choicelistprovider-plugin/
 
 ## Authors
 Stephan Watermeyer (Profile: https://github.com/phreakadelle)
