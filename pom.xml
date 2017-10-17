@@ -10,7 +10,7 @@
 	</parent>
 
 	<artifactId>maven-artifact-choicelistprovider</artifactId>
-	<version>1.1.4-SNAPSHOT</version>
+	<version>1.2.0-SNAPSHOT</version>
 	<packaging>hpi</packaging>
 
 	<name>Maven Artifact ChoiceListProvider (Nexus)</name>

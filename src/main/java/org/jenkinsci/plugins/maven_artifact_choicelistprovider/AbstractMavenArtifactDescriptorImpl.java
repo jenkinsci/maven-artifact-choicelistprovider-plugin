@@ -19,9 +19,17 @@ import jp.ikedam.jenkins.plugins.extensible_choice_parameter.ChoiceListProvider;
  */
 public abstract class AbstractMavenArtifactDescriptorImpl extends Descriptor<ChoiceListProvider> {
 
-	public FormValidation doCheckArtifactId(@QueryParameter String artifactId) {
-		if (StringUtils.isBlank(artifactId)) {
-			return FormValidation.error("The artifactId cannot be empty");
+    public FormValidation doCheckGroupId(@QueryParameter String groupId, @QueryParameter String artifactId) {
+        if (StringUtils.isBlank(groupId) && StringUtils.isBlank(artifactId)) {
+            return FormValidation.error("The groudId cannot be empty. Please fill at least GroupId or ArtifactId.");
+        }
+
+        return FormValidation.ok();
+    }
+    
+	public FormValidation doCheckArtifactId(@QueryParameter String artifactId, @QueryParameter String groupId) {
+		if (StringUtils.isBlank(artifactId) && StringUtils.isBlank(groupId)) {
+			return FormValidation.error("The artifactId cannot be empty. Please fill at least ArtifactId or GroupId.");
 		}
 
 		return FormValidation.ok();
