@@ -53,7 +53,7 @@ public class NexusLuceneSearchService extends AbstractRESTfulVersionReader imple
 	}
 
 	/**
-	 * Parses the XML response from Nexus and creates a list of links where the artifacts can be downloadad.
+	 * Parses the XML response from Nexus and creates a list of links where the artifacts can be retrieved.
 	 * 
 	 * @param pXMLResult
 	 * @param pPackaging
