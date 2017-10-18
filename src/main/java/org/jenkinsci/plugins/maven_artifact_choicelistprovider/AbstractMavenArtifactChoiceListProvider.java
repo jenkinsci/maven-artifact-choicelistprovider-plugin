@@ -44,7 +44,7 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
 	private boolean reverseOrder;
 
 	/**
-	 * Initializes the choiceliste with at the artifactId.
+	 * Initializes the choicelist with at the artifactId.
 	 * 
 	 * @param artifactId
 	 *            the artifactId is the minimum required information.
@@ -96,7 +96,7 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
 	 * @param pArtifactId
 	 *            the artifactId
 	 * @param pPackaging
-	 *            the packaginging
+	 *            the packaging
 	 * @param pClassifier
 	 *            the classifier
 	 * @param pReverseOrder
