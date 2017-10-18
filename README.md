@@ -2,12 +2,12 @@
 
 ## Official Documentation
 The user documentation is available here
-* https://wiki.jenkins-ci.org/display/JENKINS/Maven+Artifact+ChoiceListProvider+Plugin
+* https://plugins.jenkins.io/maven-artifact-choicelistprovider
 
 In this README you will find more technical information for Developers that are interested in supporting or enhancing this plugin.
 
 ## What does this  this?
-This Plugin adds an additional ChoiceListProvider to famous <a href="https://wiki.jenkins-ci.org/display/JENKINS/Extensible+Choice+Parameter+plugin">Extensible Choice Parameter</a> Plugin.
+This Plugin adds an additional ChoiceListProvider to famous <a href="https://plugins.jenkins.io/extensible-choice-parameter">Extensible Choice Parameter</a> Plugin.
 
 With this extension its possible to use the Lucene Service from various Artifact Repositories (like Nexus, MavenCentral or Artifactory) to search for artifacts using groupId, artifactId and the packaging.
 
