@@ -20,7 +20,7 @@ public class ArtifactorySearchServiceTest extends TestCase {
 	@Test
 	public void testWithoutExplicitQualifier() throws VersionReaderException {
 		ArtifactorySearchService s = new ArtifactorySearchService("https://repo.jenkins-ci.org/");
-		List<String> retrieveVersions = s.retrieveVersions("org.jenkins-ci.plugins",
+		List<String> retrieveVersions = s.retrieveVersions("", "org.jenkins-ci.plugins",
 				"maven-artifact-choicelistprovider", "", ValidAndInvalidClassifier.getDefault());
 		for (String current : retrieveVersions) {
 			System.out.println(current);
@@ -30,7 +30,7 @@ public class ArtifactorySearchServiceTest extends TestCase {
 	@Test
 	public void testWithExplicitQualifier() throws VersionReaderException {
 		ArtifactorySearchService s = new ArtifactorySearchService("https://repo.jenkins-ci.org/");
-		List<String> retrieveVersions = s.retrieveVersions("org.jenkins-ci.plugins",
+		List<String> retrieveVersions = s.retrieveVersions("", "org.jenkins-ci.plugins",
 				"maven-artifact-choicelistprovider", "", ValidAndInvalidClassifier.fromString("sources"));
 		for (String current : retrieveVersions) {
 			System.out.println(current);
@@ -40,7 +40,7 @@ public class ArtifactorySearchServiceTest extends TestCase {
 	@Test
 	public void testWithPackaging() throws VersionReaderException {
 		ArtifactorySearchService s = new ArtifactorySearchService("https://repo.jenkins-ci.org/");
-		List<String> retrieveVersions = s.retrieveVersions("org.jenkins-ci.plugins",
+		List<String> retrieveVersions = s.retrieveVersions("", "org.jenkins-ci.plugins",
 				"maven-artifact-choicelistprovider", "hpi", ValidAndInvalidClassifier.getDefault());
 		for (String current : retrieveVersions) {
 			assertTrue("must return an artifact URL for hpi files: " + current, current.endsWith("hpi"));

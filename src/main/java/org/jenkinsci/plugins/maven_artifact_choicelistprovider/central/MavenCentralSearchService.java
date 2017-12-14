@@ -50,7 +50,7 @@ public class MavenCentralSearchService implements IVersionReader {
 	private static final int MAX_SEARCH_RESULTS = 100;
 
 	@Override
-	public List<String> retrieveVersions(String pGroupId, String pArtifactId, String pPackaging,
+	public List<String> retrieveVersions(String pRepositoryId, String pGroupId, String pArtifactId, String pPackaging,
 			ValidAndInvalidClassifier pClassifier) throws VersionReaderException {
 		try {
 			final String targetURL = createURL(pGroupId, pArtifactId, pPackaging, pClassifier);

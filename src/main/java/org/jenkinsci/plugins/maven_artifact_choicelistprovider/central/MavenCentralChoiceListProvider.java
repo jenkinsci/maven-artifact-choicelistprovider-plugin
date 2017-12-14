@@ -45,13 +45,13 @@ public class MavenCentralChoiceListProvider extends AbstractMavenArtifactChoiceL
 				@QueryParameter String artifactId, @QueryParameter String packaging, @QueryParameter String classifier,
 				@QueryParameter boolean reverseOrder) {
 			final IVersionReader service = new MavenCentralSearchService();
-			return super.performTest(service, groupId, artifactId, packaging, classifier, reverseOrder);
+			return super.performTest(service, "", groupId, artifactId, packaging, classifier, reverseOrder);
 		}
 
 		@Override
-		protected Map<String, String> wrapTestConnection(IVersionReader service, String pGroupId, String pArtifactId,
+		protected Map<String, String> wrapTestConnection(IVersionReader service, String pRepositoryId, String pGroupId, String pArtifactId,
 				String pPackaging, String pClassifier, boolean pReverseOrder) {
-			return readURL(new MavenCentralSearchService(), pGroupId, pArtifactId, pPackaging, pClassifier,
+			return readURL(new MavenCentralSearchService(), pRepositoryId, pGroupId, pArtifactId, pPackaging, pClassifier,
 					pReverseOrder);
 		}
 

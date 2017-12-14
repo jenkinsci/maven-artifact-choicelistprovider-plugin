@@ -18,7 +18,7 @@ public class MavenCentralSearchServiceTest {
 	public void testSth() throws VersionReaderException {
 		MavenCentralSearchService t = new MavenCentralSearchService();
 		try {
-			List<String> retrieveVersions = t.retrieveVersions("org.apache.tomcat", "tomcat", ".tar.gz",
+			List<String> retrieveVersions = t.retrieveVersions("", "org.apache.tomcat", "tomcat", ".tar.gz",
 					ValidAndInvalidClassifier.getDefault());
 			System.out.println(retrieveVersions.size());
 			for (String current : retrieveVersions) {

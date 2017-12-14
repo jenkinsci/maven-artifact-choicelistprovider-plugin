@@ -50,7 +50,7 @@ public abstract class AbstractMavenArtifactDescriptorImpl extends Descriptor<Cho
 		return FormValidation.ok();
 	}
 
-	public FormValidation performTest(final IVersionReader pService, @QueryParameter String groupId,
+	public FormValidation performTest(final IVersionReader pService, @QueryParameter String repositoryId, @QueryParameter String groupId,
 			@QueryParameter String artifactId, @QueryParameter String packaging, @QueryParameter String classifier,
 			@QueryParameter boolean reverseOrder) {
 		if (StringUtils.isEmpty(packaging) && !StringUtils.isEmpty(classifier)) {
@@ -59,7 +59,7 @@ public abstract class AbstractMavenArtifactDescriptorImpl extends Descriptor<Cho
 		}
 
 		try {
-			final Map<String, String> entriesFromURL = wrapTestConnection(pService, groupId, artifactId, packaging,
+			final Map<String, String> entriesFromURL = wrapTestConnection(pService, repositoryId, groupId, artifactId, packaging,
 					classifier, reverseOrder);
 
 			if (entriesFromURL.isEmpty()) {
@@ -90,7 +90,7 @@ public abstract class AbstractMavenArtifactDescriptorImpl extends Descriptor<Cho
 	 *            TBD
 	 * @return the list of found items.
 	 */
-	protected abstract Map<String, String> wrapTestConnection(IVersionReader service, String groupId, String artifactId,
+	protected abstract Map<String, String> wrapTestConnection(IVersionReader service, String repositoryId, String groupId, String artifactId,
 			String packaging, String classifier, boolean reverseOrder);
 
 }

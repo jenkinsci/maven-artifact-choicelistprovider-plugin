@@ -38,9 +38,9 @@ public class NexusLuceneSearchService extends AbstractRESTfulVersionReader imple
      * https://repository.sonatype.org/nexus-indexer-lucene-plugin/default/docs/path__lucene_search.html
      */
     @Override
-    public Set<String> callService(final String pGroupId, final String pArtifactId, final String pPackaging, final ValidAndInvalidClassifier pClassifier) {
+    public Set<String> callService(final String pRepositoryId, final String pGroupId, final String pArtifactId, final String pPackaging, final ValidAndInvalidClassifier pClassifier) {
 
-        final MultivaluedMap<String, String> requestParams = RESTfulParameterBuilder.create(pGroupId, pArtifactId, pPackaging, pClassifier);
+        final MultivaluedMap<String, String> requestParams = RESTfulParameterBuilder.create(pRepositoryId, pGroupId, pArtifactId, pPackaging, pClassifier);
 
         Set<String> retVal = new LinkedHashSet<String>();
         LOGGER.info("call nexus service");

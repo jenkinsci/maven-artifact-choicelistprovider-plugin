@@ -57,7 +57,7 @@ public class ArtifactoryChoiceListProvider extends AbstractMavenArtifactChoiceLi
 		}
 
 		public FormValidation doTest(@QueryParameter String url, @QueryParameter String credentialsId,
-				@QueryParameter String groupId, @QueryParameter String artifactId, @QueryParameter String packaging,
+		        @QueryParameter String groupId, @QueryParameter String artifactId, @QueryParameter String packaging,
 				@QueryParameter String classifier, @QueryParameter boolean reverseOrder) {
 			final IVersionReader service = new ArtifactorySearchService(url);
 
@@ -66,13 +66,13 @@ public class ArtifactoryChoiceListProvider extends AbstractMavenArtifactChoiceLi
 			if (c != null) {
 				service.setCredentials(c.getUsername(), c.getPassword().getPlainText());
 			}
-			return super.performTest(service, groupId, artifactId, packaging, classifier, reverseOrder);
+			return super.performTest(service, "", groupId, artifactId, packaging, classifier, reverseOrder);
 		}
 
 		@Override
-		protected Map<String, String> wrapTestConnection(IVersionReader pService, String pGroupId, String pArtifactId,
+		protected Map<String, String> wrapTestConnection(IVersionReader pService, String pRepositoryId, String pGroupId, String pArtifactId,
 				String pPackaging, String pClassifier, boolean pReverseOrder) {
-			return readURL(pService, pGroupId, pArtifactId, pPackaging, pClassifier, pReverseOrder);
+			return readURL(pService, pRepositoryId, pGroupId, pArtifactId, pPackaging, pClassifier, pReverseOrder);
 		}
 
 		public FormValidation doCheckUrl(@QueryParameter String url) {

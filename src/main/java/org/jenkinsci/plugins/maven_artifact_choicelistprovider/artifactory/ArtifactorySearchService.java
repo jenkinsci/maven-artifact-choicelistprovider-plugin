@@ -41,9 +41,9 @@ public class ArtifactorySearchService extends AbstractRESTfulVersionReader imple
 	}
 
 	@Override
-	public Set<String> callService(String pGroupId, String pArtifactId, String pPackaging,
+	public Set<String> callService(String pRepositoryId, String pGroupId, String pArtifactId, String pPackaging,
 			ValidAndInvalidClassifier pClassifier) {
-		final MultivaluedMap<String, String> requestParams = RESTfulParameterBuilder.create(pGroupId, pArtifactId,
+		final MultivaluedMap<String, String> requestParams = RESTfulParameterBuilder.create("", pGroupId, pArtifactId,
 				pPackaging, pClassifier);
 
 		Set<String> retVal = new LinkedHashSet<String>();

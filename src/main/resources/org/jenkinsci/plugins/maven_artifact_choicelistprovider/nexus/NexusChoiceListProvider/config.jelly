@@ -27,9 +27,12 @@ THE SOFTWARE.
         <f:textbox />
     </f:entry>
     <f:entry title="${%Credentials}" field="credentialsId">
-    	<c:select/>
-  	</f:entry>
-     <f:entry title="${%GroupId}" field="groupId">
+        <c:select/>
+    </f:entry>
+    <f:entry title="${%RepositoryId}" field="repositoryId">
+        <f:textbox />
+    </f:entry>
+    <f:entry title="${%GroupId}" field="groupId">
         <f:textbox />
     </f:entry>
      <f:entry title="${%ArtifactId}" field="artifactId">
@@ -49,6 +52,6 @@ THE SOFTWARE.
         method="test"
         title="${%List Files Now}"
         progress="${%Checking...}"
-        with="url,credentialsId,groupId,artifactId,packaging,classifier,reverseOrder"
+        with="url,credentialsId,repositoryId,groupId,artifactId,packaging,classifier,reverseOrder"
     />
 </j:jelly>
