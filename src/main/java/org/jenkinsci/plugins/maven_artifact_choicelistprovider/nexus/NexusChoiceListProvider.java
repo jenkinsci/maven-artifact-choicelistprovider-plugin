@@ -2,6 +2,7 @@ package org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.AbstractMavenArtifactChoiceListProvider;
@@ -30,6 +31,8 @@ public class NexusChoiceListProvider extends AbstractMavenArtifactChoiceListProv
 
     private static final long serialVersionUID = -5192115026547049358L;
 
+    private static final Logger LOGGER = Logger.getLogger(NexusChoiceListProvider.class.getName());
+    
     private String url;
     private String credentialsId;
 
@@ -44,6 +47,10 @@ public class NexusChoiceListProvider extends AbstractMavenArtifactChoiceListProv
         /** For Global Options */
         private boolean useRestfulAPI;
 
+        public NexusDescriptorImpl() {
+            // When Jenkins is restarted, load any saved configuration from disk.
+            load();
+        }
         /**
          * the display name shown in the dropdown to select a choice provider.
          * 
@@ -92,8 +99,9 @@ public class NexusChoiceListProvider extends AbstractMavenArtifactChoiceListProv
         @Override
         public boolean configure(StaplerRequest staplerRequest, JSONObject json) throws FormException {
             useRestfulAPI = json.getBoolean("useRestfulAPI");
+            LOGGER.info("save configuration for useRestfulAPI: " + useRestfulAPI); 
             save();
-            return super.configure(staplerRequest, json);
+            return true;
         }
 
         /**
