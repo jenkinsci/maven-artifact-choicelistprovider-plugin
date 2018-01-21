@@ -27,7 +27,7 @@ public class DirectArtifactURLBuilder extends AbstractArtifactURLBuilder impleme
 			retVal.append(getArtifactId());
 			retVal.append(DASH);
 			retVal.append(getVersion());
-			if (getClassifier() == null) {
+			if (null == getClassifier() || "".equals(getClassifier())) {
 				retVal.append("");
 			} else {
 			    retVal.append(DASH);
