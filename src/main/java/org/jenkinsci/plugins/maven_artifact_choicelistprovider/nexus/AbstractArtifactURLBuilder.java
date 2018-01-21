@@ -9,6 +9,8 @@ package org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus;
 public abstract class AbstractArtifactURLBuilder implements IArtifactURLBuilder {
 
 	static final String SLASH = "/";
+	
+	static final String DASH = "-";
 
 	private String nexusURL;
 	private String repositoryId;

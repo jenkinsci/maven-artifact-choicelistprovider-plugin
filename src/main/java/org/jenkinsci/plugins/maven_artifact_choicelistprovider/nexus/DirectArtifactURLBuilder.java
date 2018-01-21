@@ -11,7 +11,7 @@ package org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus;
  */
 public class DirectArtifactURLBuilder extends AbstractArtifactURLBuilder implements IArtifactURLBuilder {
 
-	@Override
+    @Override
 	public String build(boolean pOnlyBaseURL) {
 		final StringBuilder retVal = new StringBuilder();
 
@@ -25,11 +25,12 @@ public class DirectArtifactURLBuilder extends AbstractArtifactURLBuilder impleme
 		if (!pOnlyBaseURL) {
 			retVal.append(SLASH);
 			retVal.append(getArtifactId());
-			retVal.append("-");
+			retVal.append(DASH);
 			retVal.append(getVersion());
 			if (getClassifier() == null) {
 				retVal.append("");
 			} else {
+			    retVal.append(DASH);
 				retVal.append(getClassifier());
 			}
 			retVal.append(".");

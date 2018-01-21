@@ -5,7 +5,6 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.QueryParameter;
 
-import com.cloudbees.plugins.credentials.CredentialsParameterDefinition.DescriptorImpl;
 
 import hudson.model.Descriptor;
 import hudson.util.FormValidation;
@@ -72,7 +71,7 @@ public abstract class AbstractMavenArtifactDescriptorImpl extends Descriptor<Cho
 	}
 
 	/**
-	 * Own implementations of this {@link DescriptorImpl} might do this normally as a static inner class. The
+	 * Own implementations of this  DescriptorImpl might do this normally as a static inner class. The
 	 * surrounding class then has to extend {@link AbstractMavenArtifactChoiceListProvider} and thus this wrapper method
 	 * can forward to the implementation of readURL.
 	 * 
