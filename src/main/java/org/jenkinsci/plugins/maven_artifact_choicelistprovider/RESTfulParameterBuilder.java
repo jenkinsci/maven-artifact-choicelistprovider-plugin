@@ -17,7 +17,7 @@ import javax.ws.rs.core.MultivaluedMap;
 public class RESTfulParameterBuilder {
 
     public static final String PARAMETER_REPOSITORYID = "repositoryId";
-    
+
     public static final String PARAMETER_CLASSIFIER = "c";
 
     public static final String PARAMETER_PACKAGING = "p";
@@ -33,6 +33,8 @@ public class RESTfulParameterBuilder {
     /**
      * Creates the parameter list for the RESTful service.
      * 
+     * @param pRepositoryId
+     *            the repositoryId.
      * @param pGroupId
      *            the GroupId
      * @param pArtifactId

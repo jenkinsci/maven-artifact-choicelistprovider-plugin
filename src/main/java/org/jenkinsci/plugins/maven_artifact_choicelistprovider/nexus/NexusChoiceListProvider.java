@@ -32,7 +32,7 @@ public class NexusChoiceListProvider extends AbstractMavenArtifactChoiceListProv
     private static final long serialVersionUID = -5192115026547049358L;
 
     private static final Logger LOGGER = Logger.getLogger(NexusChoiceListProvider.class.getName());
-    
+
     private String url;
     private String credentialsId;
 
@@ -51,6 +51,7 @@ public class NexusChoiceListProvider extends AbstractMavenArtifactChoiceListProv
             // When Jenkins is restarted, load any saved configuration from disk.
             load();
         }
+
         /**
          * the display name shown in the dropdown to select a choice provider.
          * 
@@ -67,8 +68,8 @@ public class NexusChoiceListProvider extends AbstractMavenArtifactChoiceListProv
                     Collections.<DomainRequirement> emptyList(), CredentialsMatchers.instanceOf(StandardUsernamePasswordCredentials.class));
         }
 
-        public FormValidation doTest(@QueryParameter String url, @QueryParameter String credentialsId, @QueryParameter String repositoryId, @QueryParameter String groupId, @QueryParameter String artifactId,
-                @QueryParameter String packaging, @QueryParameter String classifier, @QueryParameter boolean reverseOrder) {
+        public FormValidation doTest(@QueryParameter String url, @QueryParameter String credentialsId, @QueryParameter String repositoryId, @QueryParameter String groupId,
+                @QueryParameter String artifactId, @QueryParameter String packaging, @QueryParameter String classifier, @QueryParameter boolean reverseOrder) {
             final IVersionReader service = new NexusLuceneSearchService(url);
 
             // If configured, set User Credentials
@@ -99,7 +100,7 @@ public class NexusChoiceListProvider extends AbstractMavenArtifactChoiceListProv
         @Override
         public boolean configure(StaplerRequest staplerRequest, JSONObject json) throws FormException {
             useRestfulAPI = json.getBoolean("useRestfulAPI");
-            LOGGER.info("save configuration for useRestfulAPI: " + useRestfulAPI); 
+            LOGGER.info("save configuration for useRestfulAPI: " + useRestfulAPI);
             save();
             return true;
         }
@@ -107,7 +108,7 @@ public class NexusChoiceListProvider extends AbstractMavenArtifactChoiceListProv
         /**
          * Returns the value for checkbox in the "Manage Jenkins" section.
          * 
-         * @return
+         * @return TRUE if the RESTful API should be used.
          */
         public boolean getUseRestfulAPI() {
             return useRestfulAPI;
@@ -118,7 +119,7 @@ public class NexusChoiceListProvider extends AbstractMavenArtifactChoiceListProv
     public IVersionReader createServiceInstance() {
         // this comes from the global settings
         boolean useRestfulAPI = ((NexusDescriptorImpl) getDescriptor()).getUseRestfulAPI();
-        
+
         // init the service
         final IVersionReader retVal = new NexusLuceneSearchService(url, useRestfulAPI);
         final UsernamePasswordCredentialsImpl c = getCredentials(getCredentialsId());

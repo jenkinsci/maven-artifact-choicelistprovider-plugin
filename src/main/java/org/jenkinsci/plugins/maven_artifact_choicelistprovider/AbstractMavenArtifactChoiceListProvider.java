@@ -93,6 +93,8 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
      * 
      * @param pInstance
      *            the artifact repository service.
+     * @param pRepositoryId
+     *            the repositoryId
      * @param pGroupId
      *            the groupId of the artifact
      * @param pArtifactId
@@ -178,7 +180,7 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
     public void setReverseOrder(boolean reverseOrder) {
         this.reverseOrder = reverseOrder;
     }
-    
+
     @DataBoundSetter
     public void setRepositoryId(String repositoryId) {
         this.repositoryId = repositoryId;
