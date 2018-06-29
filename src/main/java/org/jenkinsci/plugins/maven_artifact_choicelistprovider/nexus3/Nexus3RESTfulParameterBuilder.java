@@ -1,14 +1,6 @@
 package org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus3;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.ws.rs.core.MultivaluedHashMap;
-import javax.ws.rs.core.MultivaluedMap;
-
-import org.jenkinsci.plugins.maven_artifact_choicelistprovider.ValidAndInvalidClassifier;
+import org.jenkinsci.plugins.maven_artifact_choicelistprovider.RESTfulParameterBuilder;
 
 /**
  * 
@@ -16,8 +8,7 @@ import org.jenkinsci.plugins.maven_artifact_choicelistprovider.ValidAndInvalidCl
  *
  * @author stephan.watermeyer, Diebold Nixdorf
  */
-//repository=maven-public&group=com.thyssenkrupp.gssit&name=hrforms&maven.extension=war
-public class Nexus3RESTfulParameterBuilder {
+public class Nexus3RESTfulParameterBuilder extends RESTfulParameterBuilder {
 
     public static final String PARAMETER_REPOSITORYID = "repository";
 
@@ -31,48 +22,29 @@ public class Nexus3RESTfulParameterBuilder {
 
     public static final String PACKAGING_ALL = "*";
 
-    private static final Logger LOGGER = Logger.getLogger(Nexus3RESTfulParameterBuilder.class.getName());
+    @Override
+    public String getRepositoryId() {
+        return PARAMETER_REPOSITORYID;
+    }
 
-    /**
-     * Creates the parameter list for the RESTful service.
-     * 
-     * @param pRepositoryId
-     *            the repositoryId.
-     * @param pGroupId
-     *            the GroupId
-     * @param pArtifactId
-     *            the ArtifactId
-     * @param pPackaging
-     *            the Packaging
-     * @param pClassifier
-     *            the Classifier
-     * @return the parameters to be used for the request.
-     */
-    public static MultivaluedMap<String, String> create(final String pRepositoryId, final String pGroupId, final String pArtifactId, final String pPackaging,
-            final ValidAndInvalidClassifier pClassifier) {
-        if (LOGGER.isLoggable(Level.FINE)) {
-            LOGGER.fine("create parameters for: repositoryId: " + pRepositoryId + " g:" + pGroupId + ", a:" + pArtifactId + ", p:" + pPackaging + ", c: " + pClassifier.toString());
-        }
+    @Override
+    public String getGroupId() {
+        return PARAMETER_GROUPID;
+    }
 
-        MultivaluedMap<String, String> requestParams = new MultivaluedHashMap<String, String>();
-        if (pRepositoryId != "")
-            requestParams.putSingle(PARAMETER_REPOSITORYID, pRepositoryId);
-        if (pGroupId != "")
-            requestParams.putSingle(PARAMETER_GROUPID, pGroupId);
-        if (pArtifactId != "")
-            requestParams.putSingle(PARAMETER_ARTIFACTID, pArtifactId);
-        if (pPackaging != "" && !PACKAGING_ALL.equals(pPackaging))
-            requestParams.putSingle(PARAMETER_PACKAGING, pPackaging);
-        if (pClassifier != null) {
-            // FIXME: There is of course a better way how to do it...
-            final List<String> query = new ArrayList<String>();
-            for (String current : pClassifier.getValid())
-                query.add(current);
+    @Override
+    public String getArtifactId() {
+        return PARAMETER_ARTIFACTID;
+    }
 
-            if (!query.isEmpty())
-                requestParams.put(PARAMETER_CLASSIFIER, query);
-        }
-        return requestParams;
+    @Override
+    public String getPackaging() {
+        return PARAMETER_PACKAGING;
+    }
+
+    @Override
+    public String getClassifier() {
+        return PARAMETER_CLASSIFIER;
     }
 
 }

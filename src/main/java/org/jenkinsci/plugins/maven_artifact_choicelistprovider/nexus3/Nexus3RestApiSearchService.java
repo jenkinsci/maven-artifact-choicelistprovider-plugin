@@ -3,6 +3,7 @@ package org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus3;
 import java.io.IOException;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.ws.rs.core.MediaType;
@@ -10,9 +11,6 @@ import javax.ws.rs.core.MultivaluedMap;
 
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.AbstractRESTfulVersionReader;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.IVersionReader;
-import org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus3.Nexus3RESTfulParameterBuilder;
-import org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus3.apiresponse.Items;
-import org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus3.apiresponse.Nexus3RestResponse;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.ValidAndInvalidClassifier;
 
 import com.fasterxml.jackson.core.JsonParseException;
@@ -22,20 +20,13 @@ import com.sun.jersey.api.client.WebResource;
 
 public class Nexus3RestApiSearchService extends AbstractRESTfulVersionReader implements IVersionReader {
 
-	//https://nexus-dev.thyssenkrupp.com/service/rest/beta/search/assets?repository=maven-public&group=com.thyssenkrupp.gssit&name=hrforms&maven.extension=war
+    // https://nexus-dev.thyssenkrupp.com/service/rest/beta/search/assets?repository=maven-public&group=com.thyssenkrupp.gssit&name=hrforms&maven.extension=war
     private static final String LUCENE_SEARCH_SERVICE_URI = "service/rest/beta/search/assets";
 
     private static final Logger LOGGER = Logger.getLogger(Nexus3RestApiSearchService.class.getName());
 
-    private boolean mUseRESTfulAPI;
-
     public Nexus3RestApiSearchService(String pURL) {
         super(pURL);
-    }
-    
-    public Nexus3RestApiSearchService(String pURL, boolean useRESTfulAPI) {
-        super(pURL);
-        mUseRESTfulAPI = useRESTfulAPI;
     }
 
     /**
@@ -44,9 +35,10 @@ public class Nexus3RestApiSearchService extends AbstractRESTfulVersionReader imp
      * https://repository.sonatype.org/nexus-indexer-lucene-plugin/default/docs/path__lucene_search.html
      */
     @Override
-    public Set<String> callService(final String pRepositoryId, final String pGroupId, final String pArtifactId, final String pPackaging, final ValidAndInvalidClassifier pClassifier) {
+    public Set<String> callService(final String pRepositoryId, final String pGroupId, final String pArtifactId, final String pPackaging,
+            final ValidAndInvalidClassifier pClassifier) {
 
-        final MultivaluedMap<String, String> requestParams = Nexus3RESTfulParameterBuilder.create(pRepositoryId, pGroupId, pArtifactId, pPackaging, pClassifier);
+        final MultivaluedMap<String, String> requestParams = new Nexus3RESTfulParameterBuilder().create(pRepositoryId, pGroupId, pArtifactId, pPackaging, pClassifier);
 
         Set<String> retVal = new LinkedHashSet<String>();
         LOGGER.info("call nexus service");
@@ -55,27 +47,25 @@ public class Nexus3RestApiSearchService extends AbstractRESTfulVersionReader imp
 
         ObjectMapper mapper = new ObjectMapper();
         Nexus3RestResponse jsonResult;
-		try {
-			jsonResult = mapper.readValue(result , Nexus3RestResponse.class);
-			if (jsonResult == null) {
-	            LOGGER.info("response from Nexus is NULL.");
-	        } else if (jsonResult.getItems().length == 0) {
-	            LOGGER.info("response from Nexus does not contain any results.");
-	        } else {
-	            retVal = parseResponse(jsonResult, pPackaging, pClassifier);
-	        }
-		} catch (JsonParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (JsonMappingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-        
-        
+        try {
+            jsonResult = mapper.readValue(result, Nexus3RestResponse.class);
+            if (jsonResult == null) {
+                LOGGER.info("response from Nexus is NULL.");
+            } else if (jsonResult.getItems().length == 0) {
+                LOGGER.info("response from Nexus does not contain any results.");
+            } else {
+                retVal = parseResponse(jsonResult, pPackaging, pClassifier);
+            }
+        } catch (JsonParseException e) {
+            LOGGER.log(Level.WARNING, "failed to parse", e);
+        } catch (JsonMappingException e) {
+            LOGGER.log(Level.WARNING, "failed to map", e);
+        } catch (IOException e) {
+            LOGGER.log(Level.WARNING, "failed to ioexception", e);
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "unexpected error", e);
+        }
+
         return retVal;
     }
 
@@ -92,9 +82,9 @@ public class Nexus3RestApiSearchService extends AbstractRESTfulVersionReader imp
         final Set<String> retVal = new LinkedHashSet<String>();
 
         for (Items current : jsonResult.getItems()) {
-            
+
             retVal.add(current.getDownloadUrl());
-            
+
         }
         return retVal;
     }

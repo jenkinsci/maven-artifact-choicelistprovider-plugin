@@ -9,7 +9,6 @@ import javax.ws.rs.core.MultivaluedMap;
 
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.AbstractRESTfulVersionReader;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.IVersionReader;
-import org.jenkinsci.plugins.maven_artifact_choicelistprovider.RESTfulParameterBuilder;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.ValidAndInvalidClassifier;
 import org.sonatype.nexus.rest.model.NexusNGArtifact;
 import org.sonatype.nexus.rest.model.NexusNGArtifactHit;
@@ -40,7 +39,7 @@ public class NexusLuceneSearchService extends AbstractRESTfulVersionReader imple
     @Override
     public Set<String> callService(final String pRepositoryId, final String pGroupId, final String pArtifactId, final String pPackaging, final ValidAndInvalidClassifier pClassifier) {
 
-        final MultivaluedMap<String, String> requestParams = RESTfulParameterBuilder.create(pRepositoryId, pGroupId, pArtifactId, pPackaging, pClassifier);
+        final MultivaluedMap<String, String> requestParams = new StandardRESTfulParameterBuilder().create(pRepositoryId, pGroupId, pArtifactId, pPackaging, pClassifier);
 
         Set<String> retVal = new LinkedHashSet<String>();
         LOGGER.info("call nexus service");

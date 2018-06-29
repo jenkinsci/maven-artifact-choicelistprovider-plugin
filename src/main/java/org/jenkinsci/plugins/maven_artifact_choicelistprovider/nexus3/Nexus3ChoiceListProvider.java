@@ -2,7 +2,6 @@ package org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus3;
 
 import java.util.Collections;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.AbstractMavenArtifactChoiceListProvider;
@@ -31,8 +30,6 @@ public class Nexus3ChoiceListProvider extends AbstractMavenArtifactChoiceListPro
 
     private static final long serialVersionUID = -5192115026547049358L;
 
-    private static final Logger LOGGER = Logger.getLogger(Nexus3ChoiceListProvider.class.getName());
-
     private String url;
     private String credentialsId;
 
@@ -43,9 +40,6 @@ public class Nexus3ChoiceListProvider extends AbstractMavenArtifactChoiceListPro
 
     @Extension
     public static class Nexus3DescriptorImpl extends AbstractMavenArtifactDescriptorImpl {
-
-        /** For Global Options */
-        private boolean useRestfulAPI;
 
         public Nexus3DescriptorImpl() {
             // When Jenkins is restarted, load any saved configuration from disk.
@@ -99,29 +93,16 @@ public class Nexus3ChoiceListProvider extends AbstractMavenArtifactChoiceListPro
          */
         @Override
         public boolean configure(StaplerRequest staplerRequest, JSONObject json) throws FormException {
-            useRestfulAPI = json.getBoolean("useRestfulAPI");
-            LOGGER.info("save configuration for useRestfulAPI: " + useRestfulAPI);
             save();
             return true;
         }
 
-        /**
-         * Returns the value for checkbox in the "Manage Jenkins" section.
-         * 
-         * @return TRUE if the RESTful API should be used.
-         */
-        public boolean getUseRestfulAPI() {
-            return useRestfulAPI;
-        }
     }
 
     @Override
     public IVersionReader createServiceInstance() {
-        // this comes from the global settings
-        boolean useRestfulAPI = ((Nexus3DescriptorImpl) getDescriptor()).getUseRestfulAPI();
-
         // init the service
-        final IVersionReader retVal = new Nexus3RestApiSearchService(url, useRestfulAPI);
+        final IVersionReader retVal = new Nexus3RestApiSearchService(url);
         final UsernamePasswordCredentialsImpl c = getCredentials(getCredentialsId());
         if (c != null) {
             retVal.setCredentials(c.getUsername(), c.getPassword().getPlainText());
