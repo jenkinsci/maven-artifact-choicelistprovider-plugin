@@ -29,11 +29,6 @@ public class Nexus3RestApiSearchService extends AbstractRESTfulVersionReader imp
         super(pURL);
     }
 
-    /**
-     * 
-     * Search in Nexus for the artifact using the Lucene Service.
-     * https://repository.sonatype.org/nexus-indexer-lucene-plugin/default/docs/path__lucene_search.html
-     */
     @Override
     public Set<String> callService(final String pRepositoryId, final String pGroupId, final String pArtifactId, final String pPackaging,
             final ValidAndInvalidClassifier pClassifier) {
@@ -82,9 +77,7 @@ public class Nexus3RestApiSearchService extends AbstractRESTfulVersionReader imp
         final Set<String> retVal = new LinkedHashSet<String>();
 
         for (Items current : jsonResult.getItems()) {
-
             retVal.add(current.getDownloadUrl());
-
         }
         return retVal;
     }
