@@ -38,8 +38,12 @@ public class Nexus3RestApiSearchService extends AbstractRESTfulVersionReader imp
         Set<String> retVal = new LinkedHashSet<String>();
         LOGGER.info("call nexus service");
         WebResource rs = getInstance();
-        final String result = rs.queryParams(requestParams).accept(MediaType.APPLICATION_JSON).get(String.class);
 
+        if(LOGGER.isLoggable(Level.INFO)) {
+            LOGGER.info("URI: " + rs.queryParams(requestParams).getURI());
+        }
+        
+        final String result = rs.queryParams(requestParams).accept(MediaType.APPLICATION_JSON).get(String.class);
         ObjectMapper mapper = new ObjectMapper();
         Nexus3RestResponse jsonResult;
         try {

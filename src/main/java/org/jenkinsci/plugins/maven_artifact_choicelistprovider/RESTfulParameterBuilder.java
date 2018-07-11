@@ -8,9 +8,12 @@ import java.util.logging.Logger;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.apache.commons.lang.StringUtils;
+
+
 /**
  * 
- * Creates URL Parameters for a NEXUS and Artifactory Repository.
+ * Creates URL Parameters for a Nexus, Nexus3 and Artifactory Repository.
  *
  * @author stephan.watermeyer, Diebold Nixdorf
  */
@@ -42,14 +45,18 @@ public abstract class RESTfulParameterBuilder {
         }
 
         MultivaluedMap<String, String> requestParams = new MultivaluedHashMap<String, String>();
-        if (pRepositoryId != "")
+        if (!StringUtils.isEmpty(pRepositoryId)) {
             requestParams.putSingle(getRepositoryId(), pRepositoryId);
-        if (pGroupId != "")
+        }
+        if (!StringUtils.isEmpty(pGroupId)) {
             requestParams.putSingle(getGroupId(), pGroupId);
-        if (pArtifactId != "")
+        }
+        if (!StringUtils.isEmpty(pArtifactId)) {
             requestParams.putSingle(getArtifactId(), pArtifactId);
-        if (pPackaging != "" && !PACKAGING_ALL.equals(pPackaging))
+        }
+        if (!StringUtils.isEmpty(pPackaging) && !PACKAGING_ALL.equals(pPackaging)) {
             requestParams.putSingle(getPackaging(), pPackaging);
+        }
         if (pClassifier != null) {
             // FIXME: There is of course a better way how to do it...
             final List<String> query = new ArrayList<String>();

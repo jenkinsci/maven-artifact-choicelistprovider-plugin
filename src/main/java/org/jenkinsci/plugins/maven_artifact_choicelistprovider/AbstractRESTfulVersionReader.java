@@ -83,6 +83,9 @@ public abstract class AbstractRESTfulVersionReader implements IVersionReader {
 					case 401:
 						msg = "Your repository requires user-authentication. Please configure a username and a password to list the content of this repository";
 						break;
+					case 404:
+                        msg = "The artifact you are looking for does not exist (HTTP404). Have you used the correct repositoryId?";
+                        break;
 					default:
 						msg = "HTTP Server Error: " + e.getResponse().getStatus() + ": " + e.getMessage();
 						break;
