@@ -3,6 +3,8 @@ package org.jenkinsci.plugins.maven_artifact_choicelistprovider.artifactory;
 import java.util.Collections;
 import java.util.Map;
 
+import javax.ws.rs.POST;
+
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.AbstractMavenArtifactChoiceListProvider;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.AbstractMavenArtifactDescriptorImpl;
@@ -11,6 +13,7 @@ import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.interceptor.RequirePOST;
 
 import com.cloudbees.plugins.credentials.CredentialsMatchers;
 import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
@@ -23,6 +26,7 @@ import hudson.model.Item;
 import hudson.security.ACL;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
+import jenkins.model.Jenkins;
 
 public class ArtifactoryChoiceListProvider extends AbstractMavenArtifactChoiceListProvider {
 
@@ -56,6 +60,7 @@ public class ArtifactoryChoiceListProvider extends AbstractMavenArtifactChoiceLi
 					CredentialsMatchers.instanceOf(StandardUsernamePasswordCredentials.class));
 		}
 
+		@POST
 		public FormValidation doTest(@QueryParameter String url, @QueryParameter String credentialsId,
 		        @QueryParameter String groupId, @QueryParameter String artifactId, @QueryParameter String packaging,
 				@QueryParameter String classifier, @QueryParameter boolean reverseOrder) {

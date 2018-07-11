@@ -3,6 +3,8 @@ package org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus3;
 import java.util.Collections;
 import java.util.Map;
 
+import javax.ws.rs.POST;
+
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.AbstractMavenArtifactChoiceListProvider;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.AbstractMavenArtifactDescriptorImpl;
@@ -62,6 +64,7 @@ public class Nexus3ChoiceListProvider extends AbstractMavenArtifactChoiceListPro
                     Collections.<DomainRequirement> emptyList(), CredentialsMatchers.instanceOf(StandardUsernamePasswordCredentials.class));
         }
 
+        @POST
         public FormValidation doTest(@QueryParameter String url, @QueryParameter String credentialsId, @QueryParameter String repositoryId, @QueryParameter String groupId,
                 @QueryParameter String artifactId, @QueryParameter String packaging, @QueryParameter String classifier, @QueryParameter boolean reverseOrder) {
             final IVersionReader service = new Nexus3RestApiSearchService(url);
