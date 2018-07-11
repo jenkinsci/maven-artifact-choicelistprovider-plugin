@@ -54,16 +54,23 @@ public class ArtifactoryChoiceListProvider extends AbstractMavenArtifactChoiceLi
 			return "Artifactory Artifact Choice Parameter";
 		}
 
-		public ListBoxModel doFillCredentialsIdItems(@AncestorInPath Item instance) {
-			return new StandardListBoxModel().includeEmptyValue().includeMatchingAs(ACL.SYSTEM, instance,
+		public ListBoxModel doFillCredentialsIdItems(@AncestorInPath Item pItem) {
+		    // SECURITY-1022
+		    pItem.checkPermission(Item.CONFIGURE);
+		    
+			return new StandardListBoxModel().includeEmptyValue().includeMatchingAs(Jenkins.getAuthentication(), pItem,
 					StandardUsernamePasswordCredentials.class, Collections.<DomainRequirement> emptyList(),
 					CredentialsMatchers.instanceOf(StandardUsernamePasswordCredentials.class));
 		}
 
 		@POST
-		public FormValidation doTest(@QueryParameter String url, @QueryParameter String credentialsId,
+		public FormValidation doTest(@AncestorInPath Item pItem, @QueryParameter String url, @QueryParameter String credentialsId,
 		        @QueryParameter String groupId, @QueryParameter String artifactId, @QueryParameter String packaging,
 				@QueryParameter String classifier, @QueryParameter boolean reverseOrder) {
+		    
+		    // SECURITY-1022
+            pItem.checkPermission(Item.CONFIGURE);
+            
 			final IVersionReader service = new ArtifactorySearchService(url);
 
 			// If configured, set User Credentials

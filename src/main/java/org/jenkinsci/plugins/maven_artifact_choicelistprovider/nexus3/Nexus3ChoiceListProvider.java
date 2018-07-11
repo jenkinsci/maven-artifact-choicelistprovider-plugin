@@ -23,9 +23,9 @@ import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl;
 
 import hudson.Extension;
 import hudson.model.Item;
-import hudson.security.ACL;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
+import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
 
 public class Nexus3ChoiceListProvider extends AbstractMavenArtifactChoiceListProvider {
@@ -59,14 +59,21 @@ public class Nexus3ChoiceListProvider extends AbstractMavenArtifactChoiceListPro
             return "Nexus3 Artifact Choice Parameter";
         }
 
-        public ListBoxModel doFillCredentialsIdItems(@AncestorInPath Item instance) {
-            return new StandardListBoxModel().includeEmptyValue().includeMatchingAs(ACL.SYSTEM, instance, StandardUsernamePasswordCredentials.class,
+        public ListBoxModel doFillCredentialsIdItems(@AncestorInPath Item pItem) {
+            // SECURITY-1022
+            pItem.checkPermission(Item.CONFIGURE);
+
+            return new StandardListBoxModel().includeEmptyValue().includeMatchingAs(Jenkins.getAuthentication(), pItem, StandardUsernamePasswordCredentials.class,
                     Collections.<DomainRequirement> emptyList(), CredentialsMatchers.instanceOf(StandardUsernamePasswordCredentials.class));
         }
 
         @POST
-        public FormValidation doTest(@QueryParameter String url, @QueryParameter String credentialsId, @QueryParameter String repositoryId, @QueryParameter String groupId,
+        public FormValidation doTest(@AncestorInPath Item pItem, @QueryParameter String url, @QueryParameter String credentialsId, @QueryParameter String repositoryId, @QueryParameter String groupId,
                 @QueryParameter String artifactId, @QueryParameter String packaging, @QueryParameter String classifier, @QueryParameter boolean reverseOrder) {
+            
+            // SECURITY-1022
+            pItem.checkPermission(Item.CONFIGURE);
+            
             final IVersionReader service = new Nexus3RestApiSearchService(url);
 
             // If configured, set User Credentials

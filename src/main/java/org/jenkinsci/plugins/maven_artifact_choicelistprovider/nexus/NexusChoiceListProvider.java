@@ -15,7 +15,6 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.interceptor.RequirePOST;
 
 import com.cloudbees.plugins.credentials.CredentialsMatchers;
 import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
@@ -25,9 +24,9 @@ import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl;
 
 import hudson.Extension;
 import hudson.model.Item;
-import hudson.security.ACL;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
+import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
 
 public class NexusChoiceListProvider extends AbstractMavenArtifactChoiceListProvider {
@@ -66,14 +65,21 @@ public class NexusChoiceListProvider extends AbstractMavenArtifactChoiceListProv
             return "Nexus Artifact Choice Parameter";
         }
 
-        public ListBoxModel doFillCredentialsIdItems(@AncestorInPath Item instance) {
-            return new StandardListBoxModel().includeEmptyValue().includeMatchingAs(ACL.SYSTEM, instance, StandardUsernamePasswordCredentials.class,
+        public ListBoxModel doFillCredentialsIdItems(@AncestorInPath Item pItem) {
+            // SECURITY-1022
+            pItem.checkPermission(Item.CONFIGURE);
+            
+            return new StandardListBoxModel().includeEmptyValue().includeMatchingAs(Jenkins.getAuthentication(), pItem, StandardUsernamePasswordCredentials.class,
                     Collections.<DomainRequirement> emptyList(), CredentialsMatchers.instanceOf(StandardUsernamePasswordCredentials.class));
         }
 
         @POST
-        public FormValidation doTest(@QueryParameter String url, @QueryParameter String credentialsId, @QueryParameter String repositoryId, @QueryParameter String groupId,
+        public FormValidation doTest(@AncestorInPath Item pItem, @QueryParameter String url, @QueryParameter String credentialsId, @QueryParameter String repositoryId, @QueryParameter String groupId,
                 @QueryParameter String artifactId, @QueryParameter String packaging, @QueryParameter String classifier, @QueryParameter boolean reverseOrder) {
+            
+            // SECURITY-1022
+            pItem.checkPermission(Item.CONFIGURE);
+            
             final IVersionReader service = new NexusLuceneSearchService(url);
 
             // If configured, set User Credentials
