@@ -19,8 +19,8 @@ public class Nexus3RestApiSearchServiceTest extends TestCase {
     @Test
     public void testWithoutExplicitQualifier() throws VersionReaderException {
         Nexus3RestApiSearchService s = new Nexus3RestApiSearchService("https://davis.wincor-nixdorf.com/n3/");
-        s.setUserName("uzcmpG+8");
-        s.setUserPassword("qXPOhKOewza0yc46FtqJvh2XXmK26gV+th1yHz1ywIbk");
+        s.setUserName("TBD");
+        s.setUserPassword("TBD");
         List<String> retrieveVersions = s.retrieveVersions("maven-central", "org.apache.ant", "ant", "",
                 ValidAndInvalidClassifier.getDefault());
         for (String current : retrieveVersions) {
