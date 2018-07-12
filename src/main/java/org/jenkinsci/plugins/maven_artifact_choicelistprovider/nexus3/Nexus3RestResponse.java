@@ -1,10 +1,16 @@
 package org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus3;
 
+/**
+ * POJO for Nexus3 API.
+ * 
+ * @author stephan.watermeyer
+ *
+ */
 public class Nexus3RestResponse {
 
     private String continuationToken;
 
-    private Items[] items;
+    private Item[] items;
 
     public String getContinuationToken() {
         return continuationToken;
@@ -14,17 +20,17 @@ public class Nexus3RestResponse {
         this.continuationToken = continuationToken;
     }
 
-    public Items[] getItems() {
+    public Item[] getItems() {
         return items;
     }
 
-    public void setItems(Items[] items) {
+    public void setItems(Item[] items) {
         this.items = items;
     }
 
     @Override
     public String toString() {
-        return "ClassPojo [continuationToken = " + continuationToken + ", items = " + items + "]";
+        return "Nexus3RestResponse [continuationToken = " + continuationToken + ", items = " + items + "]";
     }
 
 }

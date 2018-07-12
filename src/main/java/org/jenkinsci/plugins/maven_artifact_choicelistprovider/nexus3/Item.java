@@ -1,6 +1,12 @@
 package org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus3;
 
-public class Items {
+/**
+ * POJO for Nexus3 REST API.
+ * 
+ * @author stephan.watermeyer
+ *
+ */
+public class Item {
     private String id;
 
     private String repository;
@@ -63,7 +69,7 @@ public class Items {
 
     @Override
     public String toString() {
-        return "ClassPojo [id = " + id + ", repository = " + repository + ", path = " + path + ", downloadUrl = " + downloadUrl + ", checksum = " + checksum + ", format = "
-                + format + "]";
+        return "Item [id = " + id + ", repository = " + repository + ", path = " + path + ", downloadUrl = " + downloadUrl + ", checksum = " + checksum + ", format = " + format
+                + "]";
     }
 }
