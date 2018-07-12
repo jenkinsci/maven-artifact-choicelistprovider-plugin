@@ -13,7 +13,6 @@ import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
-import org.kohsuke.stapler.interceptor.RequirePOST;
 
 import com.cloudbees.plugins.credentials.CredentialsMatchers;
 import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
@@ -23,6 +22,7 @@ import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl;
 
 import hudson.Extension;
 import hudson.model.Item;
+import hudson.model.Job;
 import hudson.security.ACL;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
@@ -56,9 +56,9 @@ public class ArtifactoryChoiceListProvider extends AbstractMavenArtifactChoiceLi
 
 		public ListBoxModel doFillCredentialsIdItems(@AncestorInPath Item pItem) {
 		    // SECURITY-1022
-		    pItem.checkPermission(Item.CONFIGURE);
+		    pItem.checkPermission(Job.CONFIGURE);
 		    
-			return new StandardListBoxModel().includeEmptyValue().includeMatchingAs(Jenkins.getAuthentication(), pItem,
+			return new StandardListBoxModel().includeEmptyValue().includeMatchingAs(ACL.SYSTEM, pItem,
 					StandardUsernamePasswordCredentials.class, Collections.<DomainRequirement> emptyList(),
 					CredentialsMatchers.instanceOf(StandardUsernamePasswordCredentials.class));
 		}
@@ -69,7 +69,7 @@ public class ArtifactoryChoiceListProvider extends AbstractMavenArtifactChoiceLi
 				@QueryParameter String classifier, @QueryParameter boolean reverseOrder) {
 		    
 		    // SECURITY-1022
-            pItem.checkPermission(Item.CONFIGURE);
+            pItem.checkPermission(Job.CONFIGURE);
             
 			final IVersionReader service = new ArtifactorySearchService(url);
 

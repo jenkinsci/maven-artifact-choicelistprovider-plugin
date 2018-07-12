@@ -24,6 +24,8 @@ import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl;
 
 import hudson.Extension;
 import hudson.model.Item;
+import hudson.model.Job;
+import hudson.security.ACL;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import jenkins.model.Jenkins;
@@ -67,9 +69,9 @@ public class NexusChoiceListProvider extends AbstractMavenArtifactChoiceListProv
 
         public ListBoxModel doFillCredentialsIdItems(@AncestorInPath Item pItem) {
             // SECURITY-1022
-            pItem.checkPermission(Item.CONFIGURE);
+            pItem.checkPermission(Job.CONFIGURE);
             
-            return new StandardListBoxModel().includeEmptyValue().includeMatchingAs(Jenkins.getAuthentication(), pItem, StandardUsernamePasswordCredentials.class,
+            return new StandardListBoxModel().includeEmptyValue().includeMatchingAs(ACL.SYSTEM, pItem, StandardUsernamePasswordCredentials.class,
                     Collections.<DomainRequirement> emptyList(), CredentialsMatchers.instanceOf(StandardUsernamePasswordCredentials.class));
         }
 
@@ -78,7 +80,7 @@ public class NexusChoiceListProvider extends AbstractMavenArtifactChoiceListProv
                 @QueryParameter String artifactId, @QueryParameter String packaging, @QueryParameter String classifier, @QueryParameter boolean reverseOrder) {
             
             // SECURITY-1022
-            pItem.checkPermission(Item.CONFIGURE);
+            pItem.checkPermission(Job.CONFIGURE);
             
             final IVersionReader service = new NexusLuceneSearchService(url);
 
