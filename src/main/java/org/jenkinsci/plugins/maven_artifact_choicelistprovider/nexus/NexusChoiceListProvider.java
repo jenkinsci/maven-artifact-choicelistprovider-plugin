@@ -68,20 +68,27 @@ public class NexusChoiceListProvider extends AbstractMavenArtifactChoiceListProv
         }
 
         public ListBoxModel doFillCredentialsIdItems(@AncestorInPath Item pItem) {
-            // SECURITY-1022
-            pItem.checkPermission(Job.CONFIGURE);
+            final ListBoxModel retVal;
             
-            return new StandardListBoxModel().includeEmptyValue().includeMatchingAs(ACL.SYSTEM, pItem, StandardUsernamePasswordCredentials.class,
-                    Collections.<DomainRequirement> emptyList(), CredentialsMatchers.instanceOf(StandardUsernamePasswordCredentials.class));
+            // SECURITY-1022
+            if (pItem.hasPermission(Job.CONFIGURE)) {
+                retVal= new StandardListBoxModel().includeEmptyValue().includeMatchingAs(ACL.SYSTEM, pItem, StandardUsernamePasswordCredentials.class,
+                        Collections.<DomainRequirement> emptyList(), CredentialsMatchers.instanceOf(StandardUsernamePasswordCredentials.class));
+            } else {
+                retVal= new StandardListBoxModel().includeEmptyValue();
+            }
+            
+            return retVal;
         }
 
         @POST
-        public FormValidation doTest(@AncestorInPath Item pItem, @QueryParameter String url, @QueryParameter String credentialsId, @QueryParameter String repositoryId, @QueryParameter String groupId,
-                @QueryParameter String artifactId, @QueryParameter String packaging, @QueryParameter String classifier, @QueryParameter boolean reverseOrder) {
-            
+        public FormValidation doTest(@AncestorInPath Item pItem, @QueryParameter String url, @QueryParameter String credentialsId, @QueryParameter String repositoryId,
+                @QueryParameter String groupId, @QueryParameter String artifactId, @QueryParameter String packaging, @QueryParameter String classifier,
+                @QueryParameter boolean reverseOrder) {
+
             // SECURITY-1022
             pItem.checkPermission(Job.CONFIGURE);
-            
+
             final IVersionReader service = new NexusLuceneSearchService(url);
 
             // If configured, set User Credentials

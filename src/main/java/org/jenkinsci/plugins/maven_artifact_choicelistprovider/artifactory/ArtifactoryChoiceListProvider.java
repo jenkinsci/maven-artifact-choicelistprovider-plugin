@@ -30,98 +30,102 @@ import jenkins.model.Jenkins;
 
 public class ArtifactoryChoiceListProvider extends AbstractMavenArtifactChoiceListProvider {
 
-	private static final long serialVersionUID = -2254479209350956383L;
+    private static final long serialVersionUID = -2254479209350956383L;
 
-	private String url;
-	private String credentialsId;
+    private String url;
+    private String credentialsId;
 
-	@DataBoundConstructor
-	public ArtifactoryChoiceListProvider(String artifactId) {
-		super(artifactId);
-	}
+    @DataBoundConstructor
+    public ArtifactoryChoiceListProvider(String artifactId) {
+        super(artifactId);
+    }
 
-	@Extension
-	public static class ArtifactoryDescriptorImpl extends AbstractMavenArtifactDescriptorImpl {
+    @Extension
+    public static class ArtifactoryDescriptorImpl extends AbstractMavenArtifactDescriptorImpl {
 
-		/**
-		 * the display name shown in the dropdown to select a choice provider.
-		 * 
-		 * @return display name
-		 * @see hudson.model.Descriptor#getDisplayName()
-		 */
-		@Override
-		public String getDisplayName() {
-			return "Artifactory Artifact Choice Parameter";
-		}
+        /**
+         * the display name shown in the dropdown to select a choice provider.
+         * 
+         * @return display name
+         * @see hudson.model.Descriptor#getDisplayName()
+         */
+        @Override
+        public String getDisplayName() {
+            return "Artifactory Artifact Choice Parameter";
+        }
 
-		public ListBoxModel doFillCredentialsIdItems(@AncestorInPath Item pItem) {
-		    // SECURITY-1022
-		    pItem.checkPermission(Job.CONFIGURE);
-		    
-			return new StandardListBoxModel().includeEmptyValue().includeMatchingAs(ACL.SYSTEM, pItem,
-					StandardUsernamePasswordCredentials.class, Collections.<DomainRequirement> emptyList(),
-					CredentialsMatchers.instanceOf(StandardUsernamePasswordCredentials.class));
-		}
+        public ListBoxModel doFillCredentialsIdItems(@AncestorInPath Item pItem) {
+            final ListBoxModel retVal;
 
-		@POST
-		public FormValidation doTest(@AncestorInPath Item pItem, @QueryParameter String url, @QueryParameter String credentialsId,
-		        @QueryParameter String groupId, @QueryParameter String artifactId, @QueryParameter String packaging,
-				@QueryParameter String classifier, @QueryParameter boolean reverseOrder) {
-		    
-		    // SECURITY-1022
+            // SECURITY-1022
+            if (pItem.hasPermission(Job.CONFIGURE)) {
+                retVal = new StandardListBoxModel().includeEmptyValue().includeMatchingAs(ACL.SYSTEM, pItem, StandardUsernamePasswordCredentials.class,
+                        Collections.<DomainRequirement> emptyList(), CredentialsMatchers.instanceOf(StandardUsernamePasswordCredentials.class));
+            } else {
+                retVal = new StandardListBoxModel().includeEmptyValue();
+            }
+
+            return retVal;
+        }
+
+        @POST
+        public FormValidation doTest(@AncestorInPath Item pItem, @QueryParameter String url, @QueryParameter String credentialsId, @QueryParameter String groupId,
+                @QueryParameter String artifactId, @QueryParameter String packaging, @QueryParameter String classifier, @QueryParameter boolean reverseOrder) {
+
+            // SECURITY-1022
             pItem.checkPermission(Job.CONFIGURE);
-            
-			final IVersionReader service = new ArtifactorySearchService(url);
 
-			// If configured, set User Credentials
-			final UsernamePasswordCredentialsImpl c = getCredentials(credentialsId);
-			if (c != null) {
-				service.setCredentials(c.getUsername(), c.getPassword().getPlainText());
-			}
-			return super.performTest(service, "", groupId, artifactId, packaging, classifier, reverseOrder);
-		}
+            final IVersionReader service = new ArtifactorySearchService(url);
 
-		@Override
-		protected Map<String, String> wrapTestConnection(IVersionReader pService, String pRepositoryId, String pGroupId, String pArtifactId,
-				String pPackaging, String pClassifier, boolean pReverseOrder) {
-			return readURL(pService, pRepositoryId, pGroupId, pArtifactId, pPackaging, pClassifier, pReverseOrder);
-		}
+            // If configured, set User Credentials
+            final UsernamePasswordCredentialsImpl c = getCredentials(credentialsId);
+            if (c != null) {
+                service.setCredentials(c.getUsername(), c.getPassword().getPlainText());
+            }
+            return super.performTest(service, "", groupId, artifactId, packaging, classifier, reverseOrder);
+        }
 
-		public FormValidation doCheckUrl(@QueryParameter String url) {
-			if (StringUtils.isBlank(url)) {
-				return FormValidation.error("The artifactory URL cannot be empty");
-			}
+        @Override
+        protected Map<String, String> wrapTestConnection(IVersionReader pService, String pRepositoryId, String pGroupId, String pArtifactId, String pPackaging, String pClassifier,
+                boolean pReverseOrder) {
+            return readURL(pService, pRepositoryId, pGroupId, pArtifactId, pPackaging, pClassifier, pReverseOrder);
+        }
 
-			return FormValidation.ok();
-		}
-	}
+        public FormValidation doCheckUrl(@QueryParameter String url) {
+            if (StringUtils.isBlank(url)) {
+                return FormValidation.error("The artifactory URL cannot be empty");
+            }
 
-	@Override
-	public IVersionReader createServiceInstance() {
-		final IVersionReader retVal = new ArtifactorySearchService(url);
-		final UsernamePasswordCredentialsImpl c = getCredentials(getCredentialsId());
-		if (c != null) {
-			retVal.setCredentials(c.getUsername(), c.getPassword().getPlainText());
-		}
-		return retVal;
-	}
+            return FormValidation.ok();
+        }
+    }
 
-	@DataBoundSetter
-	public void setCredentialsId(String credentialsId) {
-		this.credentialsId = credentialsId;
-	}
+    @Override
+    public IVersionReader createServiceInstance() {
+        final IVersionReader retVal = new ArtifactorySearchService(url);
+        final UsernamePasswordCredentialsImpl c = getCredentials(getCredentialsId());
+        if (c != null) {
+            retVal.setCredentials(c.getUsername(), c.getPassword().getPlainText());
+        }
+        return retVal;
+    }
 
-	public String getCredentialsId() {
-		return credentialsId;
-	}
+    @DataBoundSetter
+    public void setCredentialsId(String credentialsId) {
+        this.credentialsId = credentialsId;
+    }
 
-	@DataBoundSetter
-	public void setUrl(String url) {
-		this.url = StringUtils.trim(url);
-	}
+    public String getCredentialsId() {
+        return credentialsId;
+    }
 
-	public String getUrl() {
-		return url;
-	}
+    @DataBoundSetter
+    public void setUrl(String url) {
+        this.url = StringUtils.trim(url);
+    }
+
+    public String getUrl() {
+        return url;
+    }
 
 }

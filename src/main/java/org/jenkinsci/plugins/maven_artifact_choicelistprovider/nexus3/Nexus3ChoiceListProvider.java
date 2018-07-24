@@ -2,7 +2,6 @@ package org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus3;
 
 import java.util.Collections;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import javax.ws.rs.POST;
 
@@ -28,15 +27,12 @@ import hudson.model.Job;
 import hudson.security.ACL;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
-import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
 
 public class Nexus3ChoiceListProvider extends AbstractMavenArtifactChoiceListProvider {
 
     private static final long serialVersionUID = -5192115026547049358L;
 
-    private static final Logger LOGGER = Logger.getLogger(Nexus3ChoiceListProvider.class.getName());
-    
     private String url;
     private String credentialsId;
 
@@ -65,20 +61,27 @@ public class Nexus3ChoiceListProvider extends AbstractMavenArtifactChoiceListPro
         }
 
         public ListBoxModel doFillCredentialsIdItems(@AncestorInPath Item pItem) {
-            // SECURITY-1022
-            pItem.checkPermission(Job.CONFIGURE);
+            final ListBoxModel retVal;
 
-            return new StandardListBoxModel().includeEmptyValue().includeMatchingAs(ACL.SYSTEM, pItem, StandardUsernamePasswordCredentials.class,
-                    Collections.<DomainRequirement> emptyList(), CredentialsMatchers.instanceOf(StandardUsernamePasswordCredentials.class));
+            // SECURITY-1022
+            if (pItem.hasPermission(Job.CONFIGURE)) {
+                retVal = new StandardListBoxModel().includeEmptyValue().includeMatchingAs(ACL.SYSTEM, pItem, StandardUsernamePasswordCredentials.class,
+                        Collections.<DomainRequirement> emptyList(), CredentialsMatchers.instanceOf(StandardUsernamePasswordCredentials.class));
+            } else {
+                retVal = new StandardListBoxModel().includeEmptyValue();
+            }
+
+            return retVal;
         }
 
         @POST
-        public FormValidation doTest(@AncestorInPath Item pItem, @QueryParameter String url, @QueryParameter String credentialsId, @QueryParameter String repositoryId, @QueryParameter String groupId,
-                @QueryParameter String artifactId, @QueryParameter String packaging, @QueryParameter String classifier, @QueryParameter boolean reverseOrder) {
-            
+        public FormValidation doTest(@AncestorInPath Item pItem, @QueryParameter String url, @QueryParameter String credentialsId, @QueryParameter String repositoryId,
+                @QueryParameter String groupId, @QueryParameter String artifactId, @QueryParameter String packaging, @QueryParameter String classifier,
+                @QueryParameter boolean reverseOrder) {
+
             // SECURITY-1022
             pItem.checkPermission(Job.CONFIGURE);
-            
+
             final IVersionReader service = new Nexus3RestApiSearchService(url);
 
             // If configured, set User Credentials
