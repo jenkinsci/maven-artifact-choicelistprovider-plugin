@@ -45,4 +45,9 @@ public class StandardRESTfulParameterBuilder extends RESTfulParameterBuilder {
         return PARAMETER_CLASSIFIER;
     }
 
+    @Override
+    public String getContinuationToken() {
+       throw new UnsupportedOperationException("this method is not supported getContinuationToken()");
+    }
+
 }

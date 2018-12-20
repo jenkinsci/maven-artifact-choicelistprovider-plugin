@@ -10,7 +10,6 @@ import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.commons.lang.StringUtils;
 
-
 /**
  * 
  * Creates URL Parameters for a Nexus, Nexus3 and Artifactory Repository.
@@ -23,6 +22,11 @@ public abstract class RESTfulParameterBuilder {
 
     private static final Logger LOGGER = Logger.getLogger(RESTfulParameterBuilder.class.getName());
 
+    public MultivaluedMap<String, String> create(final String pRepositoryId, final String pGroupId, final String pArtifactId, final String pPackaging,
+            final ValidAndInvalidClassifier pClassifier) {
+        return create(pRepositoryId, pGroupId, pArtifactId, pPackaging, pClassifier, "");
+        
+    }
     /**
      * Creates the parameter list for the RESTful service.
      * 
@@ -36,12 +40,14 @@ public abstract class RESTfulParameterBuilder {
      *            the Packaging
      * @param pClassifier
      *            the Classifier
+     * @param continuationToken
      * @return the parameters to be used for the request.
      */
     public MultivaluedMap<String, String> create(final String pRepositoryId, final String pGroupId, final String pArtifactId, final String pPackaging,
-            final ValidAndInvalidClassifier pClassifier) {
+            final ValidAndInvalidClassifier pClassifier, String continuationToken) {
         if (LOGGER.isLoggable(Level.FINE)) {
-            LOGGER.fine("create parameters for: repositoryId: " + pRepositoryId + " g:" + pGroupId + ", a:" + pArtifactId + ", p:" + pPackaging + ", c: " + pClassifier.toString());
+            LOGGER.fine("create parameters for: repositoryId: " + pRepositoryId + " g:" + pGroupId + ", a:" + pArtifactId + ", p:" + pPackaging + ", c: " + pClassifier.toString()
+                    + "t:" + continuationToken);
         }
 
         MultivaluedMap<String, String> requestParams = new MultivaluedHashMap<String, String>();
@@ -66,6 +72,11 @@ public abstract class RESTfulParameterBuilder {
             if (!query.isEmpty())
                 requestParams.put(getClassifier(), query);
         }
+        
+        if (!StringUtils.isEmpty(continuationToken)) {
+            requestParams.putSingle(getContinuationToken(), continuationToken);
+        }
+        
         return requestParams;
     }
 
@@ -78,5 +89,7 @@ public abstract class RESTfulParameterBuilder {
     public abstract String getPackaging();
 
     public abstract String getClassifier();
+    
+    public abstract String getContinuationToken();
 
 }

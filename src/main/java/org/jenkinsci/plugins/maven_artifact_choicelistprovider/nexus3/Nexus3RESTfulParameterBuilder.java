@@ -19,6 +19,8 @@ public class Nexus3RESTfulParameterBuilder extends RESTfulParameterBuilder {
     public static final String PARAMETER_ARTIFACTID = "name";
 
     public static final String PARAMETER_GROUPID = "group";
+   
+    public static final String PARAMETER_TOKEN = "continuationToken";
 
     public static final String PACKAGING_ALL = "*";
 
@@ -45,6 +47,11 @@ public class Nexus3RESTfulParameterBuilder extends RESTfulParameterBuilder {
     @Override
     public String getClassifier() {
         return PARAMETER_CLASSIFIER;
+    }
+
+    @Override
+    public String getContinuationToken() {
+        return PARAMETER_TOKEN;
     }
 
 }

@@ -1,15 +1,16 @@
 package org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus3;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.AbstractRESTfulVersionReader;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.IVersionReader;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.ValidAndInvalidClassifier;
@@ -18,6 +19,7 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.jersey.api.client.WebResource;
+
 
 public class Nexus3RestApiSearchService extends AbstractRESTfulVersionReader implements IVersionReader {
 
@@ -33,39 +35,45 @@ public class Nexus3RestApiSearchService extends AbstractRESTfulVersionReader imp
     public Set<String> callService(final String pRepositoryId, final String pGroupId, final String pArtifactId, final String pPackaging,
             final ValidAndInvalidClassifier pClassifier) {
 
-        final MultivaluedMap<String, String> requestParams = new Nexus3RESTfulParameterBuilder().create(pRepositoryId, pGroupId, pArtifactId, pPackaging, pClassifier);
-
         // init empty
-        Set<String> retVal = Collections.emptySet();
+        Set<String> retVal = new TreeSet<>();
+        String token = null;
 
-        LOGGER.info("call nexus service");
         final WebResource rs = getInstance();
-
-        if (LOGGER.isLoggable(Level.INFO)) {
-            LOGGER.info("URI: " + rs.queryParams(requestParams).getURI());
-        }
-
-        final String plainResult = rs.queryParams(requestParams).accept(MediaType.APPLICATION_JSON).get(String.class);
         final ObjectMapper mapper = new ObjectMapper();
-
-        try {
-            final Nexus3RestResponse parsedJsonResult = mapper.readValue(plainResult, Nexus3RestResponse.class);
-            if (parsedJsonResult == null) {
-                LOGGER.info("response from Nexus3 is NULL.");
-            } else if (parsedJsonResult.getItems().length == 0) {
-                LOGGER.info("response from Nexus3 does not contain any results.");
-            } else {
-                retVal = parseResponse(parsedJsonResult);
+       
+        do {
+            final MultivaluedMap<String, String> requestParams = new Nexus3RESTfulParameterBuilder().create(pRepositoryId, pGroupId, pArtifactId, pPackaging, pClassifier, token);
+            if (LOGGER.isLoggable(Level.INFO)) {
+                LOGGER.info("URI: " + rs.queryParams(requestParams).getURI());
             }
-        } catch (JsonParseException e) {
-            LOGGER.log(Level.WARNING, "failed to parse", e);
-        } catch (JsonMappingException e) {
-            LOGGER.log(Level.WARNING, "failed to map", e);
-        } catch (IOException e) {
-            LOGGER.log(Level.WARNING, "failed to ioexception", e);
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "unexpected error", e);
-        }
+            
+            final String plainResult = rs.queryParams(requestParams).accept(MediaType.APPLICATION_JSON).get(String.class);
+
+            try {
+                final Nexus3RestResponse parsedJsonResult = mapper.readValue(plainResult, Nexus3RestResponse.class);
+                
+                if (parsedJsonResult == null) {
+                    LOGGER.info("response from Nexus3 is NULL.");
+                } else if (parsedJsonResult.getItems().length == 0) {
+                    LOGGER.info("response from Nexus3 does not contain any results.");
+                } else {
+                    Set<String> currentResult = parseResponse(parsedJsonResult);
+                    retVal.addAll(currentResult);
+                    
+                    // control the loop and maybe query again
+                    token = parsedJsonResult.getContinuationToken();
+                }
+            } catch (JsonParseException e) {
+                LOGGER.log(Level.WARNING, "failed to parse", e);
+            } catch (JsonMappingException e) {
+                LOGGER.log(Level.WARNING, "failed to map", e);
+            } catch (IOException e) {
+                LOGGER.log(Level.WARNING, "failed to ioexception", e);
+            } catch (Exception e) {
+                LOGGER.log(Level.SEVERE, "unexpected error", e);
+            }
+        } while (!StringUtils.isEmpty(token));
 
         return retVal;
     }
