@@ -41,6 +41,7 @@ public abstract class RESTfulParameterBuilder {
      * @param pClassifier
      *            the Classifier
      * @param continuationToken
+     *            the Nexus 3 Token.
      * @return the parameters to be used for the request.
      */
     public MultivaluedMap<String, String> create(final String pRepositoryId, final String pGroupId, final String pArtifactId, final String pPackaging,
