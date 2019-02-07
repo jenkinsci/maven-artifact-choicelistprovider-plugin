@@ -23,7 +23,7 @@ import com.sun.jersey.api.client.WebResource;
 
 public class Nexus3RestApiSearchService extends AbstractRESTfulVersionReader implements IVersionReader {
 
-    private static final String NEXUS3_REST_API_ENDPOINT = "service/rest/beta/search/assets";
+    private static final String NEXUS3_REST_API_ENDPOINT = "service/rest/v1/search/assets";
 
     private static final Logger LOGGER = Logger.getLogger(Nexus3RestApiSearchService.class.getName());
 
