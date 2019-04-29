@@ -5,6 +5,10 @@ public class Checksum {
 
     private String sha1;
 
+    private String sha256;
+    
+    private String sha512;
+
     public String getMd5() {
         return md5;
     }
@@ -21,8 +25,25 @@ public class Checksum {
         this.sha1 = sha1;
     }
 
+    public String getSha256() {
+        return sha256;
+    }
+
+    public void setSha256(String sha256) {
+        this.sha256 = sha256;
+    }
+
+
+    public String getSha512() {
+        return sha512;
+    }
+
+    public void setSha512(String sha512) {
+        this.sha512 = sha512;
+    }
+
     @Override
     public String toString() {
-        return "ClassPojo [md5 = " + md5 + ", sha1 = " + sha1 + "]";
+        return "ClassPojo [md5 = " + md5 + ", sha256 = " + sha256 + ", sha1 = " + sha1 + ", sha512 = " + sha512 + "]";
     }
 }
