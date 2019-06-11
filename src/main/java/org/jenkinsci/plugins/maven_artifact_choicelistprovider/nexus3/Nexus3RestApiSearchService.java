@@ -57,6 +57,9 @@ public class Nexus3RestApiSearchService extends AbstractRESTfulVersionReader imp
                     LOGGER.info("response from Nexus3 is NULL.");
                 } else if (parsedJsonResult.getItems().length == 0) {
                     LOGGER.info("response from Nexus3 does not contain any results.");
+
+		    // control the loop and maybe query again
+                    token = parsedJsonResult.getContinuationToken();
                 } else {
                     Set<String> currentResult = parseResponse(parsedJsonResult);
                     retVal.addAll(currentResult);
