@@ -58,7 +58,8 @@ public class Nexus3RestApiSearchService extends AbstractRESTfulVersionReader imp
                 } else if (parsedJsonResult.getItems().length == 0) {
                     LOGGER.info("response from Nexus3 does not contain any results.");
 
-		    // control the loop and maybe query again
+                    // ISSUE20: If exactly 50 results are returned the token is still != null from the previous call. 
+                    // So we get the token from the request which should be null.
                     token = parsedJsonResult.getContinuationToken();
                 } else {
                     Set<String> currentResult = parseResponse(parsedJsonResult);
