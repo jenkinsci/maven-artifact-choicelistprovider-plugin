@@ -35,7 +35,7 @@ public abstract class AbstractRESTfulVersionReader implements IVersionReader {
 
 	private static final Logger LOGGER = Logger.getLogger(AbstractRESTfulVersionReader.class.getName());
 
-	private final String mURL;
+	private String mURL;
 
 	private String mUserName;
 	private String mUserPassword;
@@ -109,8 +109,12 @@ public abstract class AbstractRESTfulVersionReader implements IVersionReader {
 	public String getURL() {
 		return mURL;
 	}
+    public void setUrl(String url) {
+       mURL = url;
+    }
 
-	protected WebResource getInstance() {
+
+    protected WebResource getInstance() {
 		if (mInstance == null) {
 			init();
 		}
