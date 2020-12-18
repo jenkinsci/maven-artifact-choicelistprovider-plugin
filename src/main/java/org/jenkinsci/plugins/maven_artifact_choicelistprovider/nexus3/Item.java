@@ -19,6 +19,12 @@ public class Item {
 
     private String format;
 
+    private String contentType;
+
+    private String lastModified;
+
+    private Maven2 maven2;
+
     public String getId() {
         return id;
     }
@@ -65,6 +71,30 @@ public class Item {
 
     public void setFormat(String format) {
         this.format = format;
+    }
+
+    public String getContentType() {
+        return contentType;
+    }
+
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
+    }
+
+    public String getLastModified() {
+        return lastModified;
+    }
+
+    public void setLastModified(String lastModified) {
+        this.lastModified = lastModified;
+    }
+
+    public Maven2 getMaven2() {
+        return maven2;
+    }
+
+    public void setMaven2(Maven2 maven2) {
+        this.maven2 = maven2;
     }
 
     @Override
