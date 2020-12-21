@@ -28,7 +28,6 @@ import hudson.model.Job;
 import hudson.security.ACL;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
-import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
 
 public class NexusChoiceListProvider extends AbstractMavenArtifactChoiceListProvider {

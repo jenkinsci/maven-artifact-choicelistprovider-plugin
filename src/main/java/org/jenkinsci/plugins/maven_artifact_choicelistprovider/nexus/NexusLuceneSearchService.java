@@ -4,6 +4,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -43,8 +44,14 @@ public class NexusLuceneSearchService extends AbstractRESTfulVersionReader imple
 
         Set<String> retVal = new LinkedHashSet<String>();
         LOGGER.info("call nexus service");
-        final PatchedSearchNGResponse xmlResult = getInstance().queryParams(requestParams).accept(MediaType.APPLICATION_XML).get(PatchedSearchNGResponse.class);
-
+        
+        final WebTarget theInstance = getInstance();
+        for(String currentKey : requestParams.keySet()) {
+        	theInstance.queryParam(currentKey, requestParams.get(currentKey));
+        }
+        
+        final PatchedSearchNGResponse xmlResult = theInstance.request(MediaType.APPLICATION_XML).get(PatchedSearchNGResponse.class);
+        
         if (xmlResult == null) {
             LOGGER.info("response from Nexus is NULL.");
         } else if (xmlResult.getTotalCount() == 0) {
