@@ -38,7 +38,7 @@ public class Nexus3RestApiSearchService extends AbstractRESTfulVersionReader imp
 		Set<String> retVal = new TreeSet<>();
 		String token = null;
 
-		final WebTarget theInstance = getInstance();
+		WebTarget theInstance = getInstance();
 		final ObjectMapper mapper = new ObjectMapper();
 
 		do {
@@ -46,7 +46,7 @@ public class Nexus3RestApiSearchService extends AbstractRESTfulVersionReader imp
 					.create(pRepositoryId, pGroupId, pArtifactId, pPackaging, pClassifier, token);
 
 			for (String currentKey : requestParams.keySet()) {
-				theInstance.queryParam(currentKey, requestParams.get(currentKey));
+				theInstance = theInstance.queryParam(currentKey, requestParams.get(currentKey));
 			}
 
 			if (LOGGER.isLoggable(Level.INFO)) {

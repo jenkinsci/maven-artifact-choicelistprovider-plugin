@@ -103,6 +103,8 @@ public abstract class AbstractRESTfulVersionReader implements IVersionReader {
 				throw new VersionReaderException(
 						"Timeout while connecting to your Repository Service. Please consider the Jenkins-Proxy settings. If using HTTPs also invalid certificates can be the root cause.",
 						e);
+			} else if (e instanceof javax.ws.rs.BadRequestException) {
+				throw new VersionReaderException("Request is invalid", e);
 			} else {
 				throw new VersionReaderException("failed to retrieve versions from repository for r:" + getURL()
 						+ ", g:" + pGroupId + ", a:" + pArtifactId + ", p:" + pPackaging + ", c:" + pClassifier, e);

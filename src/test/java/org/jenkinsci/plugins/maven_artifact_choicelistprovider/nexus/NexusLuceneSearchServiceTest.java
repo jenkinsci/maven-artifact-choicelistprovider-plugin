@@ -1,12 +1,13 @@
 package org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.List;
 
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.ValidAndInvalidClassifier;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.VersionReaderException;
-import org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus.NexusLuceneSearchService;
 import org.junit.After;
 import org.junit.Test;
 

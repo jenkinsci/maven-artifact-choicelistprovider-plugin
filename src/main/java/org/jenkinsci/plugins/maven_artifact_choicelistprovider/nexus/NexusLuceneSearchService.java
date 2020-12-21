@@ -1,12 +1,17 @@
 package org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus;
 
+import java.io.StringReader;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Unmarshaller;
 
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.AbstractRESTfulVersionReader;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.IVersionReader;
@@ -17,113 +22,132 @@ import org.sonatype.nexus.rest.model.NexusNGArtifactLink;
 
 public class NexusLuceneSearchService extends AbstractRESTfulVersionReader implements IVersionReader {
 
-    private static final String LUCENE_SEARCH_SERVICE_URI = "service/local/lucene/search";
+	private static final String LUCENE_SEARCH_SERVICE_URI = "service/local/lucene/search";
 
-    private static final Logger LOGGER = Logger.getLogger(NexusLuceneSearchService.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(NexusLuceneSearchService.class.getName());
 
-    private boolean mUseRESTfulAPI;
+	private boolean mUseRESTfulAPI;
 
-    public NexusLuceneSearchService(String pURL) {
-        super(pURL);
-    }
-    
-    public NexusLuceneSearchService(String pURL, boolean useRESTfulAPI) {
-        super(pURL);
-        mUseRESTfulAPI = useRESTfulAPI;
-    }
+	public NexusLuceneSearchService(String pURL) {
+		super(pURL);
+	}
 
-    /**
-     * 
-     * Search in Nexus for the artifact using the Lucene Service.
-     * https://repository.sonatype.org/nexus-indexer-lucene-plugin/default/docs/path__lucene_search.html
-     */
-    @Override
-    public Set<String> callService(final String pRepositoryId, final String pGroupId, final String pArtifactId, final String pPackaging, final ValidAndInvalidClassifier pClassifier) {
+	public NexusLuceneSearchService(String pURL, boolean useRESTfulAPI) {
+		super(pURL);
+		mUseRESTfulAPI = useRESTfulAPI;
+	}
 
-        final MultivaluedMap<String, String> requestParams = new StandardRESTfulParameterBuilder().create(pRepositoryId, pGroupId, pArtifactId, pPackaging, pClassifier);
+	/**
+	 * 
+	 * Search in Nexus for the artifact using the Lucene Service.
+	 * https://repository.sonatype.org/nexus-indexer-lucene-plugin/default/docs/path__lucene_search.html
+	 */
+	@Override
+	public Set<String> callService(final String pRepositoryId, final String pGroupId, final String pArtifactId,
+			final String pPackaging, final ValidAndInvalidClassifier pClassifier) {
 
-        Set<String> retVal = new LinkedHashSet<String>();
-        LOGGER.info("call nexus service");
-        
-        final WebTarget theInstance = getInstance();
-        for(String currentKey : requestParams.keySet()) {
-        	theInstance.queryParam(currentKey, requestParams.get(currentKey));
-        }
-        
-        final PatchedSearchNGResponse xmlResult = theInstance.request(MediaType.APPLICATION_XML).get(PatchedSearchNGResponse.class);
-        
-        if (xmlResult == null) {
-            LOGGER.info("response from Nexus is NULL.");
-        } else if (xmlResult.getTotalCount() == 0) {
-            LOGGER.info("response from Nexus does not contain any results.");
-        } else {
-            retVal = parseResponse(xmlResult, pPackaging, pClassifier);
-        }
-        return retVal;
-    }
+		final MultivaluedMap<String, String> requestParams = new StandardRESTfulParameterBuilder().create(pRepositoryId,
+				pGroupId, pArtifactId, pPackaging, pClassifier);
 
-    /**
-     * Parses the XML response from Nexus and creates a list of links where the artifacts can be retrieved.
-     * 
-     * @param pXMLResult
-     * @param pPackaging
-     * @param pClassifier
-     * @return a unique list of URLs that are matching the search criteria, sorted by the order of the Nexus service.
-     */
-    Set<String> parseResponse(final PatchedSearchNGResponse pXMLResult, final String pPackaging, final ValidAndInvalidClassifier pClassifier) {
-        // Use a Map instead of a List to filter duplicated entries and also linked to keep the order of XML response
-        final Set<String> retVal = new LinkedHashSet<String>();
+		Set<String> retVal = new LinkedHashSet<String>();
+		LOGGER.info("call nexus service");
 
-        for (NexusNGArtifact current : pXMLResult.getData()) {
-            final IArtifactURLBuilder artifactURL;
-            if (mUseRESTfulAPI) {
-                artifactURL = new NexusContentServiceArtifactURLBuilder();
-            } else {
-                artifactURL = new DirectArtifactURLBuilder();
-            }
-            artifactURL.setNexusURL(getURL()).setGroupId(current.getGroupId()).setArtifactId(current.getArtifactId()).setVersion(current.getVersion());
+		WebTarget theInstance = getInstance();
+		for (String currentKey : requestParams.keySet()) {
+			List<String> paramValues = requestParams.get(currentKey);
+			theInstance = theInstance.queryParam(currentKey, paramValues.toArray(new Object[paramValues.size()]));
+		}
 
-            for (NexusNGArtifactHit currentHit : current.getArtifactHits()) {
+		LOGGER.info(theInstance.getUri().toString());
+		String string = theInstance.request(MediaType.APPLICATION_XML).get(String.class);
 
-                // RepositoryId from the ArtifactHit
-                artifactURL.setRepositoryId(currentHit.getRepositoryId());
+		try {
+			JAXBContext jaxbContext = JAXBContext.newInstance(PatchedSearchNGResponse.class);
+			Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
 
-                for (NexusNGArtifactLink currentLink : currentHit.getArtifactLinks()) {
-                    boolean addCurrentEntry = true;
-                    boolean addCurrentyEntryAsFolder = false;
+			StringReader reader = new StringReader(string);
+			PatchedSearchNGResponse xmlResult = (PatchedSearchNGResponse) unmarshaller.unmarshal(reader);
 
-                    // if packaging configuration is set but does not match
-                    if ("".equals(pPackaging)) {
-                        addCurrentyEntryAsFolder = true;
-                    } else if (PACKAGING_ALL.equals(pPackaging)) {
-                        // then always add
-                    } else if (!pPackaging.equals(currentLink.getExtension())) {
-                        addCurrentEntry &= false;
-                    }
+			if (xmlResult == null) {
+				LOGGER.info("response from Nexus is NULL.");
+			} else if (xmlResult.getTotalCount() == 0) {
+				LOGGER.info("response from Nexus does not contain any results.");
+			} else {
+				retVal = parseResponse(xmlResult, pPackaging, pClassifier);
+			}
+		} catch (Exception e) {
+			LOGGER.log(Level.WARNING, "failed to parse xml " + string, e);
+		}
+		return retVal;
+	}
 
-                    // check the classifier.
-                    if (!pClassifier.isValid(currentLink.getClassifier())) {
-                        addCurrentEntry &= false;
-                    }
+	/**
+	 * Parses the XML response from Nexus and creates a list of links where the
+	 * artifacts can be retrieved.
+	 * 
+	 * @param pXMLResult
+	 * @param pPackaging
+	 * @param pClassifier
+	 * @return a unique list of URLs that are matching the search criteria, sorted
+	 *         by the order of the Nexus service.
+	 */
+	Set<String> parseResponse(final PatchedSearchNGResponse pXMLResult, final String pPackaging,
+			final ValidAndInvalidClassifier pClassifier) {
+		// Use a Map instead of a List to filter duplicated entries and also linked to
+		// keep the order of XML response
+		final Set<String> retVal = new LinkedHashSet<String>();
 
-                    if (addCurrentEntry) {
-                        artifactURL.setClassifier(currentLink.getClassifier()).setPackaging(currentLink.getExtension());
-                        retVal.add(artifactURL.build(addCurrentyEntryAsFolder));
-                    }
-                }
-            }
-        }
-        return retVal;
-    }
+		for (NexusNGArtifact current : pXMLResult.getData()) {
+			final IArtifactURLBuilder artifactURL;
+			if (mUseRESTfulAPI) {
+				artifactURL = new NexusContentServiceArtifactURLBuilder();
+			} else {
+				artifactURL = new DirectArtifactURLBuilder();
+			}
+			artifactURL.setNexusURL(getURL()).setGroupId(current.getGroupId()).setArtifactId(current.getArtifactId())
+					.setVersion(current.getVersion());
 
-    /**
-     * Return the configured service endpoint in this repository.
-     * 
-     * @return the configured service endpoint in this repository.
-     */
-    @Override
-    public String getRESTfulServiceEndpoint() {
-        return LUCENE_SEARCH_SERVICE_URI;
-    }
+			for (NexusNGArtifactHit currentHit : current.getArtifactHits()) {
+
+				// RepositoryId from the ArtifactHit
+				artifactURL.setRepositoryId(currentHit.getRepositoryId());
+
+				for (NexusNGArtifactLink currentLink : currentHit.getArtifactLinks()) {
+					boolean addCurrentEntry = true;
+					boolean addCurrentyEntryAsFolder = false;
+
+					// if packaging configuration is set but does not match
+					if ("".equals(pPackaging)) {
+						addCurrentyEntryAsFolder = true;
+					} else if (PACKAGING_ALL.equals(pPackaging)) {
+						// then always add
+					} else if (!pPackaging.equals(currentLink.getExtension())) {
+						addCurrentEntry &= false;
+					}
+
+					// check the classifier.
+					if (!pClassifier.isValid(currentLink.getClassifier())) {
+						addCurrentEntry &= false;
+					}
+
+					if (addCurrentEntry) {
+						artifactURL.setClassifier(currentLink.getClassifier()).setPackaging(currentLink.getExtension());
+						retVal.add(artifactURL.build(addCurrentyEntryAsFolder));
+					}
+				}
+			}
+		}
+		return retVal;
+	}
+
+	/**
+	 * Return the configured service endpoint in this repository.
+	 * 
+	 * @return the configured service endpoint in this repository.
+	 */
+	@Override
+	public String getRESTfulServiceEndpoint() {
+		return LUCENE_SEARCH_SERVICE_URI;
+	}
 
 }

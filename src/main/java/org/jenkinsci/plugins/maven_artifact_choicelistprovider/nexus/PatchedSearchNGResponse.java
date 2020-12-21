@@ -1,5 +1,7 @@
 package org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 import org.sonatype.nexus.rest.model.NexusIndexerResponse;
 import org.sonatype.nexus.rest.model.NexusNGArtifact;
 import org.sonatype.nexus.rest.model.NexusNGRepositoryDetail;
@@ -18,7 +20,6 @@ import org.sonatype.nexus.rest.model.NexusNGRepositoryDetail;
 @com.thoughtworks.xstream.annotations.XStreamAlias(value = "searchNGResponse")
 @javax.xml.bind.annotation.XmlRootElement(name = "searchNGResponse")
 @javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)
-
 public class PatchedSearchNGResponse extends NexusIndexerResponse implements java.io.Serializable {
 
 	// --------------------------/
