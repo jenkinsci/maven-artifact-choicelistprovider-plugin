@@ -11,6 +11,7 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.AbstractRESTfulVersionReader;
@@ -28,6 +29,15 @@ public class NexusLuceneSearchService extends AbstractRESTfulVersionReader imple
 
 	private boolean mUseRESTfulAPI;
 
+	private static final ThreadLocal<JAXBContext> JAXBCONTEXT = ThreadLocal.withInitial(() -> {
+		try {
+			return (JAXBContext.newInstance(PatchedSearchNGResponse.class));
+		} catch (JAXBException e) {
+			LOGGER.log(Level.SEVERE, "failed to init JAXB context", e);
+			return null;
+		}
+	});
+	
 	public NexusLuceneSearchService(String pURL) {
 		super(pURL);
 	}
@@ -58,26 +68,37 @@ public class NexusLuceneSearchService extends AbstractRESTfulVersionReader imple
 			theInstance = theInstance.queryParam(currentKey, paramValues.toArray(new Object[paramValues.size()]));
 		}
 
-		LOGGER.info(theInstance.getUri().toString());
-		String string = theInstance.request(MediaType.APPLICATION_XML).get(String.class);
+		LOGGER.info("final URL: " + theInstance.getUri().toString());
+
+		// TODO: I dont know why this is not working. This should work...
+		// PatchedSearchNGResponse xmlResult =
+		// response.readEntity(PatchedSearchNGResponse.class);
+		// Response response = theInstance.request(MediaType.APPLICATION_XML).get();
+
+		String response = theInstance.request(MediaType.APPLICATION_XML).get(String.class);
+
+		PatchedSearchNGResponse xmlResult = null;
 
 		try {
-			JAXBContext jaxbContext = JAXBContext.newInstance(PatchedSearchNGResponse.class);
-			Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+			Unmarshaller unmarshaller = JAXBCONTEXT.get().createUnmarshaller();
 
-			StringReader reader = new StringReader(string);
-			PatchedSearchNGResponse xmlResult = (PatchedSearchNGResponse) unmarshaller.unmarshal(reader);
-
-			if (xmlResult == null) {
-				LOGGER.info("response from Nexus is NULL.");
-			} else if (xmlResult.getTotalCount() == 0) {
-				LOGGER.info("response from Nexus does not contain any results.");
-			} else {
-				retVal = parseResponse(xmlResult, pPackaging, pClassifier);
-			}
+			StringReader reader = new StringReader(response);
+			xmlResult = (PatchedSearchNGResponse) unmarshaller.unmarshal(reader);
 		} catch (Exception e) {
-			LOGGER.log(Level.WARNING, "failed to parse xml " + string, e);
+			LOGGER.log(Level.WARNING, "failed to parse xml from response", e);
+			if(LOGGER.isLoggable(Level.FINE)) {
+				LOGGER.log(Level.INFO, "xml response: " + response);
+			}
 		}
+
+		if (xmlResult == null) {
+			LOGGER.info("response from Nexus is NULL.");
+		} else if (xmlResult.getTotalCount() == 0) {
+			LOGGER.info("response from Nexus does not contain any results.");
+		} else {
+			retVal = parseResponse(xmlResult, pPackaging, pClassifier);
+		}
+
 		return retVal;
 	}
 
