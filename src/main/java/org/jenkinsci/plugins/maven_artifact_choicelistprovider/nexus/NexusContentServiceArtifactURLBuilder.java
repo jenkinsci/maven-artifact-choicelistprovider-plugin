@@ -1,5 +1,8 @@
 package org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 /**
  * 
  * This implementation creates a download link for the given artifact by using an inbuild Nexus service. So this
@@ -19,6 +22,8 @@ package org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus;
  * @author stephan.watermeyer, Diebold Nixdorf
  */
 public class NexusContentServiceArtifactURLBuilder extends AbstractArtifactURLBuilder implements IArtifactURLBuilder {
+
+	private static final String ENCODING = "UTF-8";
 
 	/**
 	 * The RESTful service URI.
@@ -45,9 +50,17 @@ public class NexusContentServiceArtifactURLBuilder extends AbstractArtifactURLBu
 			retVal.append("c=").append(getClassifier()).append(AMPERSAND);
 		}
 		if (getVersion() != null) {
-			retVal.append("v=").append(getVersion());
+			retVal.append("v=").append(encode(getVersion()));
 		}
 		return retVal.toString();
+	}
+	
+	String encode(final String pValue) {
+		try {
+			return URLEncoder.encode(pValue, ENCODING);
+		} catch (UnsupportedEncodingException e) {
+			return pValue;
+		}
 	}
 
 }
