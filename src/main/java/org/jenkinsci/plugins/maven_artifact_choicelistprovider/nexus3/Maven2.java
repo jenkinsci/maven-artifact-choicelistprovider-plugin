@@ -44,13 +44,11 @@ public class Maven2 {
         this.version = version;
     }
     
-    	public String getClassifier()
-	{
-		return classifier;
-	}
+    public String getClassifier(){ 
+        return classifier;
+    }
 
-	public void setClassifier(String classifier)
-	{
-		this.classifier = classifier;
-	}
+    public void setClassifier(String classifier) {
+        this.classifier = classifier;
+    }
 }
