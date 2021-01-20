@@ -9,6 +9,8 @@ public class Maven2 {
     private String artifactId;
 
     private String version;
+    
+    private String classifier;
 
     public String getExtension() {
         return extension;
@@ -41,4 +43,14 @@ public class Maven2 {
     public void setVersion(String version) {
         this.version = version;
     }
+    
+    	public String getClassifier()
+	{
+		return classifier;
+	}
+
+	public void setClassifier(String classifier)
+	{
+		this.classifier = classifier;
+	}
 }
