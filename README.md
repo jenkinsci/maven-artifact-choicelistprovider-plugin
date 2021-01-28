@@ -16,7 +16,7 @@ We are using this plugin to let our QA department choose between the various ava
 # Known Issues
 ## Nexus Snapshots
 If you would like to use Snapshot Versions of your artifacts you have to enable the tick-box in the Jenkins Settings. Only with the RESTful interface of Nexus 2 you will be able to retrieve Snapshot versions.
-![Alt text](/src/site/resources/project-config-2.jpg?raw=true "Nexus Snapshots")
+![Alt text](/src/site/resources/project-config-2.png?raw=true "Nexus Snapshots")
 
 ## Artifactory
 Artifactory API is not returning the correct ArtifactIds but only a URL to a JSON file that contains the DownloadURI of the Artifact. As currently there is no way in the Extensible Choice Plugin to intercept the selected value and because its not performant to query Artifactory for all items in the list for the correct downloadURI, the workaround is like this:
