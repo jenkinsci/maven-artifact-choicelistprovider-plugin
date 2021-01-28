@@ -2,20 +2,19 @@ package org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * 
- * This implementation creates a download link for the given artifact by using an inbuild Nexus service. So this
- * implementation uses the RESTful interface of Nexus to submit the artifact details to the service, and the Nexus
- * service will return the artifact.
- * <br>
- * Example:
- * <a href=
+ * This implementation creates a download link for the given artifact by using
+ * an inbuild Nexus service. So this implementation uses the RESTful interface
+ * of Nexus to submit the artifact details to the service, and the Nexus service
+ * will return the artifact. <br>
+ * Example: <a href=
  * "https://server/service/local/artifact/maven/content?r=repositoryId&g=groupId&a=artifactId&p=packaging&v=versionId">
- * Example</a>
- * <br>
- * Further documentation:
- * <a href=
+ * Example</a> <br>
+ * Further documentation: <a href=
  * "https://support.sonatype.com/hc/en-us/articles/213465488-How-can-I-retrieve-a-snapshot-if-I-don-t-know-the-exact-filename-">
  * Sonatype Support</a>
  * 
@@ -24,6 +23,8 @@ import java.net.URLEncoder;
 public class NexusContentServiceArtifactURLBuilder extends AbstractArtifactURLBuilder implements IArtifactURLBuilder {
 
 	private static final String ENCODING = "UTF-8";
+
+	private static final Logger LOGGER = Logger.getLogger(NexusContentServiceArtifactURLBuilder.class.getName());
 
 	/**
 	 * The RESTful service URI.
@@ -54,11 +55,12 @@ public class NexusContentServiceArtifactURLBuilder extends AbstractArtifactURLBu
 		}
 		return retVal.toString();
 	}
-	
+
 	String encode(final String pValue) {
 		try {
 			return URLEncoder.encode(pValue, ENCODING);
 		} catch (UnsupportedEncodingException e) {
+			LOGGER.log(Level.FINE, "failed to convert version to  " + ENCODING + ":" + pValue);
 			return pValue;
 		}
 	}
