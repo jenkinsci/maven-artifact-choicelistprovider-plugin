@@ -58,7 +58,9 @@ public class NexusContentServiceArtifactURLBuilder extends AbstractArtifactURLBu
 
 	String encode(final String pValue) {
 		try {
-			return URLEncoder.encode(pValue, ENCODING);
+			final String retVal = URLEncoder.encode(pValue, ENCODING);
+			//LOGGER.log(Level.FINER, "convert " + pValue + " to " + retVal);
+			return retVal;
 		} catch (UnsupportedEncodingException e) {
 			LOGGER.log(Level.FINE, "failed to convert version to  " + ENCODING + ":" + pValue);
 			return pValue;

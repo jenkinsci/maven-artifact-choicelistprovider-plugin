@@ -7,99 +7,109 @@ package org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus3;
  *
  */
 public class Item {
-    private String id;
+	private String id;
 
-    private String repository;
+	private String repository;
 
-    private String path;
+	private String path;
 
-    private String downloadUrl;
+	private String downloadUrl;
 
-    private Checksum checksum;
+	private Checksum checksum;
 
-    private String format;
+	private String format;
 
-    private String contentType;
+	private String contentType;
 
-    private String lastModified;
+	private String lastModified;
 
-    private Maven2 maven2;
+	private Maven2Asset maven2;
 
-    public String getId() {
-        return id;
-    }
+	private NPMAsset npm;
 
-    public void setId(String id) {
-        this.id = id;
-    }
+	public String getId() {
+		return id;
+	}
 
-    public String getRepository() {
-        return repository;
-    }
+	public void setId(String id) {
+		this.id = id;
+	}
 
-    public void setRepository(String repository) {
-        this.repository = repository;
-    }
+	public String getRepository() {
+		return repository;
+	}
 
-    public String getPath() {
-        return path;
-    }
+	public void setRepository(String repository) {
+		this.repository = repository;
+	}
 
-    public void setPath(String path) {
-        this.path = path;
-    }
+	public String getPath() {
+		return path;
+	}
 
-    public String getDownloadUrl() {
-        return downloadUrl;
-    }
+	public void setPath(String path) {
+		this.path = path;
+	}
 
-    public void setDownloadUrl(String downloadUrl) {
-        this.downloadUrl = downloadUrl;
-    }
+	public String getDownloadUrl() {
+		return downloadUrl;
+	}
 
-    public Checksum getChecksum() {
-        return checksum;
-    }
+	public void setDownloadUrl(String downloadUrl) {
+		this.downloadUrl = downloadUrl;
+	}
 
-    public void setChecksum(Checksum checksum) {
-        this.checksum = checksum;
-    }
+	public Checksum getChecksum() {
+		return checksum;
+	}
 
-    public String getFormat() {
-        return format;
-    }
+	public void setChecksum(Checksum checksum) {
+		this.checksum = checksum;
+	}
 
-    public void setFormat(String format) {
-        this.format = format;
-    }
+	public String getFormat() {
+		return format;
+	}
 
-    public String getContentType() {
-        return contentType;
-    }
+	public void setFormat(String format) {
+		this.format = format;
+	}
 
-    public void setContentType(String contentType) {
-        this.contentType = contentType;
-    }
+	public String getContentType() {
+		return contentType;
+	}
 
-    public String getLastModified() {
-        return lastModified;
-    }
+	public void setContentType(String contentType) {
+		this.contentType = contentType;
+	}
 
-    public void setLastModified(String lastModified) {
-        this.lastModified = lastModified;
-    }
+	public String getLastModified() {
+		return lastModified;
+	}
 
-    public Maven2 getMaven2() {
-        return maven2;
-    }
+	public void setLastModified(String lastModified) {
+		this.lastModified = lastModified;
+	}
 
-    public void setMaven2(Maven2 maven2) {
-        this.maven2 = maven2;
-    }
+	public Maven2Asset getMaven2() {
+		return maven2;
+	}
 
-    @Override
-    public String toString() {
-        return "Item [id = " + id + ", repository = " + repository + ", path = " + path + ", downloadUrl = " + downloadUrl + ", checksum = " + checksum + ", format = " + format
-                + "]";
-    }
+	public NPMAsset getNpm() {
+		return npm;
+	}
+
+	public void setNpm(NPMAsset npm) {
+		this.npm = npm;
+	}
+
+	public void setMaven2(Maven2Asset maven2) {
+		this.maven2 = maven2;
+	}
+
+	@Override
+	public String toString() {
+		return "Item [id = " + id + ", repository = " + repository + ", path = " + path + ", downloadUrl = "
+				+ downloadUrl + ", checksum = " + checksum + ", format = " + format + "]";
+	}
 }
