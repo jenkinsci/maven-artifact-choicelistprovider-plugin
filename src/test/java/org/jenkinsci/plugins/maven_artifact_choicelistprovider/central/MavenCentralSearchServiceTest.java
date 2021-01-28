@@ -4,18 +4,14 @@ import java.util.List;
 
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.ValidAndInvalidClassifier;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.VersionReaderException;
-import org.junit.After;
-import org.junit.Test;
 
 public class MavenCentralSearchServiceTest {
 
-	@After
-	public void before() {
-		System.out.println("---");
+	public static void main(String args[]) throws VersionReaderException {
+		testSth();
 	}
-
-	@Test
-	public void testSth() throws VersionReaderException {
+	
+	public static void testSth() throws VersionReaderException {
 		MavenCentralSearchService t = new MavenCentralSearchService();
 		try {
 			List<String> retrieveVersions = t.retrieveVersions("", "org.apache.tomcat", "tomcat", ".tar.gz",
@@ -25,7 +21,7 @@ public class MavenCentralSearchServiceTest {
 				System.out.println(current);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 	}
 }
