@@ -16,6 +16,7 @@ We are using this plugin to let our QA department choose between the various ava
 # Known Issues
 ## Nexus Snapshots
 If you would like to use Snapshot Versions of your artifacts you have to enable the tick-box in the Jenkins Settings. Only with the RESTful interface of Nexus 2 you will be able to retrieve Snapshot versions.
+
 ![Alt text](/src/site/resources/project-config-2.png?raw=true "Nexus Snapshots")
 
 ## Artifactory
