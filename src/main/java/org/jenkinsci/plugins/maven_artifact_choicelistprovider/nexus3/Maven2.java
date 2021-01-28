@@ -1,5 +1,8 @@
 package org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus3;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Maven2 {
 
     private String extension;
