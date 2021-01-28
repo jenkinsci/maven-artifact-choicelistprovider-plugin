@@ -29,8 +29,5 @@ https://ci.jenkins.io/job/Plugins/job/maven-artifact-choicelistprovider-plugin/
 ## Authors
 Stephan Watermeyer (Profile: https://github.com/phreakadelle)
 
-## Further Links
-* Nexus 3 Support (Pending): https://issues.sonatype.org/browse/NEXUS-11893
-
 ## License
 Licensed under the [MIT License (MIT)](https://github.com/heremaps/buildrotator-plugin/blob/master/LICENSE).
