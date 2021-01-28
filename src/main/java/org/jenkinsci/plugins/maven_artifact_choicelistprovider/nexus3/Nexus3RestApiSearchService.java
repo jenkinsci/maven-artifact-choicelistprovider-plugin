@@ -7,6 +7,7 @@ import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -18,95 +19,102 @@ import org.jenkinsci.plugins.maven_artifact_choicelistprovider.ValidAndInvalidCl
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.jersey.api.client.WebResource;
-
 
 public class Nexus3RestApiSearchService extends AbstractRESTfulVersionReader implements IVersionReader {
 
-    private static final String NEXUS3_REST_API_ENDPOINT = "service/rest/v1/search/assets";
+	private static final String NEXUS3_REST_API_ENDPOINT = "service/rest/v1/search/assets";
 
-    private static final Logger LOGGER = Logger.getLogger(Nexus3RestApiSearchService.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(Nexus3RestApiSearchService.class.getName());
 
-    public Nexus3RestApiSearchService(String pURL) {
-        super(pURL);
-    }
+	public Nexus3RestApiSearchService(String pURL) {
+		super(pURL);
+	}
 
-    @Override
-    public Set<String> callService(final String pRepositoryId, final String pGroupId, final String pArtifactId, final String pPackaging,
-            final ValidAndInvalidClassifier pClassifier) {
+	@Override
+	public Set<String> callService(final String pRepositoryId, final String pGroupId, final String pArtifactId,
+			final String pPackaging, final ValidAndInvalidClassifier pClassifier) {
 
-        // init empty
-        Set<String> retVal = new TreeSet<>();
-        String token = null;
+		// init empty
+		Set<String> retVal = new TreeSet<>();
+		String token = null;
 
-        final WebResource rs = getInstance();
-        final ObjectMapper mapper = new ObjectMapper();
-       
-        do {
-            final MultivaluedMap<String, String> requestParams = new Nexus3RESTfulParameterBuilder().create(pRepositoryId, pGroupId, pArtifactId, pPackaging, pClassifier, token);
-            if (LOGGER.isLoggable(Level.INFO)) {
-                LOGGER.info("URI: " + rs.queryParams(requestParams).getURI());
-            }
-            
-            final String plainResult = rs.queryParams(requestParams).accept(MediaType.APPLICATION_JSON).get(String.class);
+		WebTarget theInstance = getInstance();
+		final ObjectMapper mapper = new ObjectMapper();
 
-            try {
-                final Nexus3RestResponse parsedJsonResult = mapper.readValue(plainResult, Nexus3RestResponse.class);
-                
-                if (parsedJsonResult == null) {
-                    LOGGER.info("response from Nexus3 is NULL.");
-                } else if (parsedJsonResult.getItems().length == 0) {
-                    LOGGER.info("response from Nexus3 does not contain any results.");
+		do {
+			final MultivaluedMap<String, String> requestParams = new Nexus3RESTfulParameterBuilder()
+					.create(pRepositoryId, pGroupId, pArtifactId, pPackaging, pClassifier, token);
 
-                    // ISSUE20: If exactly 50 results are returned the token is still != null from the previous call. 
-                    // So we get the token from the request which should be null.
-                    token = parsedJsonResult.getContinuationToken();
-                } else {
-                    Set<String> currentResult = parseResponse(parsedJsonResult);
-                    retVal.addAll(currentResult);
-                    
-                    // control the loop and maybe query again
-                    token = parsedJsonResult.getContinuationToken();
-                }
-            } catch (JsonParseException e) {
-                LOGGER.log(Level.WARNING, "failed to parse", e);
-            } catch (JsonMappingException e) {
-                LOGGER.log(Level.WARNING, "failed to map", e);
-            } catch (IOException e) {
-                LOGGER.log(Level.WARNING, "failed to ioexception", e);
-            } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, "unexpected error", e);
-            }
-        } while (!StringUtils.isEmpty(token));
+			for (String currentKey : requestParams.keySet()) {
+				theInstance = theInstance.queryParam(currentKey, requestParams.get(currentKey));
+			}
 
-        return retVal;
-    }
+			if (LOGGER.isLoggable(Level.INFO)) {
+				LOGGER.info("URI: " + theInstance.getUri());
+			}
 
-    /**
-     * Parses the JSON response from Nexus3 and creates a list of links where the artifacts can be retrieved.
-     * 
-     * @param pJsonResult
-     *            the JSON response of the Nexus3 API.
-     * @return a unique list of URLs that are matching the search criteria, sorted by the order of the Nexus3 service.
-     */
-    Set<String> parseResponse(final Nexus3RestResponse pJsonResult) {
-        // Use a Map instead of a List to filter duplicated entries and also linked to keep the order of XML response
-        final Set<String> retVal = new LinkedHashSet<String>();
+			final String plainResult = theInstance.request(MediaType.APPLICATION_JSON).get(String.class);
 
-        for (Item current : pJsonResult.getItems()) {
-            retVal.add(current.getDownloadUrl());
-        }
-        return retVal;
-    }
+			try {
+				final Nexus3RestResponse parsedJsonResult = mapper.readValue(plainResult, Nexus3RestResponse.class);
 
-    /**
-     * Return the configured service endpoint in this repository.
-     * 
-     * @return the configured service endpoint in this repository.
-     */
-    @Override
-    public String getRESTfulServiceEndpoint() {
-        return NEXUS3_REST_API_ENDPOINT;
-    }
+				if (parsedJsonResult == null) {
+					LOGGER.info("response from Nexus3 is NULL.");
+				} else if (parsedJsonResult.getItems().length == 0) {
+					LOGGER.info("response from Nexus3 does not contain any results.");
+
+					// ISSUE20: If exactly 50 results are returned the token is still != null from
+					// the previous call.
+					// So we get the token from the request which should be null.
+					token = parsedJsonResult.getContinuationToken();
+				} else {
+					Set<String> currentResult = parseResponse(parsedJsonResult);
+					retVal.addAll(currentResult);
+
+					// control the loop and maybe query again
+					token = parsedJsonResult.getContinuationToken();
+				}
+			} catch (JsonParseException e) {
+				LOGGER.log(Level.WARNING, "failed to parse", e);
+			} catch (JsonMappingException e) {
+				LOGGER.log(Level.WARNING, "failed to map", e);
+			} catch (IOException e) {
+				LOGGER.log(Level.WARNING, "failed to ioexception", e);
+			} catch (Exception e) {
+				LOGGER.log(Level.SEVERE, "unexpected error", e);
+			}
+		} while (!StringUtils.isEmpty(token));
+
+		return retVal;
+	}
+
+	/**
+	 * Parses the JSON response from Nexus3 and creates a list of links where the
+	 * artifacts can be retrieved.
+	 * 
+	 * @param pJsonResult the JSON response of the Nexus3 API.
+	 * @return a unique list of URLs that are matching the search criteria, sorted
+	 *         by the order of the Nexus3 service.
+	 */
+	Set<String> parseResponse(final Nexus3RestResponse pJsonResult) {
+		// Use a Map instead of a List to filter duplicated entries and also linked to
+		// keep the order of XML response
+		final Set<String> retVal = new LinkedHashSet<String>();
+
+		for (Item current : pJsonResult.getItems()) {
+			retVal.add(current.getDownloadUrl());
+		}
+		return retVal;
+	}
+
+	/**
+	 * Return the configured service endpoint in this repository.
+	 * 
+	 * @return the configured service endpoint in this repository.
+	 */
+	@Override
+	public String getRESTfulServiceEndpoint() {
+		return NEXUS3_REST_API_ENDPOINT;
+	}
 
 }

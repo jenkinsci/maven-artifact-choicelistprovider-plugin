@@ -6,16 +6,17 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.ws.rs.core.UriBuilder;
+import javax.net.ssl.SSLHandshakeException;
+import javax.ws.rs.ProcessingException;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.ResponseProcessingException;
+import javax.ws.rs.client.WebTarget;
 
 import org.apache.commons.lang.StringUtils;
-
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.UniformInterfaceException;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.config.ClientConfig;
-import com.sun.jersey.api.client.config.DefaultClientConfig;
-import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
+import org.glassfish.jersey.client.ClientConfig;
+import org.glassfish.jersey.client.ClientProperties;
+import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 
 /**
  * 
@@ -40,7 +41,7 @@ public abstract class AbstractRESTfulVersionReader implements IVersionReader {
 	private String mUserName;
 	private String mUserPassword;
 
-	private WebResource mInstance;
+	private WebTarget mInstance;
 
 	public AbstractRESTfulVersionReader(String pURL) {
 		super();
@@ -48,57 +49,62 @@ public abstract class AbstractRESTfulVersionReader implements IVersionReader {
 	}
 
 	void init() {
-		ClientConfig config = new DefaultClientConfig();
-		Client client = Client.create(config);
+		ClientConfig config = new ClientConfig();
+		Client client = ClientBuilder.newClient(config);
 
 		if (StringUtils.isNotEmpty(mUserName) && StringUtils.isNotEmpty(mUserPassword)) {
 			LOGGER.fine("setting username to: " + mUserName);
-			client.addFilter(new HTTPBasicAuthFilter(mUserName, mUserPassword));
+			HttpAuthenticationFeature feature = HttpAuthenticationFeature.basic(mUserName, mUserPassword);
+			client.register(feature);
 		} else {
 			LOGGER.fine("no username AND password provided");
 		}
 
-		client.setReadTimeout(getTimeout());
-		mInstance = client.resource(UriBuilder.fromUri(getURL()).build());
-		mInstance = mInstance.path(getRESTfulServiceEndpoint());
-		LOGGER.info("repository search service at: " + mInstance.getURI().toString());
+		client.property(ClientProperties.READ_TIMEOUT, getTimeout());
+		mInstance = client.target(getURL()).path(getRESTfulServiceEndpoint());
+		LOGGER.info("repository search service at: " + mInstance.getUri().toString());
 	}
 
 	public List<String> retrieveVersions(String pRepositoryId, String pGroupId, String pArtifactId, String pPackaging,
 			ValidAndInvalidClassifier pClassifier) throws VersionReaderException {
 		try {
 			final Set<String> result = callService(pRepositoryId, pGroupId, pArtifactId, pPackaging, pClassifier);
-			if(LOGGER.isLoggable(Level.FINE)) {
+			if (LOGGER.isLoggable(Level.FINE)) {
 				LOGGER.log(Level.FINE, "result: " + result.size());
-				for(String current : result) {
+				for (String current : result) {
 					LOGGER.log(Level.FINE, current);
 				}
 			}
-			
+
 			return new ArrayList<String>(result);
-		} catch (UniformInterfaceException e) {
+		} catch (ResponseProcessingException e) {
 			final String msg;
 			if (e.getResponse() != null) {
 				switch (e.getResponse().getStatus()) {
-					case 401:
-						msg = "Your repository requires user-authentication. Please configure a username and a password to list the content of this repository";
-						break;
-					case 404:
-                        msg = "The artifact you are looking for does not exist (HTTP404). Have you used the correct repositoryId? For Nexus 3 please check Plugin Release Notes";
-                        break;
-					default:
-						msg = "HTTP Server Error: " + e.getResponse().getStatus() + ": " + e.getMessage();
-						break;
+				case 401:
+					msg = "Your repository requires user-authentication. Please configure a username and a password to list the content of this repository";
+					break;
+				case 404:
+					msg = "The artifact you are looking for does not exist (HTTP404). Have you used the correct repositoryId? For Nexus 3 please check Plugin Release Notes";
+					break;
+				default:
+					msg = "HTTP Server Error: " + e.getResponse().getStatus() + ": " + e.getMessage();
+					break;
 				}
 			} else {
 				msg = "General Error:" + e.getMessage();
 			}
 			throw new VersionReaderException(msg, e);
 		} catch (Exception e) {
-			if (e instanceof com.sun.jersey.api.client.ClientHandlerException) {
+			if (e instanceof SSLHandshakeException) {
+				throw new VersionReaderException("The certificate of the target repository is untrusted by this JVM",
+						e);
+			} else if (e instanceof ProcessingException) {
 				throw new VersionReaderException(
 						"Timeout while connecting to your Repository Service. Please consider the Jenkins-Proxy settings. If using HTTPs also invalid certificates can be the root cause.",
 						e);
+			} else if (e instanceof javax.ws.rs.BadRequestException) {
+				throw new VersionReaderException("Request is invalid", e);
 			} else {
 				throw new VersionReaderException("failed to retrieve versions from repository for r:" + getURL()
 						+ ", g:" + pGroupId + ", a:" + pArtifactId + ", p:" + pPackaging + ", c:" + pClassifier, e);
@@ -110,7 +116,7 @@ public abstract class AbstractRESTfulVersionReader implements IVersionReader {
 		return mURL;
 	}
 
-	protected WebResource getInstance() {
+	protected WebTarget getInstance() {
 		if (mInstance == null) {
 			init();
 		}
@@ -152,6 +158,6 @@ public abstract class AbstractRESTfulVersionReader implements IVersionReader {
 	 */
 	public abstract String getRESTfulServiceEndpoint();
 
-	public abstract Set<String> callService(final String pRepositoryId, final String pGroupId, final String pArtifactId, final String pPackaging,
-			final ValidAndInvalidClassifier pClassifier);
+	public abstract Set<String> callService(final String pRepositoryId, final String pGroupId, final String pArtifactId,
+			final String pPackaging, final ValidAndInvalidClassifier pClassifier);
 }

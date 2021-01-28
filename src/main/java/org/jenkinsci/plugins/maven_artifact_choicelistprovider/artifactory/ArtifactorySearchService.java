@@ -1,10 +1,12 @@
 package org.jenkinsci.plugins.maven_artifact_choicelistprovider.artifactory;
 
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -46,8 +48,14 @@ public class ArtifactorySearchService extends AbstractRESTfulVersionReader imple
 
         Set<String> retVal = new LinkedHashSet<String>();
         LOGGER.info("call artifactory service");
-        final String plainResult = getInstance().queryParams(requestParams).accept(MediaType.APPLICATION_JSON).get(String.class);
 
+        WebTarget theInstance = getInstance();
+        for(String currentKey : requestParams.keySet()) {
+        	List<String> list = requestParams.get(currentKey);
+			theInstance = theInstance.queryParam(currentKey, list.toArray(new Object[list.size()]));
+        }
+        final String plainResult = theInstance.request(MediaType.APPLICATION_JSON).get(String.class);
+        
         if (plainResult == null) {
             LOGGER.info("response from Artifactory Service is NULL.");
         } else {
