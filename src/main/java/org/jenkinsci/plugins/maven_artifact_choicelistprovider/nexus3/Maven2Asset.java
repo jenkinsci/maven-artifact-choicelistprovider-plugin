@@ -1,5 +1,8 @@
 package org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus3;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Maven2Asset extends BaseAsset {
 
 	private String extension;
@@ -7,6 +10,8 @@ public class Maven2Asset extends BaseAsset {
 	private String groupId;
 
 	private String artifactId;
+
+	private String classifier;
 
 	public String getExtension() {
 		return extension;
@@ -30,6 +35,14 @@ public class Maven2Asset extends BaseAsset {
 
 	public void setArtifactId(String artifactId) {
 		this.artifactId = artifactId;
+	}
+
+	public String getClassifier() {
+		return classifier;
+	}
+
+	public void setClassifier(String classifier) {
+		this.classifier = classifier;
 	}
 
 }
