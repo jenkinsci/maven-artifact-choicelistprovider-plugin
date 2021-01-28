@@ -1,5 +1,5 @@
 # MavenArtifact ChoiceListProvider
-![Build Status](https://ci.jenkins.io/job/Plugins/job/maven-artifact-choicelistprovider-plugin/job/master/badge/icon)](https://ci.jenkins.io/job/Plugins/job/maven-artifact-choicelistprovider-plugin/job/master)
+[![Build Status](https://ci.jenkins.io/job/Plugins/job/maven-artifact-choicelistprovider-plugin/job/master/badge/icon)](https://ci.jenkins.io/job/Plugins/job/maven-artifact-choicelistprovider-plugin/job/master)
 [![Contributors](https://img.shields.io/github/contributors/jenkinsci/maven-artifact-choicelistprovider-plugin.svg)](https://github.com/jenkinsci/maven-artifact-choicelistprovider-plugin/graphs/contributors)
 [![Jenkins Plugin](https://img.shields.io/jenkins/plugin/v/maven-artifact-choicelistprovider.svg)](https://plugins.jenkins.io/maven-artifact-choicelistprovider)
 [![Jenkins Plugin Installs](https://img.shields.io/jenkins/plugin/i/maven-artifact-choicelistprovider.svg?color=blue)](https://plugins.jenkins.io/maven-artifact-choicelistprovider)
