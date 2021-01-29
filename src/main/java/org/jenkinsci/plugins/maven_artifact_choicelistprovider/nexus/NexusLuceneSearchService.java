@@ -3,6 +3,7 @@ package org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus;
 import java.io.StringReader;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -59,13 +60,12 @@ public class NexusLuceneSearchService extends AbstractRESTfulVersionReader imple
 		final MultivaluedMap<String, String> requestParams = new StandardRESTfulParameterBuilder().create(pRepositoryId,
 				pGroupId, pArtifactId, pPackaging, pClassifier);
 
-		Set<String> retVal = new LinkedHashSet<String>();
+		Set<String> retVal = new LinkedHashSet<>();
 		LOGGER.info("call nexus service");
 
 		WebTarget theInstance = getInstance();
-		for (String currentKey : requestParams.keySet()) {
-			List<String> paramValues = requestParams.get(currentKey);
-			theInstance = theInstance.queryParam(currentKey, paramValues.toArray(new Object[paramValues.size()]));
+		for (Map.Entry<String, List<String>> entries : requestParams.entrySet()) {
+			theInstance = theInstance.queryParam(entries.getKey(), entries.getValue().toArray());
 		}
 
 		LOGGER.info("final URL: " + theInstance.getUri().toString());
@@ -116,7 +116,7 @@ public class NexusLuceneSearchService extends AbstractRESTfulVersionReader imple
 			final ValidAndInvalidClassifier pClassifier) {
 		// Use a Map instead of a List to filter duplicated entries and also linked to
 		// keep the order of XML response
-		final Set<String> retVal = new LinkedHashSet<String>();
+		final Set<String> retVal = new LinkedHashSet<>();
 
 		for (NexusNGArtifact current : pXMLResult.getData()) {
 			final IArtifactURLBuilder artifactURL;
