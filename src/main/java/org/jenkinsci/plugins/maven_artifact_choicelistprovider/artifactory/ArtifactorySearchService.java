@@ -2,6 +2,7 @@ package org.jenkinsci.plugins.maven_artifact_choicelistprovider.artifactory;
 
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -46,16 +47,15 @@ public class ArtifactorySearchService extends AbstractRESTfulVersionReader imple
     public Set<String> callService(String pRepositoryId, String pGroupId, String pArtifactId, String pPackaging, ValidAndInvalidClassifier pClassifier) {
         final MultivaluedMap<String, String> requestParams = new StandardRESTfulParameterBuilder().create("", pGroupId, pArtifactId, pPackaging, pClassifier);
 
-        Set<String> retVal = new LinkedHashSet<String>();
+        Set<String> retVal = new LinkedHashSet<>();
         LOGGER.info("call artifactory service");
 
         WebTarget theInstance = getInstance();
-        for(String currentKey : requestParams.keySet()) {
-        	List<String> list = requestParams.get(currentKey);
-			theInstance = theInstance.queryParam(currentKey, list.toArray(new Object[list.size()]));
+        for (Map.Entry<String, List<String>> entries : requestParams.entrySet()) {
+            theInstance = theInstance.queryParam(entries.getKey(), entries.getValue().toArray());
         }
         final String plainResult = theInstance.request(MediaType.APPLICATION_JSON).get(String.class);
-        
+
         if (plainResult == null) {
             LOGGER.info("response from Artifactory Service is NULL.");
         } else {
@@ -67,7 +67,7 @@ public class ArtifactorySearchService extends AbstractRESTfulVersionReader imple
     }
 
     Set<String> parseResult(final String pContent, final String pPackaging) {
-        final Set<String> retVal = new LinkedHashSet<String>();
+        final Set<String> retVal = new LinkedHashSet<>();
         try {
             final ArtifactoryResultModel fromJson = new Gson().fromJson(pContent, ArtifactoryResultModel.class);
             for (ArtifactoryResultEntryModel current : fromJson.getResults()) {

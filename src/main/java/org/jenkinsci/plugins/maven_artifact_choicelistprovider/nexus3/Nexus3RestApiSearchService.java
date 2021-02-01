@@ -2,6 +2,8 @@ package org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus3;
 
 import java.io.IOException;
 import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Level;
@@ -45,8 +47,8 @@ public class Nexus3RestApiSearchService extends AbstractRESTfulVersionReader imp
 			final MultivaluedMap<String, String> requestParams = new Nexus3RESTfulParameterBuilder()
 					.create(pRepositoryId, pGroupId, pArtifactId, pPackaging, pClassifier, token);
 
-			for (String currentKey : requestParams.keySet()) {
-				theInstance = theInstance.queryParam(currentKey, requestParams.get(currentKey));
+			for (Map.Entry<String, List<String>> entries : requestParams.entrySet()) {
+				theInstance = theInstance.queryParam(entries.getKey(), entries.getValue().toArray());
 			}
 
 			if (LOGGER.isLoggable(Level.INFO)) {
@@ -99,7 +101,7 @@ public class Nexus3RestApiSearchService extends AbstractRESTfulVersionReader imp
 	Set<String> parseResponse(final Nexus3RestResponse pJsonResult) {
 		// Use a Map instead of a List to filter duplicated entries and also linked to
 		// keep the order of XML response
-		final Set<String> retVal = new LinkedHashSet<String>();
+		final Set<String> retVal = new LinkedHashSet<>();
 
 		for (Item current : pJsonResult.getItems()) {
 			retVal.add(current.getDownloadUrl());
