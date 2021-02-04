@@ -44,6 +44,12 @@ THE SOFTWARE.
     <f:entry title="${%Classifier}" field="classifier">
         <f:textbox />
     </f:entry>
+    <f:entry title="${%Inverse Filter}" field="inverseFilter">
+        <f:checkbox />
+    </f:entry>
+    <f:entry title="${%Filter Expression}" field="filterExpression">
+        <f:textbox />
+    </f:entry>
      <f:entry title="${%Reverse Order}" field="reverseOrder">
         <f:checkbox />
     </f:entry>
@@ -52,6 +58,6 @@ THE SOFTWARE.
         method="test"
         title="${%List Files Now}"
         progress="${%Checking...}"
-        with="url,credentialsId,repositoryId,groupId,artifactId,packaging,classifier,reverseOrder"
+        with="url,credentialsId,repositoryId,groupId,artifactId,packaging,classifier,inverseFilter,filterExpression,reverseOrder"
     />
 </j:jelly>
