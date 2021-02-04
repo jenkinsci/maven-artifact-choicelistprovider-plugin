@@ -49,14 +49,17 @@ public abstract class AbstractMavenArtifactDescriptorImpl extends Descriptor<Cho
     }
 
     public FormValidation performTest(final IVersionReader pService, @QueryParameter String repositoryId, @QueryParameter String groupId, @QueryParameter String artifactId,
-            @QueryParameter String packaging, @QueryParameter String classifier, @QueryParameter boolean reverseOrder) {
+            @QueryParameter String packaging, @QueryParameter String classifier,
+            @QueryParameter boolean inverseFilter, @QueryParameter String filterExpression, @QueryParameter boolean reverseOrder) {
         if (StringUtils.isEmpty(packaging) && !StringUtils.isEmpty(classifier)) {
             return FormValidation
                     .error("You have choosen an empty Packaging configuration but have configured a Classifier. Please either define a Packaging value or remove the Classifier");
         }
 
+        //TODO error handling of invalid regexp syntax
+
         try {
-            final Map<String, String> entriesFromURL = wrapTestConnection(pService, repositoryId, groupId, artifactId, packaging, classifier, reverseOrder);
+            final Map<String, String> entriesFromURL = wrapTestConnection(pService, repositoryId, groupId, artifactId, packaging, classifier, inverseFilter, filterExpression, reverseOrder);
 
             if (entriesFromURL.isEmpty()) {
                 return FormValidation.ok("(Working, but no Entries found)");
@@ -84,11 +87,15 @@ public abstract class AbstractMavenArtifactDescriptorImpl extends Descriptor<Cho
      *            TBD
      * @param classifier
      *            TBD
+     * @param inverseFilter
+     *            TBD
+     * @param filterExpression
+     *            TBD
      * @param reverseOrder
      *            TBD
      * @return the list of found items.
      */
     protected abstract Map<String, String> wrapTestConnection(IVersionReader service, String repositoryId, String groupId, String artifactId, String packaging, String classifier,
-            boolean reverseOrder);
+            boolean inverseFilter, String filterExpression, boolean reverseOrder);
 
 }

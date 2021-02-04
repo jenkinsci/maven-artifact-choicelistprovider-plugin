@@ -43,16 +43,16 @@ public class MavenCentralChoiceListProvider extends AbstractMavenArtifactChoiceL
 
 		public FormValidation doTest(@QueryParameter String url, @QueryParameter String groupId,
 				@QueryParameter String artifactId, @QueryParameter String packaging, @QueryParameter String classifier,
-				@QueryParameter boolean reverseOrder) {
+				@QueryParameter boolean inverseFilter, @QueryParameter String filterExpression, @QueryParameter boolean reverseOrder) {
 			final IVersionReader service = new MavenCentralSearchService();
-			return super.performTest(service, "", groupId, artifactId, packaging, classifier, reverseOrder);
+			return super.performTest(service, "", groupId, artifactId, packaging, classifier, inverseFilter, filterExpression, reverseOrder);
 		}
 
 		@Override
 		protected Map<String, String> wrapTestConnection(IVersionReader service, String pRepositoryId, String pGroupId, String pArtifactId,
-				String pPackaging, String pClassifier, boolean pReverseOrder) {
+				String pPackaging, String pClassifier, boolean pInverseFilter, String pFilterExpression, boolean pReverseOrder) {
 			return readURL(new MavenCentralSearchService(), pRepositoryId, pGroupId, pArtifactId, pPackaging, pClassifier,
-					pReverseOrder);
+					pInverseFilter, pFilterExpression, pReverseOrder);
 		}
 
 	}
