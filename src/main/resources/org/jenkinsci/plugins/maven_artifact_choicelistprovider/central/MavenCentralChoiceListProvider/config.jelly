@@ -39,7 +39,7 @@ THE SOFTWARE.
         <f:checkbox />
     </f:entry>
     <f:entry title="${%Filter Expression}" field="filterExpression">
-        <f:textbox />
+        <f:textbox default=".*" />
     </f:entry>
      <f:entry title="${%Reverse Order}" field="reverseOrder">
         <f:checkbox />
