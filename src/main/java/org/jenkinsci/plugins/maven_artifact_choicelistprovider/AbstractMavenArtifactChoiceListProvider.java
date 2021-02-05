@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.artifactory.ArtifactoryChoiceListProvider;
@@ -140,12 +142,28 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
     }
 
     /**
-     * TODO javadoc
-     * Return a list containing/excluding the matching items based on whether inversion was required.
+     * Returns a new list containing/excluding the matching artifacts based on whether inversion was required.
+     *
+     * @param pChoices List of artifacts to filter. This function won't change its elements.
+     * @param pInverseFilter Decides whether the pFilterExpression should be negated.
+     *                       If <code>true</code> then only non matching artifacts will be returned.
+     * @param pFilterExpression A regular expression which will be applied to the whole artifact string.
+     *                          Empty string and null are treated as perfect match (value of inverse is still considered).
+     * @return A new list of matching artifacts only
+     * @throws PatternSyntaxException If pFilterExpression parameter is not a valid regular expression
      */
     public static List<String> filterArtifacts(final List<String> pChoices, final boolean pInverseFilter, final String pFilterExpression) {
-        //TODO apply filtering
-        return pChoices;
+        final List<String> filteredList = new ArrayList<>();
+        final Pattern compiledFilter = Pattern.compile(StringUtils.isEmpty(pFilterExpression) ? ".*" : pFilterExpression);
+
+        for(String choice : pChoices) {
+            final boolean match = compiledFilter.matcher(choice).matches();
+            // Using XOR operator: EITHER inverse was requested and filter doesn't match OR filter simply matches
+            if (pInverseFilter ^ match) {
+                filteredList.add(choice);
+            }
+        }
+        return filteredList;
     }
 
     /**

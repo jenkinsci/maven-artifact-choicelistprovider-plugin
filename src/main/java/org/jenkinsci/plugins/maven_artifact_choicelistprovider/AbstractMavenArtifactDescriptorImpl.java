@@ -1,6 +1,8 @@
 package org.jenkinsci.plugins.maven_artifact_choicelistprovider;
 
 import java.util.Map;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.QueryParameter;
@@ -48,6 +50,24 @@ public abstract class AbstractMavenArtifactDescriptorImpl extends Descriptor<Cho
         return FormValidation.ok();
     }
 
+    public FormValidation doCheckFilterExpression(@QueryParameter String filterExpression) {
+        if (StringUtils.isEmpty(filterExpression)) {
+            return FormValidation.warning("Although blank string is a syntactically valid regular expression, it would result no match. " +
+                                          "To maintain backward compatibility of the plugin, blank string is considered as match all. " +
+                                          "Please explicitly type '.*' instead (without quotes) to remove this warning.");
+        }
+
+        try {
+            Pattern.compile(filterExpression);
+        } catch (PatternSyntaxException pse) {
+            return FormValidation.error("Filter Expression is not a valid regular expression. Try '.*' instead (without quotes). " +
+                                        "Please check https://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html " +
+                                        "for the accepted syntax");
+        }
+
+        return FormValidation.ok();
+    }
+
     public FormValidation performTest(final IVersionReader pService, @QueryParameter String repositoryId, @QueryParameter String groupId, @QueryParameter String artifactId,
             @QueryParameter String packaging, @QueryParameter String classifier,
             @QueryParameter boolean inverseFilter, @QueryParameter String filterExpression, @QueryParameter boolean reverseOrder) {
@@ -55,8 +75,6 @@ public abstract class AbstractMavenArtifactDescriptorImpl extends Descriptor<Cho
             return FormValidation
                     .error("You have choosen an empty Packaging configuration but have configured a Classifier. Please either define a Packaging value or remove the Classifier");
         }
-
-        //TODO error handling of invalid regexp syntax
 
         try {
             final Map<String, String> entriesFromURL = wrapTestConnection(pService, repositoryId, groupId, artifactId, packaging, classifier, inverseFilter, filterExpression, reverseOrder);
