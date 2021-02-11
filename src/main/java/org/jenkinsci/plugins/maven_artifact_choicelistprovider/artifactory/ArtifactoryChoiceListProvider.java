@@ -69,7 +69,8 @@ public class ArtifactoryChoiceListProvider extends AbstractMavenArtifactChoiceLi
 
         @POST
         public FormValidation doTest(@AncestorInPath Item pItem, @QueryParameter String url, @QueryParameter String credentialsId, @QueryParameter String groupId,
-                @QueryParameter String artifactId, @QueryParameter String packaging, @QueryParameter String classifier, @QueryParameter boolean reverseOrder) {
+                @QueryParameter String artifactId, @QueryParameter String packaging, @QueryParameter String classifier,
+                @QueryParameter boolean inverseFilter, @QueryParameter String filterExpression, @QueryParameter boolean reverseOrder) {
 
             // SECURITY-1022
             pItem.checkPermission(Job.CONFIGURE);
@@ -81,13 +82,13 @@ public class ArtifactoryChoiceListProvider extends AbstractMavenArtifactChoiceLi
             if (c != null) {
                 service.setCredentials(c.getUsername(), c.getPassword().getPlainText());
             }
-            return super.performTest(service, "", groupId, artifactId, packaging, classifier, reverseOrder);
+            return super.performTest(service, "", groupId, artifactId, packaging, classifier, inverseFilter, filterExpression, reverseOrder);
         }
 
         @Override
         protected Map<String, String> wrapTestConnection(IVersionReader pService, String pRepositoryId, String pGroupId, String pArtifactId, String pPackaging, String pClassifier,
-                boolean pReverseOrder) {
-            return readURL(pService, pRepositoryId, pGroupId, pArtifactId, pPackaging, pClassifier, pReverseOrder);
+                boolean pInverseFilter, String pFilterExpression, boolean pReverseOrder) {
+            return readURL(pService, pRepositoryId, pGroupId, pArtifactId, pPackaging, pClassifier, pInverseFilter, pFilterExpression, pReverseOrder);
         }
 
         public FormValidation doCheckUrl(@QueryParameter String url) {

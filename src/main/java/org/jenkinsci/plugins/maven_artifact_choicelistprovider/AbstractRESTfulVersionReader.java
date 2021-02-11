@@ -96,7 +96,7 @@ public abstract class AbstractRESTfulVersionReader implements IVersionReader {
 			}
 			throw new VersionReaderException(msg, e);
 		} catch (Exception e) {
-			if (e instanceof SSLHandshakeException) {
+			if (e.getCause() instanceof SSLHandshakeException) {
 				throw new VersionReaderException("The certificate of the target repository is untrusted by this JVM",
 						e);
 			} else if (e instanceof ProcessingException) {

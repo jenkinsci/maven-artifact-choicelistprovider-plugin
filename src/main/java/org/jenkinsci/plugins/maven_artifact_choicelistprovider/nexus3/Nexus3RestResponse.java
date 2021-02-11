@@ -1,5 +1,7 @@
 package org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus3;
 
+import java.util.Arrays;
+
 /**
  * POJO for Nexus3 API.
  * 
@@ -21,16 +23,16 @@ public class Nexus3RestResponse {
     }
 
     public Item[] getItems() {
-        return items;
+        return Arrays.copyOf(items, items.length);
     }
 
     public void setItems(Item[] items) {
-        this.items = items;
+        this.items = Arrays.copyOf(items, items.length);
     }
 
     @Override
     public String toString() {
-        return "Nexus3RestResponse [continuationToken = " + continuationToken + ", items = " + items + "]";
+        return "Nexus3RestResponse [continuationToken = " + continuationToken + ", items = " + Arrays.toString(items) + "]";
     }
 
 }
