@@ -40,10 +40,12 @@ public class Nexus3RestApiSearchService extends AbstractRESTfulVersionReader imp
 		Set<String> retVal = new TreeSet<>();
 		String token = null;
 
-		WebTarget theInstance = getInstance();
+
 		final ObjectMapper mapper = new ObjectMapper();
 
 		do {
+			WebTarget theInstance = getInstance();
+
 			final MultivaluedMap<String, String> requestParams = new Nexus3RESTfulParameterBuilder()
 					.create(pRepositoryId, pGroupId, pArtifactId, pPackaging, pClassifier, token);
 
