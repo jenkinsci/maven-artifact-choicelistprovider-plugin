@@ -67,7 +67,7 @@ public class ArtifactFilterTest {
     @Test
     public void testDefaultFilter() {
         boolean inverse = false;
-        String pattern = ".*";
+        String pattern = AbstractMavenArtifactChoiceListProvider.DEFAULT_REGEX_MATCH_ALL;
         List<String> filteredList = AbstractMavenArtifactChoiceListProvider.filterArtifacts(testInput, inverse, pattern);
 
         assertEquals("Expected all items from original list", testInput.size(), filteredList.size());

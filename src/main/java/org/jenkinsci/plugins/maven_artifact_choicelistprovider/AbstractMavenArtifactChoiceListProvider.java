@@ -38,7 +38,9 @@ import jp.ikedam.jenkins.plugins.extensible_choice_parameter.ExtensibleChoicePar
  */
 public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceListProvider implements ExtensionPoint {
 
-    private static final long serialVersionUID = -6055763342458172275L;
+    public static final String DEFAULT_REGEX_MATCH_ALL = ".*";
+
+	private static final long serialVersionUID = -6055763342458172275L;
 
     private static final Logger LOGGER = Logger.getLogger(AbstractMavenArtifactChoiceListProvider.class.getName());
 
@@ -153,17 +155,26 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
      * @throws PatternSyntaxException If pFilterExpression parameter is not a valid regular expression
      */
     public static List<String> filterArtifacts(final List<String> pChoices, final boolean pInverseFilter, final String pFilterExpression) {
-        final List<String> filteredList = new ArrayList<>();
-        final Pattern compiledFilter = Pattern.compile(StringUtils.isEmpty(pFilterExpression) ? ".*" : pFilterExpression);
+    	final List<String> retVal;
+        
+    	// We only apply and compile regex if someone has configured something none-default.
+        if(StringUtils.isEmpty(pFilterExpression) || DEFAULT_REGEX_MATCH_ALL.equals(pFilterExpression)) {
+        	LOGGER.log(Level.FINE, "do not filter artifacts.");
+        	retVal = pChoices;
+        } else {
+        	LOGGER.log(Level.FINE, "filter artifacts based on " + pFilterExpression + ", inverse: " + pInverseFilter);
+        	retVal = new ArrayList<>();
+        	final Pattern compiledFilter = Pattern.compile(StringUtils.isEmpty(pFilterExpression) ? DEFAULT_REGEX_MATCH_ALL : pFilterExpression);
 
-        for(String choice : pChoices) {
-            final boolean match = compiledFilter.matcher(choice).matches();
-            // Using XOR operator: EITHER inverse was requested and filter doesn't match OR filter simply matches
-            if (pInverseFilter ^ match) {
-                filteredList.add(choice);
+            for(String choice : pChoices) {
+                final boolean match = compiledFilter.matcher(choice).matches();
+                // Using XOR operator: EITHER inverse was requested and filter doesn't match OR filter simply matches
+                if (pInverseFilter ^ match) {
+                    retVal.add(choice);
+                }
             }
         }
-        return filteredList;
+        return retVal;
     }
 
     /**
