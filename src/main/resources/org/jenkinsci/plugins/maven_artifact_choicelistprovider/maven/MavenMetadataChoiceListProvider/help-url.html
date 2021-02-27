@@ -1,0 +1,11 @@
+<div>
+    Enter the base URL to the maven_metadata.xml for a given repository, groupId, artifact.
+    It is advised to use virtual repositories which serve all the desired artifacts (snapshots+releases).
+    Plugin downloads the following url construct:
+    [base_url]/[repository]/[groupId hierarchy expanded]/[artifactId]/maven-metadata.xml
+    i.e. base_url: https://maven.mycompany.com/content/repository
+         repository: myrepository
+         groupId: my.group.id
+         artifactId: my-artifactId
+    https://maven.mycompany.com/content/repository/myrepository/my/group/id/my-artifactId/maven-metadata.xml
+</div>
