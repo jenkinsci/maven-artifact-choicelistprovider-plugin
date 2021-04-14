@@ -47,7 +47,7 @@
         <dependency>
             <groupId>jp.ikedam.jenkins.plugins</groupId>
             <artifactId>extensible-choice-parameter</artifactId>
-            <version>1.6.0</version>
+            <version>1.7.0</version>
         </dependency>
 
         <!-- All JaxWS/RS, Jersey and Glassfish Dependencies to allow RESTful Service calls -->
