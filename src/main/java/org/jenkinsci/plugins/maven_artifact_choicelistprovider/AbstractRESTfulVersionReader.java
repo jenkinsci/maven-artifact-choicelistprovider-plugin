@@ -95,6 +95,10 @@ public abstract class AbstractRESTfulVersionReader implements IVersionReader {
 				msg = "General Error:" + e.getMessage();
 			}
 			throw new VersionReaderException(msg, e);
+		} catch(javax.ws.rs.NotFoundException e) {
+			throw new VersionReaderException("The artifact you are looking for does not exist (HTTP404). Have you used the correct repositoryId / baseURL?", e);
+		} catch (VersionReaderException e) {
+			throw e; // just forward from the services
 		} catch (Exception e) {
 			if (e.getCause() instanceof SSLHandshakeException) {
 				throw new VersionReaderException("The certificate of the target repository is untrusted by this JVM",
@@ -159,5 +163,5 @@ public abstract class AbstractRESTfulVersionReader implements IVersionReader {
 	public abstract String getRESTfulServiceEndpoint();
 
 	public abstract Set<String> callService(final String pRepositoryId, final String pGroupId, final String pArtifactId,
-			final String pPackaging, final ValidAndInvalidClassifier pClassifier);
+			final String pPackaging, final ValidAndInvalidClassifier pClassifier) throws VersionReaderException;
 }

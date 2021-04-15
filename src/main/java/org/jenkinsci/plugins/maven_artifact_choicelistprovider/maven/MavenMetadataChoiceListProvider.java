@@ -2,7 +2,6 @@ package org.jenkinsci.plugins.maven_artifact_choicelistprovider.maven;
 
 import java.util.Collections;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import javax.ws.rs.POST;
 
@@ -34,8 +33,6 @@ import jp.ikedam.jenkins.plugins.extensible_choice_parameter.ChoiceListProvider;
  */
 public class MavenMetadataChoiceListProvider extends AbstractMavenArtifactChoiceListProvider {
     private static final long serialVersionUID = -3154940299983798059L;
-
-    private static final Logger LOGGER = Logger.getLogger(MavenMetadataChoiceListProvider.class.getName());
 
     private String url;
     private String credentialsId;
