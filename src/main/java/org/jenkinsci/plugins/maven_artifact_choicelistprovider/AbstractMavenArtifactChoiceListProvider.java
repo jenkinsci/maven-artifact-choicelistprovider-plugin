@@ -5,8 +5,11 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -20,7 +23,7 @@ import com.cloudbees.plugins.credentials.CredentialsMatchers;
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.domains.DomainRequirement;
 import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl;
-
+import com.vdurmont.semver4j.Semver;
 import hudson.ExtensionPoint;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
@@ -30,7 +33,7 @@ import jp.ikedam.jenkins.plugins.extensible_choice_parameter.ChoiceListProvider;
 import jp.ikedam.jenkins.plugins.extensible_choice_parameter.ExtensibleChoiceParameterDefinition;
 
 /**
- * 
+ *
  * Base Class for different {@link ChoiceListProvider} that can display information from an artifact repository, like
  * {@link NexusChoiceListProvider}, {@link MavenCentralChoiceListProvider} and {@link ArtifactoryChoiceListProvider}
  *
@@ -44,6 +47,16 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
 
     private static final Logger LOGGER = Logger.getLogger(AbstractMavenArtifactChoiceListProvider.class.getName());
 
+    /**
+     * Semantic version RegEx.
+     *
+     * @see <a href="https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string">semantic version RegEx</a>
+     */
+    private static final Pattern semanticVersionPattern =
+        Pattern.compile(".*/((0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-]" +
+            "[0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+" +
+            "(?:\\.[0-9a-zA-Z-]+)*))?)+");
+
     private String repositoryId;
     private String groupId;
     private String artifactId;
@@ -55,7 +68,7 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
 
     /**
      * Initializes the choicelist with at the artifactId.
-     * 
+     *
      * @param artifactId
      *            the artifactId is the minimum required information.
      */
@@ -77,14 +90,14 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
 
     /**
      * Different implementation will return different {@link IVersionReader} instances.
-     * 
+     *
      * @return the source of the artifacts.
      */
     public abstract IVersionReader createServiceInstance();
 
     /**
      * Returns the {@link UsernamePasswordCredentialsImpl} for the given CredentialId
-     * 
+     *
      * @param pCredentialId
      *            the internal jenkins id for the credentials
      * @return the credentials for the ID or NULL
@@ -97,7 +110,7 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
 
     /**
      * Retrieves the versions from the given source.
-     * 
+     *
      * @param pInstance
      *            the artifact repository service.
      * @param pRepositoryId
@@ -129,10 +142,12 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
 
             List<String> filteredChoices = filterArtifacts(choices, pInverseFilter, pFilterExpression);
 
-            if (pReverseOrder)
-                Collections.reverse(filteredChoices);
+            List<String> sortedFilteredChoices = semanticVersionSortArtifacts(filteredChoices);
 
-            retVal = toMap(filteredChoices);
+            if (pReverseOrder)
+                Collections.reverse(sortedFilteredChoices);
+
+            retVal = toMap(sortedFilteredChoices);
         } catch (VersionReaderException e) {
             LOGGER.log(Level.INFO, "failed to retrieve versions from repository for g:" + pGroupId + ", a:" + pArtifactId + ", p:" + pPackaging + ", c:" + pClassifier, e);
             retVal.put("error", e.getMessage());
@@ -141,6 +156,34 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
             retVal.put("error", "Unexpected Error: " + e.getMessage());
         }
         return retVal;
+    }
+
+    /**
+     * Sorts a list of Maven artifact URLs accordingly to their semantic version.
+     *
+     * @param choices list of maven artifact URLs
+     * @return ordered list of choices
+     * @see <a href="https://semver.org/#spec-item-11">semantic version sorting</a>
+     */
+    static List<String> semanticVersionSortArtifacts(List<String> choices) {
+        SortedMap<Semver, String> sortedChoicesMap = new TreeMap<>();
+        for (String choice : choices) {
+            Matcher m = semanticVersionPattern.matcher(choice);
+            if (m.matches()) {
+                try {
+                    String semanticVersion = m.group(1);
+                    sortedChoicesMap.put(new Semver(semanticVersion), choice);
+                } catch (Exception e) {
+                    LOGGER.log(Level.WARNING, "Skipping '" + choice + "' as it doesn't match any semantic version");
+                }
+            }
+        }
+
+        List<String> sortedChoices = new ArrayList<>();
+        for (Map.Entry<Semver, String> entry : sortedChoicesMap.entrySet()) {
+            sortedChoices.add(entry.getValue());
+        }
+        return sortedChoices;
     }
 
     /**
@@ -156,7 +199,7 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
      */
     public static List<String> filterArtifacts(final List<String> pChoices, final boolean pInverseFilter, final String pFilterExpression) {
     	final List<String> retVal;
-        
+
     	// We only apply and compile regex if someone has configured something none-default.
         if(StringUtils.isEmpty(pFilterExpression) || DEFAULT_REGEX_MATCH_ALL.equals(pFilterExpression)) {
         	LOGGER.log(Level.FINE, "do not filter artifacts.");
@@ -179,9 +222,8 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
 
     /**
      * Cuts of the first parts of the URL and only returns a smaller set of items.
-     * 
-     * @param pChoices
-     *            the list which is transformed to a map
+     *
+     * @param pChoices the list which is transformed to a map
      * @return the map containing the short url as Key and the long url as value.
      */
     public static Map<String, String> toMap(List<String> pChoices) {
