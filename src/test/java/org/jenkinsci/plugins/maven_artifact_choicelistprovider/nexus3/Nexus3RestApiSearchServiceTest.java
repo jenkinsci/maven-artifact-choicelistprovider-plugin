@@ -27,8 +27,8 @@ public class Nexus3RestApiSearchServiceTest {
         service.callService("repositoryId", "groupId", "artifactId", "tar.gz", ValidAndInvalidClassifier.getDefault());
 
         assertThat(instances).hasSize(2);
-		verify(instances.get(0), times(4)).queryParam(anyString(), anyString());
-		verify(instances.get(1), times(5)).queryParam(anyString(), anyString());
+		verify(instances.get(0), times(5)).queryParam(anyString(), anyString());
+		verify(instances.get(1), times(6)).queryParam(anyString(), anyString());
     }
 
     private class TestService extends Nexus3RestApiSearchService {
