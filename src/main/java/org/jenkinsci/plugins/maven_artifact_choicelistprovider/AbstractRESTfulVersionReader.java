@@ -1,6 +1,5 @@
 package org.jenkinsci.plugins.maven_artifact_choicelistprovider;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
