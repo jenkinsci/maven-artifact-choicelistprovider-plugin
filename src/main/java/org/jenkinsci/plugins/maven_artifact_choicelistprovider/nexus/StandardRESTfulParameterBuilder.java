@@ -19,6 +19,8 @@ public class StandardRESTfulParameterBuilder extends RESTfulParameterBuilder {
     public static final String PARAMETER_ARTIFACTID = "a";
 
     public static final String PARAMETER_GROUPID = "g";
+    
+    public static final String PARAMETER_SORT = "s";
 
     @Override
     public String getRepositoryId() {
@@ -49,5 +51,10 @@ public class StandardRESTfulParameterBuilder extends RESTfulParameterBuilder {
     public String getContinuationToken() {
        throw new UnsupportedOperationException("this method is not supported getContinuationToken()");
     }
+
+	@Override
+	public String getSortOrder() {
+		return PARAMETER_SORT;
+	}
 
 }

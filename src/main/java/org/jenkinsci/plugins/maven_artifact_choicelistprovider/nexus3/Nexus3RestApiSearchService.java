@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Nexus3RestApiSearchService extends AbstractRESTfulVersionReader implements IVersionReader {
 
+	// https://help.sonatype.com/repomanager3/rest-and-integration-api/search-api#SearchAPI-SearchAssets
 	private static final String NEXUS3_REST_API_ENDPOINT = "service/rest/v1/search/assets";
 
 	private static final Logger LOGGER = Logger.getLogger(Nexus3RestApiSearchService.class.getName());

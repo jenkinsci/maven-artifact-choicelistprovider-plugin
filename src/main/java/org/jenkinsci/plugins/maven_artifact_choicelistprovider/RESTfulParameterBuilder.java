@@ -18,8 +18,11 @@ import org.apache.commons.lang.StringUtils;
  */
 public abstract class RESTfulParameterBuilder {
 
-    public static final String PACKAGING_ALL = "*";
+	public static final String PACKAGING_ALL = "*";
 
+	// Always order the results by semantic version
+    private static final String DEFAULT_SORTORDER = "version";
+    
     private static final Logger LOGGER = Logger.getLogger(RESTfulParameterBuilder.class.getName());
 
     public MultivaluedMap<String, String> create(final String pRepositoryId, final String pGroupId, final String pArtifactId, final String pPackaging,
@@ -78,6 +81,8 @@ public abstract class RESTfulParameterBuilder {
             requestParams.putSingle(getContinuationToken(), continuationToken);
         }
         
+        requestParams.putSingle(getSortOrder(), DEFAULT_SORTORDER);
+        
         return requestParams;
     }
 
@@ -92,5 +97,7 @@ public abstract class RESTfulParameterBuilder {
     public abstract String getClassifier();
     
     public abstract String getContinuationToken();
+    
+    public abstract String getSortOrder();
 
 }

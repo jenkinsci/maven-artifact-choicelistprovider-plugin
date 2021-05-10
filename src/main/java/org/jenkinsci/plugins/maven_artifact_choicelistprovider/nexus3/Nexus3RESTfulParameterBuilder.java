@@ -21,8 +21,10 @@ public class Nexus3RESTfulParameterBuilder extends RESTfulParameterBuilder {
     public static final String PARAMETER_GROUPID = "group";
    
     public static final String PARAMETER_TOKEN = "continuationToken";
-
+    
     public static final String PACKAGING_ALL = "*";
+    
+    public static final String PARAMETER_SORT = "sort";
 
     @Override
     public String getRepositoryId() {
@@ -53,5 +55,10 @@ public class Nexus3RESTfulParameterBuilder extends RESTfulParameterBuilder {
     public String getContinuationToken() {
         return PARAMETER_TOKEN;
     }
+
+	@Override
+	public String getSortOrder() {
+		return PARAMETER_SORT;
+	}
 
 }
