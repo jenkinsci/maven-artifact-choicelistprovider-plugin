@@ -3,6 +3,7 @@ package org.jenkinsci.plugins.maven_artifact_choicelistprovider;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -70,9 +71,10 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
         LOGGER.log(Level.FINE, "retrieve the versions from the repository");
         final Map<String, String> mChoices = readURL(createServiceInstance(), getRepositoryId(), getGroupId(), getArtifactId(), getPackaging(), getClassifier(),
                 getInverseFilter(), getFilterExpression(), getReverseOrder());
+        
         // FIXME: CHANGE-1: Return only the keys, that are shorter then the values
         // return new ArrayList<String>(mChoices.keySet());
-        return new ArrayList<String>(mChoices.values());
+        return new LinkedList<String>(mChoices.values());
     }
 
     /**

@@ -1,6 +1,7 @@
 package org.jenkinsci.plugins.maven_artifact_choicelistprovider;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
@@ -76,7 +77,7 @@ public abstract class AbstractRESTfulVersionReader implements IVersionReader {
 				}
 			}
 
-			return new ArrayList<String>(result);
+			return new LinkedList<String>(result);
 		} catch (ResponseProcessingException e) {
 			final String msg;
 			if (e.getResponse() != null) {

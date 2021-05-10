@@ -38,7 +38,7 @@ public class Nexus3RestApiSearchService extends AbstractRESTfulVersionReader imp
 			final String pPackaging, final ValidAndInvalidClassifier pClassifier) {
 
 		// init empty
-		Set<String> retVal = new TreeSet<>();
+		Set<String> retVal = new LinkedHashSet<>(); // retain order of insertion
 		String token = null;
 
 
@@ -103,7 +103,7 @@ public class Nexus3RestApiSearchService extends AbstractRESTfulVersionReader imp
 	 */
 	Set<String> parseResponse(final Nexus3RestResponse pJsonResult) {
 		// Use a Map instead of a List to filter duplicated entries and also linked to
-		// keep the order of XML response
+		// keep the order of response
 		final Set<String> retVal = new LinkedHashSet<>();
 
 		for (Item current : pJsonResult.getItems()) {
