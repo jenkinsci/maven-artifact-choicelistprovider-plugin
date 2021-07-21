@@ -34,7 +34,7 @@
     </properties>
 
     <dependencies>
-    	<!--  Java 11 / JAXB Stuff -->
+    	<!--  Java 11 / JAXB Stuff / Parse Nexus XML Interface -->
     	<dependency>
     	 	<groupId>io.jenkins.plugins</groupId>
     		<artifactId>jaxb</artifactId>
