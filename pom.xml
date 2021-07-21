@@ -44,7 +44,7 @@
         <!-- For Authentication Details -->
         <dependency>
             <artifactId>credentials</artifactId>
-            <version>2.3.11</version>
+            <version>2.3.19</version>
             <groupId>org.jenkins-ci.plugins</groupId>
         </dependency>
 
