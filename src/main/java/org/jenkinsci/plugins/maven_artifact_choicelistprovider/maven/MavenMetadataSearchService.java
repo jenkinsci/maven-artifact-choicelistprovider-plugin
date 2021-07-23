@@ -1,6 +1,6 @@
 package org.jenkinsci.plugins.maven_artifact_choicelistprovider.maven;
 
-import java.nio.charset.StandardCharsets;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -10,37 +10,19 @@ import java.util.logging.Logger;
 
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 
-import org.apache.commons.io.IOUtils;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.AbstractRESTfulVersionReader;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.IVersionReader;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.ValidAndInvalidClassifier;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.VersionReaderException;
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
 
 public class MavenMetadataSearchService extends AbstractRESTfulVersionReader implements IVersionReader {
 	
 	private static final Logger LOGGER = Logger.getLogger(MavenMetadataSearchService.class.getName());
 
-	private static final XPathExpression XPATH;
-	
-	static {
-		final String expression = "/metadata/versioning/versions/version";
-		try {
-			final XPath xPath = XPathFactory.newInstance().newXPath();
-			XPATH = xPath.compile(expression);
-		} catch (XPathExpressionException e) {
-			throw new RuntimeException("cannot compile xpath expression: " + expression, e);
-		}
-	}
 	public MavenMetadataSearchService(String mURL) {
 		super(mURL);
 	}
@@ -91,14 +73,16 @@ public class MavenMetadataSearchService extends AbstractRESTfulVersionReader imp
 	List<String> parseVersions(final String pResponse) throws VersionReaderException {
 		final List<String> retVal = new ArrayList<>();
 
+		MavenMetaData xmlResult = null;
+		
 		try {
-			final DocumentBuilder db = threadLocalBuilder.get().newDocumentBuilder();
-			final Document doc = db.parse(IOUtils.toInputStream(pResponse, StandardCharsets.UTF_8));
+			Unmarshaller unmarshaller = JAXBCONTEXT.get().createUnmarshaller();
 
-			final NodeList versions = (NodeList) XPATH.evaluate(doc, XPathConstants.NODESET);
-
-			for (int i = 0; i < versions.getLength(); ++i) {
-				retVal.add(versions.item(i).getTextContent().trim());
+			StringReader reader = new StringReader(pResponse);
+			xmlResult = (MavenMetaData) unmarshaller.unmarshal(reader);
+			
+			for(Version current :  xmlResult.getVersioning().getVersions()) {
+				retVal.add(current.getVersion());
 			}
 
 		} catch (Exception e) {
@@ -112,11 +96,13 @@ public class MavenMetadataSearchService extends AbstractRESTfulVersionReader imp
 		return retVal;
 	}
 
-	ThreadLocal<DocumentBuilderFactory> threadLocalBuilder = new ThreadLocal<DocumentBuilderFactory>() {
-		@Override
-		protected DocumentBuilderFactory initialValue() {
-			return DocumentBuilderFactory.newInstance();
+	private static final ThreadLocal<JAXBContext> JAXBCONTEXT = ThreadLocal.withInitial(() -> {
+		try {
+			return (JAXBContext.newInstance(MavenMetaData.class));
+		} catch (JAXBException e) {
+			LOGGER.log(Level.SEVERE, "failed to init JAXB context", e);
+			return null;
 		}
-	};
-
+	});
+	
 }

@@ -21,10 +21,14 @@ public class MavenMetadataResponseParserTest {
 		String mockedResponse = IOUtils.toString(resourceAsStream);
 
 		MavenMetadataSearchService service = new MavenMetadataSearchService("");
-		List<String> versions = service.parseVersions(mockedResponse);
-
-		assertEquals("Parsing couldn't find all versions", 144, versions.size());
-		assertEquals("Parsing didn't preserve order", "200.0.0-ASSA-SNAPSHOT", versions.get(versions.size() - 1));
+		try {
+			List<String> versions = service.parseVersions(mockedResponse);
+			assertEquals("Parsing couldn't find all versions", 144, versions.size());
+			assertEquals("Parsing didn't preserve order", "200.0.0-ASSA-SNAPSHOT", versions.get(versions.size() - 1));
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail(e.getMessage());
+		}
 	}
 
 	@Test
