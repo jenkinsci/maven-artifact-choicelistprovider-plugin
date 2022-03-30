@@ -1,11 +1,14 @@
 package org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus3;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 /**
  * POJO for Nexus3 REST API.
  * 
  * @author stephan.watermeyer
  *
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Item {
 	private String id;
 
