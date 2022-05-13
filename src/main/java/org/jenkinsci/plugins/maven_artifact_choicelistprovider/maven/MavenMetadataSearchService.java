@@ -99,11 +99,16 @@ public class MavenMetadataSearchService extends AbstractRESTfulVersionReader imp
 	}
 
 	private static final ThreadLocal<JAXBContext> JAXBCONTEXT = ThreadLocal.withInitial(() -> {
+		Thread currentThread = Thread.currentThread();
+		ClassLoader originalContext = currentThread.getContextClassLoader();
 		try {
+			currentThread.setContextClassLoader(MavenMetadataSearchService.class.getClassLoader());
 			return (JAXBContext.newInstance(MavenMetaData.class));
 		} catch (JAXBException e) {
 			LOGGER.log(Level.SEVERE, "failed to init JAXB context", e);
 			return null;
+		} finally {
+			currentThread.setContextClassLoader(originalContext);
 		}
 	});
 	
