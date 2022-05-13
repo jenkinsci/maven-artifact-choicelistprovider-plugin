@@ -7,12 +7,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.net.ssl.SSLHandshakeException;
-import javax.ws.rs.ProcessingException;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.ResponseProcessingException;
-import javax.ws.rs.client.WebTarget;
 
+import jakarta.ws.rs.ProcessingException;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.ResponseProcessingException;
+import jakarta.ws.rs.client.WebTarget;
 import org.apache.commons.lang.StringUtils;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
@@ -95,7 +95,7 @@ public abstract class AbstractRESTfulVersionReader implements IVersionReader {
 				msg = "General Error:" + e.getMessage();
 			}
 			throw new VersionReaderException(msg, e);
-		} catch(javax.ws.rs.NotFoundException e) {
+		} catch(jakarta.ws.rs.NotFoundException e) {
 			throw new VersionReaderException("The artifact you are looking for does not exist (HTTP404). Have you used the correct repositoryId / baseURL?", e);
 		} catch (VersionReaderException e) {
 			throw e; // just forward from the services
@@ -107,7 +107,7 @@ public abstract class AbstractRESTfulVersionReader implements IVersionReader {
 				throw new VersionReaderException(
 						"Timeout while connecting to your Repository Service. Please consider the Jenkins-Proxy settings. If using HTTPs also invalid certificates can be the root cause.",
 						e);
-			} else if (e instanceof javax.ws.rs.BadRequestException) {
+			} else if (e instanceof jakarta.ws.rs.BadRequestException) {
 				throw new VersionReaderException("Request is invalid", e);
 			} else {
 				throw new VersionReaderException("failed to retrieve versions from repository for r:" + getURL()
