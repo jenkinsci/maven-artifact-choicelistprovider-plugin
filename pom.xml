@@ -53,11 +53,6 @@
             <groupId>io.jenkins.plugins</groupId>
             <artifactId>jersey2-api</artifactId>
         </dependency>
-        <dependency>
-            <groupId>javax.ws.rs</groupId>
-            <artifactId>javax.ws.rs-api</artifactId>
-            <version>2.1.1</version>
-        </dependency>
 
         <!-- For Authentication Details -->
         <dependency>
@@ -73,28 +68,12 @@
             <version>1.8.0</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.glassfish.jersey.core</groupId>
-            <artifactId>jersey-client</artifactId>
-            <version>3.0.4</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>jakarta.activation</groupId>
-                    <artifactId>jakarta.activation-api</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
         <!-- Necessary to parse the XML from Nexus Lucene Service -->
         <dependency>
             <groupId>org.sonatype.nexus.plugins</groupId>
             <artifactId>nexus-indexer-lucene-model</artifactId>
             <version>2.15.1-02</version>
             <exclusions>
-                <exclusion>
-                    <groupId>org.codehaus.plexus</groupId>
-                    <artifactId>plexus-utils</artifactId>
-                </exclusion>
                 <exclusion> <!-- provided by jackson2-api plugin -->
                     <groupId>org.json</groupId>
                     <artifactId>json</artifactId>
