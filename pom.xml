@@ -49,6 +49,10 @@
             <groupId>io.jenkins.plugins</groupId>
             <artifactId>jaxb</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.jenkins.plugins</groupId>
+            <artifactId>jersey2-api</artifactId>
+        </dependency>
 
         <!-- For Authentication Details -->
         <dependency>
@@ -74,11 +78,6 @@
                 <artifactId>jakarta.activation-api</artifactId>
               </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.jersey.connectors</groupId>
-            <artifactId>jersey-apache-connector</artifactId>
-            <version>3.0.4</version>
         </dependency>
 
         <!-- Necessary to parse the XML from Nexus Lucene Service -->
