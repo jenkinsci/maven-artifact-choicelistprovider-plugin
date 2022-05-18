@@ -3,6 +3,8 @@ package org.jenkinsci.plugins.maven_artifact_choicelistprovider.maven;
 import java.util.Collections;
 import java.util.Map;
 
+import javax.ws.rs.POST;
+
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.AbstractMavenArtifactChoiceListProvider;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.IVersionReader;
@@ -24,7 +26,6 @@ import hudson.security.ACL;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import jp.ikedam.jenkins.plugins.extensible_choice_parameter.ChoiceListProvider;
-import org.kohsuke.stapler.interceptor.RequirePOST;
 
 
 /**
@@ -106,7 +107,7 @@ public class MavenMetadataChoiceListProvider extends AbstractMavenArtifactChoice
             return FormValidation.ok();
         }
 
-        @RequirePOST
+        @POST
         public FormValidation doTest(@AncestorInPath Item pItem, @QueryParameter String url, @QueryParameter String credentialsId, @QueryParameter String repositoryId,
                                      @QueryParameter String groupId, @QueryParameter String artifactId,
                                      @QueryParameter boolean inverseFilter, @QueryParameter String filterExpression, @QueryParameter boolean reverseOrder) {

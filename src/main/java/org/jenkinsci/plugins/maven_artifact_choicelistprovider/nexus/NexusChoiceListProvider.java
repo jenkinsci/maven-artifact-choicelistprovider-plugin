@@ -4,6 +4,8 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import javax.ws.rs.POST;
+
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.AbstractMavenArtifactChoiceListProvider;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.AbstractMavenArtifactDescriptorImpl;
@@ -27,7 +29,6 @@ import hudson.security.ACL;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import net.sf.json.JSONObject;
-import org.kohsuke.stapler.interceptor.RequirePOST;
 
 public class NexusChoiceListProvider extends AbstractMavenArtifactChoiceListProvider {
 
@@ -79,7 +80,7 @@ public class NexusChoiceListProvider extends AbstractMavenArtifactChoiceListProv
             return retVal;
         }
 
-        @RequirePOST
+        @POST
         public FormValidation doTest(@AncestorInPath Item pItem, @QueryParameter String url, @QueryParameter String credentialsId, @QueryParameter String repositoryId,
                 @QueryParameter String groupId, @QueryParameter String artifactId, @QueryParameter String packaging, @QueryParameter String classifier,
                 @QueryParameter boolean inverseFilter, @QueryParameter String filterExpression, @QueryParameter boolean reverseOrder) {
