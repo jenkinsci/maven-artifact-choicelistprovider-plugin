@@ -14,7 +14,6 @@ import javax.ws.rs.client.ResponseProcessingException;
 import javax.ws.rs.client.WebTarget;
 
 import org.apache.commons.lang.StringUtils;
-import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 
@@ -49,8 +48,7 @@ public abstract class AbstractRESTfulVersionReader implements IVersionReader {
 	}
 
 	void init() {
-		ClientConfig config = new ClientConfig();
-		Client client = ClientBuilder.newClient(config);
+		Client client = ClientBuilder.newClient();
 
 		if (StringUtils.isNotEmpty(mUserName) && StringUtils.isNotEmpty(mUserPassword)) {
 			LOGGER.fine("setting username to: " + mUserName);
