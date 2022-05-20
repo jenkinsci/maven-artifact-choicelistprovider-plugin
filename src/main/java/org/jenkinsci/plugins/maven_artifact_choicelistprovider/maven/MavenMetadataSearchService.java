@@ -80,9 +80,11 @@ public class MavenMetadataSearchService extends AbstractRESTfulVersionReader imp
 
 			StringReader reader = new StringReader(pResponse);
 			xmlResult = (MavenMetaData) unmarshaller.unmarshal(reader);
-			
-			for(Version current :  xmlResult.getVersioning().getVersions()) {
-				retVal.add(current.getVersion());
+
+			if (xmlResult.getVersioning() != null) {
+				for(Version current :  xmlResult.getVersioning().getVersions()) {
+					retVal.add(current.getVersion());
+				}
 			}
 
 		} catch (Exception e) {
