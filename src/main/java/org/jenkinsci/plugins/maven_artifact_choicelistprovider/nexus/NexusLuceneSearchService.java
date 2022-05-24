@@ -31,11 +31,16 @@ public class NexusLuceneSearchService extends AbstractRESTfulVersionReader imple
 	private boolean mUseRESTfulAPI;
 
 	private static final ThreadLocal<JAXBContext> JAXBCONTEXT = ThreadLocal.withInitial(() -> {
+		Thread currentThread = Thread.currentThread();
+		ClassLoader originalContext = currentThread.getContextClassLoader();
 		try {
+			currentThread.setContextClassLoader(NexusLuceneSearchService.class.getClassLoader());
 			return (JAXBContext.newInstance(PatchedSearchNGResponse.class));
 		} catch (JAXBException e) {
 			LOGGER.log(Level.SEVERE, "failed to init JAXB context", e);
 			return null;
+		} finally {
+			currentThread.setContextClassLoader(originalContext);
 		}
 	});
 	
