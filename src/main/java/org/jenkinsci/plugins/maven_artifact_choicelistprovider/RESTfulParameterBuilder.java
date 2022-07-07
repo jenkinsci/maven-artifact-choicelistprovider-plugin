@@ -19,6 +19,8 @@ import org.apache.commons.lang.StringUtils;
 public abstract class RESTfulParameterBuilder {
 
 	public static final String PACKAGING_ALL = "*";
+	
+	public static final String CLASSIFIER_ALL = "*";
 
 	// Always order the results by semantic version
     private static final String DEFAULT_SORTORDER = "version";
@@ -68,13 +70,28 @@ public abstract class RESTfulParameterBuilder {
             requestParams.putSingle(getPackaging(), pPackaging);
         }
         if (pClassifier != null) {
+            boolean retrieveAllClassifiers = false;
+            
             // FIXME: There is of course a better way how to do it...
             final List<String> query = new ArrayList<String>();
-            for (String current : pClassifier.getValid())
+            for (String current : pClassifier.getValid()) {
                 query.add(current);
+                
+                
+                if(RESTfulParameterBuilder.CLASSIFIER_ALL.equals(current)) {
+                    retrieveAllClassifiers = true;
+                } 
+            }
 
-            if (!query.isEmpty())
+            if (retrieveAllClassifiers || pClassifier.getInvalid().isEmpty() == false) {
+                // in this case the parameter "maven.classifier" must not be present in the REST call to retrieve all classifiers.
+                // if there is a "invalid" selection, we need to retrieve all elements to filter the "invalid" entries after retrieval.
+            } else if (!query.isEmpty()) {
                 requestParams.put(getClassifier(), query);
+            } else {
+                // In case the classifier has not been given, we send it to Nexus3 API to retrieve only the default artifacts like JARs.
+                requestParams.putSingle(getClassifier(), "");
+            }
         }
         
         if (!StringUtils.isEmpty(continuationToken)) {

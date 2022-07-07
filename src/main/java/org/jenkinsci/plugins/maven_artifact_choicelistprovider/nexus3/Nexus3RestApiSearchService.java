@@ -72,7 +72,7 @@ public class Nexus3RestApiSearchService extends AbstractRESTfulVersionReader imp
 					// So we get the token from the request which should be null.
 					token = parsedJsonResult.getContinuationToken();
 				} else {
-					Set<String> currentResult = parseResponse(parsedJsonResult);
+					Set<String> currentResult = parseAndFilterResponse(parsedJsonResult, pClassifier);
 					retVal.addAll(currentResult);
 
 					// control the loop and maybe query again
@@ -97,16 +97,32 @@ public class Nexus3RestApiSearchService extends AbstractRESTfulVersionReader imp
 	 * artifacts can be retrieved.
 	 * 
 	 * @param pJsonResult the JSON response of the Nexus3 API.
+	 * @param pClassifier 
 	 * @return a unique list of URLs that are matching the search criteria, sorted
 	 *         by the order of the Nexus3 service.
 	 */
-	Set<String> parseResponse(final Nexus3RestResponse pJsonResult) {
+	Set<String> parseAndFilterResponse(final Nexus3RestResponse pJsonResult, final ValidAndInvalidClassifier pClassifier) {
 		// Use a Map instead of a List to filter duplicated entries and also linked to
 		// keep the order of response
 		final Set<String> retVal = new LinkedHashSet<>();
 
-		for (Item current : pJsonResult.getItems()) {
-			retVal.add(current.getDownloadUrl());
+		boolean mustApplyInvalidFilter = pClassifier.getInvalid().isEmpty() == false;
+		boolean addItemToResult = true;
+		
+		for (final Item current : pJsonResult.getItems()) {
+		    if(mustApplyInvalidFilter) {
+		        addItemToResult = true;
+		        for(final String currentInvalidClassifier : pClassifier.getInvalid()) {
+		            // Example: "https://xxx/repository/r/com/a/b/c/log-uploader/1.0.56/log-uploader-1.0.56-javadoc.jar",
+		            if(current.getDownloadUrl().contains("-" + currentInvalidClassifier+ ".")) {
+		                addItemToResult = false;
+		            }
+		        }
+		    }
+			
+		    if(addItemToResult) {
+		        retVal.add(current.getDownloadUrl());
+		    }
 		}
 		return retVal;
 	}
