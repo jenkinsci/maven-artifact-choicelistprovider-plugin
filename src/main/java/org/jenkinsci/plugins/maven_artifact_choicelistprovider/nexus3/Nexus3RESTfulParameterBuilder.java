@@ -16,9 +16,9 @@ public class Nexus3RESTfulParameterBuilder extends RESTfulParameterBuilder {
 
     public static final String PARAMETER_PACKAGING = "maven.extension";
 
-    public static final String PARAMETER_ARTIFACTID = "name";
+    public static final String PARAMETER_ARTIFACTID = "maven.artifactId";
 
-    public static final String PARAMETER_GROUPID = "group";
+    public static final String PARAMETER_GROUPID = "maven.groupId";
    
     public static final String PARAMETER_TOKEN = "continuationToken";
     
