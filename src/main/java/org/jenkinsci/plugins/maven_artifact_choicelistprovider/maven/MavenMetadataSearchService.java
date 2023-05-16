@@ -46,7 +46,7 @@ public class MavenMetadataSearchService extends AbstractRESTfulVersionReader imp
 	 * Ordering of returned versions is important so using a LinkedHashSet inside.
 	 * {@inheritDoc}
 	 * 
-	 * @throws VersionReaderException
+	 * @throws VersionReaderException TBD.
 	 */
 	@Override
 	public Set<String> callService(String pRepositoryId, String pGroupId, String pArtifactId, String pPackaging,
