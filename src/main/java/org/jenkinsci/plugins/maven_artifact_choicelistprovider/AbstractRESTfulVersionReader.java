@@ -20,7 +20,7 @@ import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 /**
  * 
  * Basic Class for perform artifact searches against an RESTful service API,
- * like Nexus and Artifactory.
+ * like Nexus and Artifactory. 
  *
  * @author stephan.watermeyer, Diebold Nixdorf
  */

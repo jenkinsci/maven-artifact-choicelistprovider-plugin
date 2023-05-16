@@ -49,7 +49,7 @@ public class Nexus3ChoiceListProvider extends AbstractMavenArtifactChoiceListPro
         }
 
         /**
-         * the display name shown in the dropdown to select a choice provider.
+         * the display name shown in the drop down to select a choice provider.
          * 
          * @return display name
          * @see hudson.model.Descriptor#getDisplayName()
@@ -81,7 +81,7 @@ public class Nexus3ChoiceListProvider extends AbstractMavenArtifactChoiceListPro
             // SECURITY-1022
             pItem.checkPermission(Job.CONFIGURE);
 
-            final IVersionReader service = new Nexus3RestApiSearchService(url);
+            final IVersionReader service = new Nexus3RestApiAssetService(url);
 
             // If configured, set User Credentials
             final UsernamePasswordCredentialsImpl c = getCredentials(credentialsId);
@@ -120,7 +120,7 @@ public class Nexus3ChoiceListProvider extends AbstractMavenArtifactChoiceListPro
     @Override
     public IVersionReader createServiceInstance() {
         // init the service
-        final IVersionReader retVal = new Nexus3RestApiSearchService(url);
+        final IVersionReader retVal = new Nexus3RestApiAssetService(url);
         final UsernamePasswordCredentialsImpl c = getCredentials(getCredentialsId());
         if (c != null) {
             retVal.setCredentials(c.getUsername(), c.getPassword().getPlainText());

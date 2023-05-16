@@ -27,6 +27,11 @@ public abstract class RESTfulParameterBuilder {
     
     private static final Logger LOGGER = Logger.getLogger(RESTfulParameterBuilder.class.getName());
 
+    public MultivaluedMap<String, String> create(final String pRepositoryId, final String pName) {
+        return create(pRepositoryId, null, pName, null, null, "");
+        
+    }
+    
     public MultivaluedMap<String, String> create(final String pRepositoryId, final String pGroupId, final String pArtifactId, final String pPackaging,
             final ValidAndInvalidClassifier pClassifier) {
         return create(pRepositoryId, pGroupId, pArtifactId, pPackaging, pClassifier, "");
@@ -45,15 +50,15 @@ public abstract class RESTfulParameterBuilder {
      *            the Packaging
      * @param pClassifier
      *            the Classifier
-     * @param continuationToken
+     * @param pToken
      *            the Nexus 3 Token.
      * @return the parameters to be used for the request.
      */
     public MultivaluedMap<String, String> create(final String pRepositoryId, final String pGroupId, final String pArtifactId, final String pPackaging,
-            final ValidAndInvalidClassifier pClassifier, String continuationToken) {
+            final ValidAndInvalidClassifier pClassifier, String pToken) {
         if (LOGGER.isLoggable(Level.FINE)) {
-            LOGGER.fine("create parameters for: repositoryId: " + pRepositoryId + " g:" + pGroupId + ", a:" + pArtifactId + ", p:" + pPackaging + ", c: " + pClassifier.toString()
-                    + "t:" + continuationToken);
+            LOGGER.fine("create parameters for: repositoryId: " + pRepositoryId + " g:" + pGroupId + ", a:" + pArtifactId + ", p:" + pPackaging + ", c: " + (pClassifier == null ? "null" : pClassifier.toString())
+                    + "t:" + pToken);
         }
 
         MultivaluedMap<String, String> requestParams = new MultivaluedHashMap<String, String>();
@@ -69,7 +74,7 @@ public abstract class RESTfulParameterBuilder {
         if (!StringUtils.isEmpty(pPackaging) && !PACKAGING_ALL.equals(pPackaging)) {
             requestParams.putSingle(getPackaging(), pPackaging);
         }
-        if (pClassifier != null) {
+        if (pClassifier != null && getClassifier() != null) {
             boolean retrieveAllClassifiers = false;
             
             // FIXME: There is of course a better way how to do it...
@@ -94,8 +99,8 @@ public abstract class RESTfulParameterBuilder {
             }
         }
         
-        if (!StringUtils.isEmpty(continuationToken)) {
-            requestParams.putSingle(getContinuationToken(), continuationToken);
+        if (!StringUtils.isEmpty(pToken)) {
+            requestParams.putSingle(getContinuationToken(), pToken);
         }
         
         requestParams.putSingle(getSortOrder(), DEFAULT_SORTORDER);

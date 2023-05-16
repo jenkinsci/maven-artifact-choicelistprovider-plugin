@@ -21,14 +21,14 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class Nexus3RestApiSearchService extends AbstractRESTfulVersionReader implements IVersionReader {
+abstract class AbstractNexus3RestApiAssetService extends AbstractRESTfulVersionReader implements IVersionReader {
 
 	// https://help.sonatype.com/repomanager3/rest-and-integration-api/search-api#SearchAPI-SearchAssets
 	private static final String NEXUS3_REST_API_ENDPOINT = "service/rest/v1/search/assets";
 
-	private static final Logger LOGGER = Logger.getLogger(Nexus3RestApiSearchService.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(AbstractNexus3RestApiAssetService.class.getName());
 
-	public Nexus3RestApiSearchService(String pURL) {
+	public AbstractNexus3RestApiAssetService(String pURL) {
 		super(pURL);
 	}
 
@@ -46,8 +46,7 @@ public class Nexus3RestApiSearchService extends AbstractRESTfulVersionReader imp
 		do {
 			WebTarget theInstance = getInstance();
 
-			final MultivaluedMap<String, String> requestParams = new Nexus3RESTfulParameterBuilder()
-					.create(pRepositoryId, pGroupId, pArtifactId, pPackaging, pClassifier, token);
+			final MultivaluedMap<String, String> requestParams = createRequestParameters(pRepositoryId, pGroupId, pArtifactId, pPackaging, pClassifier, token);
 
 			for (Map.Entry<String, List<String>> entries : requestParams.entrySet()) {
 				theInstance = theInstance.queryParam(entries.getKey(), entries.getValue().toArray());
@@ -92,6 +91,9 @@ public class Nexus3RestApiSearchService extends AbstractRESTfulVersionReader imp
 		return retVal;
 	}
 
+	protected abstract MultivaluedMap<String, String> createRequestParameters(String pRepositoryId, String pGroupId,
+			String pArtifactId, String pPackaging, ValidAndInvalidClassifier pClassifier, String token);
+
 	/**
 	 * Parses the JSON response from Nexus3 and creates a list of links where the
 	 * artifacts can be retrieved.
@@ -106,7 +108,7 @@ public class Nexus3RestApiSearchService extends AbstractRESTfulVersionReader imp
 		// keep the order of response
 		final Set<String> retVal = new LinkedHashSet<>();
 
-		boolean mustApplyInvalidFilter = pClassifier.getInvalid().isEmpty() == false;
+		boolean mustApplyInvalidFilter = pClassifier != null && pClassifier.getInvalid().isEmpty() == false;
 		boolean addItemToResult = true;
 		
 		for (final Item current : pJsonResult.getItems()) {

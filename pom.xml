@@ -10,11 +10,11 @@
     </parent>
 
     <artifactId>maven-artifact-choicelistprovider</artifactId>
-    <version>1.11.2-SNAPSHOT</version>
+    <version>1.12-SNAPSHOT</version>
     <packaging>hpi</packaging>
 
     <name>Maven Artifact ChoiceListProvider (Nexus)</name>
-    <description>A ChoiceListProvider to read Maven artifact information from a Nexus repository or MavenCentral</description>
+    <description>A ChoiceListProvider to read Maven artifact information from a Maven2 repository like Nexus, Artifactory and MavenCentral</description>
     <url>https://github.com/jenkinsci/maven-artifact-choicelistprovider-plugin/blob/master/README.md</url>
 
     <scm>

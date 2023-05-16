@@ -8,7 +8,7 @@ import org.jenkinsci.plugins.maven_artifact_choicelistprovider.RESTfulParameterB
  *
  * @author stephan.watermeyer, Diebold Nixdorf
  */
-public class Nexus3RESTfulParameterBuilder extends RESTfulParameterBuilder {
+public class Nexus3RESTfulParameterBuilderForMaven2Artifacts extends RESTfulParameterBuilder {
 
     public static final String PARAMETER_REPOSITORYID = "repository";
 

@@ -134,7 +134,7 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
             if (pReverseOrder)
                 Collections.reverse(filteredChoices);
 
-            retVal = toMap(filteredChoices);
+            retVal = MavenArtifactChoiceListProviderUtils.toMap(filteredChoices);
         } catch (VersionReaderException e) {
             LOGGER.log(Level.INFO, "failed to retrieve versions from repository for g:" + pGroupId + ", a:" + pArtifactId + ", p:" + pPackaging + ", c:" + pClassifier, e);
             retVal.put("error", e.getMessage());
@@ -179,20 +179,7 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
         return retVal;
     }
 
-    /**
-     * Cuts of the first parts of the URL and only returns a smaller set of items.
-     * 
-     * @param pChoices
-     *            the list which is transformed to a map
-     * @return the map containing the short url as Key and the long url as value.
-     */
-    public static Map<String, String> toMap(List<String> pChoices) {
-        Map<String, String> retVal = new LinkedHashMap<String, String>();
-        for (String current : pChoices) {
-            retVal.put(current.substring(current.lastIndexOf("/") + 1), current);
-        }
-        return retVal;
-    }
+
 
     @Override
     public void onBuildCompletedWithValue(AbstractBuild<?, ?> build, ExtensibleChoiceParameterDefinition def, String value) {

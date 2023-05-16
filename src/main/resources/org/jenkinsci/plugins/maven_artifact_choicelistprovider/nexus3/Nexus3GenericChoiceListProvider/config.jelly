@@ -32,16 +32,7 @@ THE SOFTWARE.
     <f:entry title="${%RepositoryId}" field="repositoryId">
         <f:textbox />
     </f:entry>
-    <f:entry title="${%GroupId}" field="groupId">
-        <f:textbox />
-    </f:entry>
-     <f:entry title="${%ArtifactId}" field="artifactId">
-        <f:textbox />
-    </f:entry>
-    <f:entry title="${%Packaging}" field="packaging">
-        <f:textbox />
-    </f:entry>
-    <f:entry title="${%Classifier}" field="classifier">
+    <f:entry title="${%Name}" field="name">
         <f:textbox />
     </f:entry>
     <f:entry title="${%Inverse Filter}" field="inverseFilter">
@@ -58,6 +49,6 @@ THE SOFTWARE.
         method="test"
         title="${%List Files Now}"
         progress="${%Checking...}"
-        with="url,credentialsId,repositoryId,groupId,artifactId,packaging,classifier,inverseFilter,filterExpression,reverseOrder"
+        with="url,credentialsId,repositoryId,name,inverseFilter,filterExpression,reverseOrder"
     />
 </j:jelly>
