@@ -1,7 +1,8 @@
 package org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus3;
 
-import java.util.Collections;
 import java.util.Map;
+
+import javax.inject.Inject;
 
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.AbstractMavenArtifactChoiceListProvider;
@@ -12,21 +13,16 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.interceptor.RequirePOST;
 
-import com.cloudbees.plugins.credentials.CredentialsMatchers;
-import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
-import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
-import com.cloudbees.plugins.credentials.domains.DomainRequirement;
 import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl;
 
 import hudson.Extension;
 import hudson.model.Item;
 import hudson.model.Job;
-import hudson.security.ACL;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import net.sf.json.JSONObject;
-import org.kohsuke.stapler.interceptor.RequirePOST;
 
 public class Nexus3ChoiceListProvider extends AbstractMavenArtifactChoiceListProvider {
 
@@ -43,6 +39,9 @@ public class Nexus3ChoiceListProvider extends AbstractMavenArtifactChoiceListPro
     @Extension
     public static class Nexus3DescriptorImpl extends AbstractMavenArtifactDescriptorImpl {
 
+    	@Inject
+    	private AbstractMavenArtifactChoiceListProvider.DescriptorImpl delegate;
+    	
         public Nexus3DescriptorImpl() {
             // When Jenkins is restarted, load any saved configuration from disk.
             load();
@@ -59,18 +58,8 @@ public class Nexus3ChoiceListProvider extends AbstractMavenArtifactChoiceListPro
             return "Nexus3 Artifact Choice Parameter";
         }
 
-        public ListBoxModel doFillCredentialsIdItems(@AncestorInPath Item pItem) {
-            final ListBoxModel retVal;
-
-            // SECURITY-1022
-            if (pItem.hasPermission(Job.CONFIGURE)) {
-                retVal = new StandardListBoxModel().includeEmptyValue().includeMatchingAs(ACL.SYSTEM, pItem, StandardUsernamePasswordCredentials.class,
-                        Collections.<DomainRequirement> emptyList(), CredentialsMatchers.instanceOf(StandardUsernamePasswordCredentials.class));
-            } else {
-                retVal = new StandardListBoxModel().includeEmptyValue();
-            }
-
-            return retVal;
+        public ListBoxModel doFillCredentialsIdItems(@AncestorInPath Item pItem, @QueryParameter String credentialsId) {
+        	return delegate.doFillCredentialsIdItems(pItem, credentialsId);
         }
 
         @RequirePOST
@@ -83,8 +72,8 @@ public class Nexus3ChoiceListProvider extends AbstractMavenArtifactChoiceListPro
 
             final IVersionReader service = new Nexus3RestApiAssetService(url);
 
-            // If configured, set User Credentials
-            final UsernamePasswordCredentialsImpl c = getCredentials(credentialsId);
+			// If configured, set User Credentials
+            final UsernamePasswordCredentialsImpl c = getCredentials(credentialsId, pItem);
             if (c != null) {
                 service.setCredentials(c.getUsername(), c.getPassword().getPlainText());
             }
@@ -118,10 +107,10 @@ public class Nexus3ChoiceListProvider extends AbstractMavenArtifactChoiceListPro
     }
 
     @Override
-    public IVersionReader createServiceInstance() {
+    public IVersionReader createServiceInstance(Item item) {
         // init the service
         final IVersionReader retVal = new Nexus3RestApiAssetService(url);
-        final UsernamePasswordCredentialsImpl c = getCredentials(getCredentialsId());
+		final UsernamePasswordCredentialsImpl c = getCredentials(getCredentialsId(), item);
         if (c != null) {
             retVal.setCredentials(c.getUsername(), c.getPassword().getPlainText());
         }

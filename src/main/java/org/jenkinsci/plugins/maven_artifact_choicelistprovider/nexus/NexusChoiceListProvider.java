@@ -1,8 +1,9 @@
 package org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.logging.Logger;
+
+import javax.inject.Inject;
 
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.AbstractMavenArtifactChoiceListProvider;
@@ -13,21 +14,16 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.interceptor.RequirePOST;
 
-import com.cloudbees.plugins.credentials.CredentialsMatchers;
-import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
-import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
-import com.cloudbees.plugins.credentials.domains.DomainRequirement;
 import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl;
 
 import hudson.Extension;
 import hudson.model.Item;
 import hudson.model.Job;
-import hudson.security.ACL;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import net.sf.json.JSONObject;
-import org.kohsuke.stapler.interceptor.RequirePOST;
 
 public class NexusChoiceListProvider extends AbstractMavenArtifactChoiceListProvider {
 
@@ -46,6 +42,9 @@ public class NexusChoiceListProvider extends AbstractMavenArtifactChoiceListProv
     @Extension
     public static class NexusDescriptorImpl extends AbstractMavenArtifactDescriptorImpl {
 
+    	@Inject
+    	private AbstractMavenArtifactChoiceListProvider.DescriptorImpl delegate;
+    	
         /** For Global Options */
         private boolean useRestfulAPI;
 
@@ -65,18 +64,8 @@ public class NexusChoiceListProvider extends AbstractMavenArtifactChoiceListProv
             return "Nexus Artifact Choice Parameter";
         }
 
-        public ListBoxModel doFillCredentialsIdItems(@AncestorInPath Item pItem) {
-            final ListBoxModel retVal;
-            
-            // SECURITY-1022
-            if (pItem.hasPermission(Job.CONFIGURE)) {
-                retVal= new StandardListBoxModel().includeEmptyValue().includeMatchingAs(ACL.SYSTEM, pItem, StandardUsernamePasswordCredentials.class,
-                        Collections.<DomainRequirement> emptyList(), CredentialsMatchers.instanceOf(StandardUsernamePasswordCredentials.class));
-            } else {
-                retVal= new StandardListBoxModel().includeEmptyValue();
-            }
-            
-            return retVal;
+        public ListBoxModel doFillCredentialsIdItems(@AncestorInPath Item pItem, @QueryParameter String credentialsId) {
+        	return delegate.doFillCredentialsIdItems(pItem, credentialsId);
         }
 
         @RequirePOST
@@ -89,8 +78,8 @@ public class NexusChoiceListProvider extends AbstractMavenArtifactChoiceListProv
 
             final IVersionReader service = new NexusLuceneSearchService(url);
 
-            // If configured, set User Credentials
-            final UsernamePasswordCredentialsImpl c = getCredentials(credentialsId);
+			// If configured, set User Credentials
+            final UsernamePasswordCredentialsImpl c = getCredentials(credentialsId, pItem);
             if (c != null) {
                 service.setCredentials(c.getUsername(), c.getPassword().getPlainText());
             }
@@ -100,8 +89,7 @@ public class NexusChoiceListProvider extends AbstractMavenArtifactChoiceListProv
         @Override
         protected Map<String, String> wrapTestConnection(IVersionReader pService, String pRepositoryId, String pGroupId, String pArtifactId, String pPackaging, String pClassifier,
                 boolean pInverseFilter, String pFilterExpression, boolean pReverseOrder) {
-            return readURL(pService, pRepositoryId, pGroupId, pArtifactId, pPackaging, pClassifier,
-                pInverseFilter, pFilterExpression, pReverseOrder);
+        	return readURL(pService, pRepositoryId, pGroupId, pArtifactId, pPackaging, pClassifier, pInverseFilter, pFilterExpression, pReverseOrder);
         }
 
         public FormValidation doCheckUrl(@QueryParameter String url) {
@@ -134,13 +122,13 @@ public class NexusChoiceListProvider extends AbstractMavenArtifactChoiceListProv
     }
 
     @Override
-    public IVersionReader createServiceInstance() {
+    public IVersionReader createServiceInstance(Item item) {
         // this comes from the global settings
         boolean useRestfulAPI = ((NexusDescriptorImpl) getDescriptor()).getUseRestfulAPI();
 
         // init the service
         final IVersionReader retVal = new NexusLuceneSearchService(url, useRestfulAPI);
-        final UsernamePasswordCredentialsImpl c = getCredentials(getCredentialsId());
+		final UsernamePasswordCredentialsImpl c = getCredentials(getCredentialsId(), item);
         if (c != null) {
             retVal.setCredentials(c.getUsername(), c.getPassword().getPlainText());
         }
