@@ -97,7 +97,7 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
     @Extension
     public static class DescriptorImpl extends Descriptor<ChoiceListProvider> {
 
-		public ListBoxModel doFillCredentialsIdItems(Item item, String credentialsId) {
+		public ListBoxModel doFillCredentialsIdItems(@AncestorInPath Item item, @QueryParameter String credentialsId) {
 			final StandardListBoxModel result = new StandardListBoxModel();
 			if (item == null) {
 				if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
