@@ -135,7 +135,7 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
     public static UsernamePasswordCredentialsImpl getCredentials(@Nonnull String pCredentialId, @Nonnull Item pItem) {
 		final Authentication acl = pItem instanceof Queue.Task ? Tasks.getAuthenticationOf((Queue.Task) pItem) : ACL.SYSTEM;
 		return CredentialsMatchers.firstOrNull(
-                CredentialsProvider.lookupCredentials(UsernamePasswordCredentialsImpl.class, Jenkins.get(), acl, Collections.<DomainRequirement> emptyList()),
+                CredentialsProvider.lookupCredentials(UsernamePasswordCredentialsImpl.class, pItem, ACL.SYSTEM, Collections.<DomainRequirement> emptyList()),
                 CredentialsMatchers.allOf(CredentialsMatchers.withId(pCredentialId)));
     }
 
