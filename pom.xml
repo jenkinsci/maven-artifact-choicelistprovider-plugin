@@ -1,181 +1,146 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>org.jenkins-ci.plugins</groupId>
-        <artifactId>plugin</artifactId>
-        <version>4.61</version>
-        <relativePath />
-    </parent>
+	<parent>
+		<groupId>org.jenkins-ci.plugins</groupId>
+		<artifactId>plugin</artifactId>
+		<version>4.72</version>
+		<relativePath />
+	</parent>
 
-    <artifactId>maven-artifact-choicelistprovider</artifactId>
-    <version>1.15-SNAPSHOT</version>
-    <packaging>hpi</packaging>
+	<artifactId>maven-artifact-choicelistprovider</artifactId>
+	<version>1.15-SNAPSHOT</version>
+	<packaging>hpi</packaging>
 
-    <name>Maven Artifact ChoiceListProvider (Nexus)</name>
-    <description>A ChoiceListProvider to read Maven artifact information from a Maven2 repository like Nexus, Artifactory and MavenCentral</description>
-    <url>https://github.com/jenkinsci/maven-artifact-choicelistprovider-plugin/blob/master/README.md</url>
+	<name>Maven Artifact ChoiceListProvider (Nexus)</name>
+	<description>A ChoiceListProvider to read Maven artifact information from a
+		Maven2 repository like Nexus, Artifactory and MavenCentral</description>
+	<url>
+		https://github.com/jenkinsci/maven-artifact-choicelistprovider-plugin/blob/master/README.md</url>
 
-    <scm>
-        <connection>scm:git:git@github.com:jenkinsci/maven-artifact-choicelistprovider-plugin.git</connection>
-        <developerConnection>scm:git:git@github.com:jenkinsci/maven-artifact-choicelistprovider-plugin.git</developerConnection>
-        <url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
-        <tag>HEAD</tag>
-    </scm>
+	<scm>
+		<connection>
+			scm:git:git@github.com:jenkinsci/maven-artifact-choicelistprovider-plugin.git</connection>
+		<developerConnection>
+			scm:git:git@github.com:jenkinsci/maven-artifact-choicelistprovider-plugin.git</developerConnection>
+		<url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
+		<tag>HEAD</tag>
+	</scm>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <jenkins.version>2.361.4</jenkins.version>
-        <revision>1.4.0</revision>
-        <changelist>-SNAPSHOT</changelist>
-    </properties>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<jenkins.version>2.387.3</jenkins.version>
+		<revision>1.4.0</revision>
+		<changelist>-SNAPSHOT</changelist>
+	</properties>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>io.jenkins.tools.bom</groupId>
-                <artifactId>bom-2.332.x</artifactId>
-                <version>1382.v7d694476f340</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.codehaus.plexus</groupId>
-                <artifactId>plexus-utils</artifactId>
-                <version>3.4.1</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-    <dependencies>
-    	<!--  Java 11 / JAXB Stuff / Parse Nexus XML Interface -->
-        <dependency>
-            <groupId>io.jenkins.plugins</groupId>
-            <artifactId>jaxb</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.jenkins.plugins</groupId>
-            <artifactId>jersey2-api</artifactId>
-        </dependency>
+	<dependencyManagement>
+		<dependencies>
+			<!--
+			https://mvnrepository.com/artifact/io.jenkins.tools.bom/bom-2.387.x -->
+			<dependency>
+				<groupId>io.jenkins.tools.bom</groupId>
+				<artifactId>bom-2.387.x</artifactId>
+				<version>2329.v078520e55c19</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
 
-        <!-- For Authentication Details -->
-        <dependency>
-          <groupId>org.jenkins-ci.plugins</groupId>
-          <artifactId>credentials</artifactId>
-        </dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<dependencies>
+		<!--  Java 11 / JAXB Stuff / Parse Nexus XML Interface -->
+		<dependency>
+			<groupId>io.jenkins.plugins</groupId>
+			<artifactId>jaxb</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.jenkins.plugins</groupId>
+			<artifactId>jersey2-api</artifactId>
+		</dependency>
+
+		<!-- For Authentication Details -->
+		<dependency>
+			<groupId>org.jenkins-ci.plugins</groupId>
+			<artifactId>credentials</artifactId>
+		</dependency>
 
 
-        <!-- Basic Dependency to allow Extension of the ChoiceListProvider -->
-        <dependency>
-            <groupId>jp.ikedam.jenkins.plugins</groupId>
-            <artifactId>extensible-choice-parameter</artifactId>
-            <version>1.8.0</version>
-        </dependency>
+		<!-- Basic Dependency to allow Extension of the ChoiceListProvider -->
+		<dependency>
+			<groupId>jp.ikedam.jenkins.plugins</groupId>
+			<artifactId>extensible-choice-parameter</artifactId>
+			<version>1.8.1</version>
+		</dependency>
 
-        <!-- Necessary to parse the XML from Nexus Lucene Service -->
-        <dependency>
-            <groupId>org.sonatype.nexus.plugins</groupId>
-            <artifactId>nexus-indexer-lucene-model</artifactId>
-            <version>2.15.1-02</version>
-            <exclusions>
-                <exclusion> <!-- provided by jackson2-api plugin -->
-                    <groupId>org.json</groupId>
-                    <artifactId>json</artifactId>
-                </exclusion>
-              </exclusions>
-        </dependency>
+		<!-- Necessary to parse the XML from Nexus Lucene Service -->
+		<dependency>
+			<groupId>org.sonatype.nexus.plugins</groupId>
+			<artifactId>nexus-indexer-lucene-model</artifactId>
+			<version>2.15.1-02</version>
+			<exclusions>
+				<exclusion> <!-- provided by jackson2-api plugin -->
+					<groupId>org.json</groupId>
+					<artifactId>json</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 
-      <!-- Necessary to parse JSON from Maven Central -->
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.10.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jenkins-ci.plugins</groupId>
-            <artifactId>jackson2-api</artifactId>
-        </dependency>
+		<!-- Necessary to parse JSON from Maven Central -->
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.10.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jenkins-ci.plugins</groupId>
+			<artifactId>jackson2-api</artifactId>
+		</dependency>
 
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.assertj</groupId>
-            <artifactId>assertj-core</artifactId>
-            <version>3.24.2</version>
-        </dependency>
-    </dependencies>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
+			<version>3.24.2</version>
+		</dependency>
+	</dependencies>
 
-    <licenses>
-        <license>
-            <name>MIT License</name>
-            <url>http://opensource.org/licenses/MIT</url>
-        </license>
-    </licenses>
+	<licenses>
+		<license>
+			<name>MIT License</name>
+			<url>http://opensource.org/licenses/MIT</url>
+		</license>
+	</licenses>
 
-    <developers>
-        <developer>
-            <id>phreakadelle</id>
-            <name>Stephan Watermeyer</name>
-        </developer>
-    </developers>
+	<developers>
+		<developer>
+			<id>phreakadelle</id>
+			<name>Stephan Watermeyer</name>
+		</developer>
+	</developers>
 
-    <repositories>
-        <repository>
-            <id>repo.jenkins-ci.org</id>
-            <url>https://repo.jenkins-ci.org/public/</url>
-        </repository>
-    </repositories>
+	<repositories>
+		<repository>
+			<id>repo.jenkins-ci.org</id>
+			<url>https://repo.jenkins-ci.org/public/</url>
+		</repository>
+	</repositories>
 
-    <pluginRepositories>
-        <pluginRepository>
-            <id>repo.jenkins-ci.org</id>
-            <url>https://repo.jenkins-ci.org/public/</url>
-        </pluginRepository>
-    </pluginRepositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>repo.jenkins-ci.org</id>
+			<url>https://repo.jenkins-ci.org/public/</url>
+		</pluginRepository>
+	</pluginRepositories>
 
-    <build>
-        <pluginManagement>
-            <plugins>
-                <!--This plugin's configuration is used to store Eclipse m2e settings 
-					only. It has no influence on the Maven build itself. -->
-				<plugin>
-					<groupId>org.eclipse.m2e</groupId>
-					<artifactId>lifecycle-mapping</artifactId>
-					<version>1.0.0</version>
-					<configuration>
-						<lifecycleMappingMetadata>
-							<pluginExecutions>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>
-											org.jenkins-ci.tools
-										</groupId>
-										<artifactId>
-											maven-hpi-plugin
-										</artifactId>
-										<versionRange>
-											[1.74,)
-										</versionRange>
-										<goals>
-											<goal>validate</goal>
-											<goal>
-												resolve-test-dependencies
-											</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore />
-									</action>
-								</pluginExecution>
-							</pluginExecutions>
-						</lifecycleMappingMetadata>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
-	</build>
+	
 </project>

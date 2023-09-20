@@ -1,7 +1,8 @@
 package org.jenkinsci.plugins.maven_artifact_choicelistprovider.maven;
 
-import java.util.Collections;
 import java.util.Map;
+
+import javax.inject.Inject;
 
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.AbstractMavenArtifactChoiceListProvider;
@@ -10,21 +11,17 @@ import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.interceptor.RequirePOST;
 
-import com.cloudbees.plugins.credentials.CredentialsMatchers;
-import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
-import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl;
 
 import hudson.Extension;
 import hudson.model.Descriptor;
 import hudson.model.Item;
 import hudson.model.Job;
-import hudson.security.ACL;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import jp.ikedam.jenkins.plugins.extensible_choice_parameter.ChoiceListProvider;
-import org.kohsuke.stapler.interceptor.RequirePOST;
 
 
 /**
@@ -44,6 +41,9 @@ public class MavenMetadataChoiceListProvider extends AbstractMavenArtifactChoice
     @Extension
     public static class MavenMetadataDescriptorImpl extends Descriptor<ChoiceListProvider> {
 
+    	@Inject
+    	private AbstractMavenArtifactChoiceListProvider.DescriptorImpl delegate;
+    	   
         public MavenMetadataDescriptorImpl() {
             // When Jenkins is restarted, load any saved configuration from disk.
             load();
@@ -60,18 +60,8 @@ public class MavenMetadataChoiceListProvider extends AbstractMavenArtifactChoice
             return "Maven Version Only Choice Parameter";
         }
 
-        public ListBoxModel doFillCredentialsIdItems(@AncestorInPath Item pItem) {
-            final ListBoxModel retVal;
-
-            // SECURITY-1022
-            if (pItem.hasPermission(Job.CONFIGURE)) {
-                retVal = new StandardListBoxModel().includeEmptyValue().includeMatchingAs(ACL.SYSTEM, pItem, StandardUsernamePasswordCredentials.class,
-                        Collections.emptyList(), CredentialsMatchers.instanceOf(StandardUsernamePasswordCredentials.class));
-            } else {
-                retVal = new StandardListBoxModel().includeEmptyValue();
-            }
-
-            return retVal;
+        public ListBoxModel doFillCredentialsIdItems(@AncestorInPath Item pItem, @QueryParameter String credentialsId) {
+            return delegate.doFillCredentialsIdItems(pItem, credentialsId);
         }
 
         public FormValidation doCheckUrl(@QueryParameter String url) {
@@ -116,8 +106,8 @@ public class MavenMetadataChoiceListProvider extends AbstractMavenArtifactChoice
 
             final IVersionReader service = new MavenMetadataSearchService(url);
 
-            // If configured, set User Credentials
-            final UsernamePasswordCredentialsImpl c = getCredentials(credentialsId);
+			// If configured, set User Credentials
+            final UsernamePasswordCredentialsImpl c = getCredentials(credentialsId, pItem);
             if (c != null) {
                 service.setCredentials(c.getUsername(), c.getPassword().getPlainText());
             }
@@ -148,10 +138,10 @@ public class MavenMetadataChoiceListProvider extends AbstractMavenArtifactChoice
     }
 
     @Override
-    public IVersionReader createServiceInstance() {
+    public IVersionReader createServiceInstance(Item item) {
         // init the service
         final IVersionReader retVal = new MavenMetadataSearchService(url);
-        final UsernamePasswordCredentialsImpl c = getCredentials(getCredentialsId());
+		final UsernamePasswordCredentialsImpl c = getCredentials(getCredentialsId(), item);
         if (c != null) {
             retVal.setCredentials(c.getUsername(), c.getPassword().getPlainText());
         }

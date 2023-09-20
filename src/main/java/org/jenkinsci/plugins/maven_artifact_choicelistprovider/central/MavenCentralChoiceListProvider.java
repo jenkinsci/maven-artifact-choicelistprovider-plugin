@@ -9,6 +9,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 
 import hudson.Extension;
+import hudson.model.Item;
 import hudson.util.FormValidation;
 import jp.ikedam.jenkins.plugins.extensible_choice_parameter.ChoiceListProvider;
 
@@ -57,7 +58,7 @@ public class MavenCentralChoiceListProvider extends AbstractMavenArtifactChoiceL
 
 	}
 
-	public IVersionReader createServiceInstance() {
+	public IVersionReader createServiceInstance(Item item) {
 		return new MavenCentralSearchService();
 	}
 

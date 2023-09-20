@@ -11,21 +11,36 @@ import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import javax.annotation.Nonnull;
+
+import org.acegisecurity.Authentication;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.artifactory.ArtifactoryChoiceListProvider;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.central.MavenCentralChoiceListProvider;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus.NexusChoiceListProvider;
+import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundSetter;
+import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.Stapler;
+import org.kohsuke.stapler.StaplerRequest;
 
 import com.cloudbees.plugins.credentials.CredentialsMatchers;
 import com.cloudbees.plugins.credentials.CredentialsProvider;
+import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
+import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import com.cloudbees.plugins.credentials.domains.DomainRequirement;
 import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl;
 
+import hudson.Extension;
 import hudson.ExtensionPoint;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
+import hudson.model.Descriptor;
+import hudson.model.Item;
+import hudson.model.Queue;
+import hudson.model.queue.Tasks;
 import hudson.security.ACL;
+import hudson.util.ListBoxModel;
 import jenkins.model.Jenkins;
 import jp.ikedam.jenkins.plugins.extensible_choice_parameter.ChoiceListProvider;
 import jp.ikedam.jenkins.plugins.extensible_choice_parameter.ExtensibleChoiceParameterDefinition;
@@ -55,7 +70,7 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
     private boolean reverseOrder;
 
     /**
-     * Initializes the choicelist with at the artifactId.
+     * Initializes the choice list with at the artifactId.
      * 
      * @param artifactId
      *            the artifactId is the minimum required information.
@@ -67,9 +82,13 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
 
     @Override
     public List<String> getChoiceList() {
-
+    	StaplerRequest req = Stapler.getCurrentRequest();
+    	Item item = req.findAncestorObject(Item.class);
+    	
+    	IVersionReader serviceInstance = createServiceInstance(item);
+    	
         LOGGER.log(Level.FINE, "retrieve the versions from the repository");
-        final Map<String, String> mChoices = readURL(createServiceInstance(), getRepositoryId(), getGroupId(), getArtifactId(), getPackaging(), getClassifier(),
+        final Map<String, String> mChoices = readURL(serviceInstance, getRepositoryId(), getGroupId(), getArtifactId(), getPackaging(), getClassifier(),
                 getInverseFilter(), getFilterExpression(), getReverseOrder());
         
         // FIXME: CHANGE-1: Return only the keys, that are shorter then the values
@@ -77,12 +96,36 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
         return new LinkedList<String>(mChoices.values());
     }
 
+    @Extension
+    public static class DescriptorImpl extends Descriptor<ChoiceListProvider> {
+
+		public ListBoxModel doFillCredentialsIdItems(@AncestorInPath Item item, @QueryParameter String credentialsId) {
+			final StandardListBoxModel result = new StandardListBoxModel();
+			if (item == null) {
+				if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
+					return result.includeCurrentValue(credentialsId);
+				}
+			} else {
+				if (!item.hasPermission(Item.EXTENDED_READ) && !item.hasPermission(CredentialsProvider.USE_ITEM)) {
+					return result.includeCurrentValue(credentialsId);
+				}
+			}
+			return result.includeEmptyValue()
+					.includeMatchingAs(
+							item instanceof Queue.Task ? Tasks.getAuthenticationOf((Queue.Task) item) : ACL.SYSTEM,
+							item, StandardUsernamePasswordCredentials.class, Collections.emptyList(),
+							CredentialsMatchers.instanceOf(StandardUsernamePasswordCredentials.class))
+					.includeCurrentValue(credentialsId);
+		}
+    	
+    }
+    
     /**
      * Different implementation will return different {@link IVersionReader} instances.
-     * 
-     * @return the source of the artifacts.
+     * @param item for security checks.
+     * @return the service implementation.
      */
-    public abstract IVersionReader createServiceInstance();
+    public abstract IVersionReader createServiceInstance(Item item);
 
     /**
      * Returns the {@link UsernamePasswordCredentialsImpl} for the given CredentialId
@@ -91,9 +134,10 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
      *            the internal jenkins id for the credentials
      * @return the credentials for the ID or NULL
      */
-    public static UsernamePasswordCredentialsImpl getCredentials(final String pCredentialId) {
-        return CredentialsMatchers.firstOrNull(
-                CredentialsProvider.lookupCredentials(UsernamePasswordCredentialsImpl.class, Jenkins.getInstance(), ACL.SYSTEM, Collections.<DomainRequirement> emptyList()),
+    public static UsernamePasswordCredentialsImpl getCredentials(@Nonnull String pCredentialId, @Nonnull Item pItem) {
+		final Authentication acl = pItem instanceof Queue.Task ? Tasks.getAuthenticationOf((Queue.Task) pItem) : ACL.SYSTEM;
+		return CredentialsMatchers.firstOrNull(
+                CredentialsProvider.lookupCredentials(UsernamePasswordCredentialsImpl.class, pItem, ACL.SYSTEM, Collections.<DomainRequirement> emptyList()),
                 CredentialsMatchers.allOf(CredentialsMatchers.withId(pCredentialId)));
     }
 
@@ -264,5 +308,6 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
     public String getRepositoryId() {
         return repositoryId;
     }
+
 
 }
