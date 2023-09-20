@@ -110,9 +110,10 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
 					return result.includeCurrentValue(credentialsId);
 				}
 			}
+			final Authentication acl = item instanceof Queue.Task ? Tasks.getAuthenticationOf((Queue.Task) item) : ACL.SYSTEM;
 			return result.includeEmptyValue()
 					.includeMatchingAs(
-							item instanceof Queue.Task ? Tasks.getAuthenticationOf((Queue.Task) item) : ACL.SYSTEM,
+							item instanceof Queue.Task ? Tasks.getAuthenticationOf((Queue.Task) item) : acl,
 							item, StandardUsernamePasswordCredentials.class, Collections.emptyList(),
 							CredentialsMatchers.instanceOf(StandardUsernamePasswordCredentials.class))
 					.includeCurrentValue(credentialsId);
@@ -137,7 +138,7 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
     public static UsernamePasswordCredentialsImpl getCredentials(@Nonnull String pCredentialId, @Nonnull Item pItem) {
 		final Authentication acl = pItem instanceof Queue.Task ? Tasks.getAuthenticationOf((Queue.Task) pItem) : ACL.SYSTEM;
 		return CredentialsMatchers.firstOrNull(
-                CredentialsProvider.lookupCredentials(UsernamePasswordCredentialsImpl.class, pItem, ACL.SYSTEM, Collections.<DomainRequirement> emptyList()),
+                CredentialsProvider.lookupCredentials(UsernamePasswordCredentialsImpl.class, pItem, acl, Collections.<DomainRequirement> emptyList()),
                 CredentialsMatchers.allOf(CredentialsMatchers.withId(pCredentialId)));
     }
 
