@@ -83,15 +83,22 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
     @Override
     public List<String> getChoiceList() {
     	StaplerRequest req = Stapler.getCurrentRequest();
-    	Item item = req.findAncestorObject(Item.class);
-    	
-    	IVersionReader serviceInstance = createServiceInstance(item);
-    	
-        LOGGER.log(Level.FINE, "retrieve the versions from the repository");
-        final Map<String, String> mChoices = readURL(serviceInstance, getRepositoryId(), getGroupId(), getArtifactId(), getPackaging(), getClassifier(),
-                getInverseFilter(), getFilterExpression(), getReverseOrder());
-        
-        // FIXME: CHANGE-1: Return only the keys, that are shorter then the values
+    	final Map<String, String> mChoices;
+    	if(req != null) {
+	    	Item item = req.findAncestorObject(Item.class);
+	    	
+	    	IVersionReader serviceInstance = createServiceInstance(item);
+	    	
+	        LOGGER.log(Level.FINE, "retrieve the versions from the repository");
+	        mChoices = readURL(serviceInstance, getRepositoryId(), getGroupId(), getArtifactId(), getPackaging(), getClassifier(),
+	                getInverseFilter(), getFilterExpression(), getReverseOrder());
+
+    	} else {
+    		// JENKINS-72158: In downstream projects the current request can be null.
+    		mChoices = Collections.emptyMap();
+    	}
+
+    	// FIXME: CHANGE-1: Return only the keys, that are shorter then the values
         // return new ArrayList<String>(mChoices.keySet());
         return new LinkedList<String>(mChoices.values());
     }
