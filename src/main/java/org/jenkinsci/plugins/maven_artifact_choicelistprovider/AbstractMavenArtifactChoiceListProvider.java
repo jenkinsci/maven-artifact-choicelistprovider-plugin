@@ -84,23 +84,18 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
     public List<String> getChoiceList() {
     	StaplerRequest req = Stapler.getCurrentRequest();
     	final Map<String, String> mChoices;
-    	if(req != null) {
-	    	Item item = req.findAncestorObject(Item.class);
-	    	
-	    	IVersionReader serviceInstance = createServiceInstance(item);
-	    	
-	        LOGGER.log(Level.FINE, "retrieve the versions from the repository");
-	        mChoices = readURL(serviceInstance, getRepositoryId(), getGroupId(), getArtifactId(), getPackaging(), getClassifier(),
-	                getInverseFilter(), getFilterExpression(), getReverseOrder());
+        // Allow null Items b/c this will cause the job to be run as System,
+        // since we're being run outside of an authentication context (i.e.
+        // either downstream, or by the system, which means: ACL.SYSTEM)
+        Item item = (req != null ? req.findAncestorObject(Item.class) : null);
+        IVersionReader serviceInstance = createServiceInstance(item);
 
-    	} else {
-    		// JENKINS-72158: In downstream projects the current request can be null.
-    		mChoices = Collections.emptyMap();
-    	}
+        LOGGER.log(Level.FINE, "retrieve the versions from the repository");
+        mChoices = readURL(serviceInstance, getRepositoryId(), getGroupId(), getArtifactId(), getPackaging(), getClassifier(),
+                getInverseFilter(), getFilterExpression(), getReverseOrder());
 
-    	// FIXME: CHANGE-1: Return only the keys, that are shorter then the values
-        // return new ArrayList<String>(mChoices.keySet());
-        return new LinkedList<String>(mChoices.values());
+        // CHANGE-1: Return only the keys, that are shorter then the values
+        return new LinkedList<String>(mChoices.keySet());
     }
 
     @Extension
@@ -142,8 +137,14 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
      *            the internal jenkins id for the credentials
      * @return the credentials for the ID or NULL
      */
-    public static UsernamePasswordCredentialsImpl getCredentials(@Nonnull String pCredentialId, @Nonnull Item pItem) {
-		final Authentication acl = pItem instanceof Queue.Task ? Tasks.getAuthenticationOf((Queue.Task) pItem) : ACL.SYSTEM;
+    public static UsernamePasswordCredentialsImpl getCredentials(@Nonnull String pCredentialId, Item pItem) {
+        // Using isInstance() also returns false on null, so if we don't have an item call context
+        // because this job isn't being launched directly (i.e. it's a downstream job, or scheduled job),
+        // then we simply assume the System identity, which isn't ideal (we'd LOVE to be able to inherit the
+        // calling job's identity), but it will do for now. This is important in order for parameterized
+        // builds with restricted choice values, but without having to enable the "Editable" flag, which
+        // is not desirable for whatever reason.
+		final Authentication acl = Queue.Task.class.isInstance(pItem) ? Tasks.getAuthenticationOf((Queue.Task) pItem) : ACL.SYSTEM;
 		return CredentialsMatchers.firstOrNull(
                 CredentialsProvider.lookupCredentials(UsernamePasswordCredentialsImpl.class, pItem, acl, Collections.<DomainRequirement> emptyList()),
                 CredentialsMatchers.allOf(CredentialsMatchers.withId(pCredentialId)));
