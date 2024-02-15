@@ -46,7 +46,7 @@ import jp.ikedam.jenkins.plugins.extensible_choice_parameter.ChoiceListProvider;
 import jp.ikedam.jenkins.plugins.extensible_choice_parameter.ExtensibleChoiceParameterDefinition;
 
 /**
- * 
+ *
  * Base Class for different {@link ChoiceListProvider} that can display information from an artifact repository, like
  * {@link NexusChoiceListProvider}, {@link MavenCentralChoiceListProvider} and {@link ArtifactoryChoiceListProvider}
  *
@@ -71,7 +71,7 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
 
     /**
      * Initializes the choice list with at the artifactId.
-     * 
+     *
      * @param artifactId
      *            the artifactId is the minimum required information.
      */
@@ -93,7 +93,7 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
         LOGGER.log(Level.FINE, "retrieve the versions from the repository");
         mChoices = readURL(serviceInstance, getRepositoryId(), getGroupId(), getArtifactId(), getPackaging(), getClassifier(),
                 getInverseFilter(), getFilterExpression(), getReverseOrder());
-
+        LOGGER.log(Level.FINER, "found these choices: {0}", mChoices);
         // CHANGE-1: Return only the keys, that are shorter then the values
         return new LinkedList<String>(mChoices.keySet());
     }
@@ -120,9 +120,9 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
 							CredentialsMatchers.instanceOf(StandardUsernamePasswordCredentials.class))
 					.includeCurrentValue(credentialsId);
 		}
-    	
+
     }
-    
+
     /**
      * Different implementation will return different {@link IVersionReader} instances.
      * @param item for security checks.
@@ -132,7 +132,7 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
 
     /**
      * Returns the {@link UsernamePasswordCredentialsImpl} for the given CredentialId
-     * 
+     *
      * @param pCredentialId
      *            the internal jenkins id for the credentials
      * @return the credentials for the ID or NULL
@@ -152,7 +152,7 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
 
     /**
      * Retrieves the versions from the given source.
-     * 
+     *
      * @param pInstance
      *            the artifact repository service.
      * @param pRepositoryId
@@ -181,13 +181,22 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
             ValidAndInvalidClassifier classifierBox = ValidAndInvalidClassifier.fromString(pClassifier);
 
             List<String> choices = pInstance.retrieveVersions(pRepositoryId, pGroupId, pArtifactId, pPackaging, classifierBox);
+            if (LOGGER.isLoggable(Level.FINER)) {
+				LOGGER.log(Level.FINER, "loaded the following choices from repository {0} for {1}:{2}:{3}:{4} -> {5}", new Object[] { pRepositoryId, pGroupId, pArtifactId, pPackaging, classifierBox, choices });
+            }
 
             List<String> filteredChoices = filterArtifacts(choices, pInverseFilter, pFilterExpression);
+            if (LOGGER.isLoggable(Level.FINER)) {
+				LOGGER.log(Level.FINER, "filtered down using /{0}/ (inverted={1}) to the following choices: {2}", new Object[] { pFilterExpression, pInverseFilter, choices });
+            }
 
             if (pReverseOrder)
                 Collections.reverse(filteredChoices);
 
             retVal = MavenArtifactChoiceListProviderUtils.toMap(filteredChoices);
+            if (LOGGER.isLoggable(Level.FINER)) {
+				LOGGER.log(Level.FINER, "returning the final choices: {0}", new Object[] { retVal });
+            }
         } catch (VersionReaderException e) {
             LOGGER.log(Level.INFO, "failed to retrieve versions from repository for g:" + pGroupId + ", a:" + pArtifactId + ", p:" + pPackaging + ", c:" + pClassifier, e);
             retVal.put("error", e.getMessage());
@@ -211,7 +220,7 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
      */
     public static List<String> filterArtifacts(final List<String> pChoices, final boolean pInverseFilter, final String pFilterExpression) {
     	final List<String> retVal;
-        
+
     	// We only apply and compile regex if someone has configured something none-default.
         if(StringUtils.isEmpty(pFilterExpression) || DEFAULT_REGEX_MATCH_ALL.equals(pFilterExpression)) {
         	LOGGER.log(Level.FINE, "do not filter artifacts.");
