@@ -20,7 +20,7 @@ import org.jenkinsci.plugins.maven_artifact_choicelistprovider.ValidAndInvalidCl
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.VersionReaderException;
 
 public class MavenMetadataSearchService extends AbstractRESTfulVersionReader implements IVersionReader {
-	
+
 	private static final Logger LOGGER = Logger.getLogger(MavenMetadataSearchService.class.getName());
 
 	public MavenMetadataSearchService(String mURL) {
@@ -45,7 +45,7 @@ public class MavenMetadataSearchService extends AbstractRESTfulVersionReader imp
 	/**
 	 * Ordering of returned versions is important so using a LinkedHashSet inside.
 	 * {@inheritDoc}
-	 * 
+	 *
 	 * @throws VersionReaderException TBD.
 	 */
 	@Override
@@ -62,10 +62,18 @@ public class MavenMetadataSearchService extends AbstractRESTfulVersionReader imp
 
 		LOGGER.info("Received response. Parsing maven-metadata.xml of size: " + response.length());
 		final List<String> parseVersions = parseVersions(response);
-		
+
+		if (LOGGER.isLoggable(Level.FINER)) {
+			LOGGER.log(Level.FINER, "Received the following versions: {0}", new Object[] { parseVersions });
+		}
+
 		final LinkedHashSet<String> retVal = new LinkedHashSet<>();
 		for (String version : parseVersions) {
 			retVal.add(baseURL + "/" + version);
+		}
+
+		if (LOGGER.isLoggable(Level.FINER)) {
+			LOGGER.log(Level.FINER, "Returning the following versions: {0}", new Object[] { retVal });
 		}
 		return retVal;
 	}
@@ -74,7 +82,7 @@ public class MavenMetadataSearchService extends AbstractRESTfulVersionReader imp
 		final List<String> retVal = new ArrayList<>();
 
 		MavenMetaData xmlResult = null;
-		
+
 		try {
 			Unmarshaller unmarshaller = JAXBCONTEXT.get().createUnmarshaller();
 
@@ -111,5 +119,5 @@ public class MavenMetadataSearchService extends AbstractRESTfulVersionReader imp
 			currentThread.setContextClassLoader(originalContext);
 		}
 	});
-	
+
 }
