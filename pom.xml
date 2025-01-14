@@ -44,7 +44,7 @@
 			https://mvnrepository.com/artifact/io.jenkins.tools.bom/bom-2.387.x -->
 			<dependency>
 				<groupId>io.jenkins.tools.bom</groupId>
-				<artifactId>bom-{jenkins.baseline}.x</artifactId>
+				<artifactId>bom-${jenkins.baseline}.x</artifactId>
 				<version>2329.v078520e55c19</version>
 				<type>pom</type>
 				<scope>import</scope>
