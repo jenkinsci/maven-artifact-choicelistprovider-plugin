@@ -46,7 +46,7 @@ import jp.ikedam.jenkins.plugins.extensible_choice_parameter.ChoiceListProvider;
 import jp.ikedam.jenkins.plugins.extensible_choice_parameter.ExtensibleChoiceParameterDefinition;
 
 /**
- * 
+ *
  * Base Class for different {@link ChoiceListProvider} that can display information from an artifact repository, like
  * {@link NexusChoiceListProvider}, {@link MavenCentralChoiceListProvider} and {@link ArtifactoryChoiceListProvider}
  *
@@ -71,7 +71,7 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
 
     /**
      * Initializes the choice list with at the artifactId.
-     * 
+     *
      * @param artifactId
      *            the artifactId is the minimum required information.
      */
@@ -84,23 +84,18 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
     public List<String> getChoiceList() {
     	StaplerRequest req = Stapler.getCurrentRequest();
     	final Map<String, String> mChoices;
-    	if(req != null) {
-	    	Item item = req.findAncestorObject(Item.class);
-	    	
-	    	IVersionReader serviceInstance = createServiceInstance(item);
-	    	
-	        LOGGER.log(Level.FINE, "retrieve the versions from the repository");
-	        mChoices = readURL(serviceInstance, getRepositoryId(), getGroupId(), getArtifactId(), getPackaging(), getClassifier(),
-	                getInverseFilter(), getFilterExpression(), getReverseOrder());
+        // Allow null Items b/c this will cause the job to be run as System,
+        // since we're being run outside of an authentication context (i.e.
+        // either downstream, or by the system, which means: ACL.SYSTEM)
+        Item item = (req != null ? req.findAncestorObject(Item.class) : null);
+        IVersionReader serviceInstance = createServiceInstance(item);
 
-    	} else {
-    		// JENKINS-72158: In downstream projects the current request can be null.
-    		mChoices = Collections.emptyMap();
-    	}
-
-    	// FIXME: CHANGE-1: Return only the keys, that are shorter then the values
-        // return new ArrayList<String>(mChoices.keySet());
-        return new LinkedList<String>(mChoices.values());
+        LOGGER.log(Level.FINE, "retrieve the versions from the repository");
+        mChoices = readURL(serviceInstance, getRepositoryId(), getGroupId(), getArtifactId(), getPackaging(), getClassifier(),
+                getInverseFilter(), getFilterExpression(), getReverseOrder());
+        LOGGER.log(Level.FINER, "found these choices: {0}", mChoices);
+        // CHANGE-1: Return only the keys, that are shorter then the values
+        return new LinkedList<String>(mChoices.keySet());
     }
 
     @Extension
@@ -125,9 +120,9 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
 							CredentialsMatchers.instanceOf(StandardUsernamePasswordCredentials.class))
 					.includeCurrentValue(credentialsId);
 		}
-    	
+
     }
-    
+
     /**
      * Different implementation will return different {@link IVersionReader} instances.
      * @param item for security checks.
@@ -137,13 +132,19 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
 
     /**
      * Returns the {@link UsernamePasswordCredentialsImpl} for the given CredentialId
-     * 
+     *
      * @param pCredentialId
      *            the internal jenkins id for the credentials
      * @return the credentials for the ID or NULL
      */
-    public static UsernamePasswordCredentialsImpl getCredentials(@Nonnull String pCredentialId, @Nonnull Item pItem) {
-		final Authentication acl = pItem instanceof Queue.Task ? Tasks.getAuthenticationOf((Queue.Task) pItem) : ACL.SYSTEM;
+    public static UsernamePasswordCredentialsImpl getCredentials(@Nonnull String pCredentialId, Item pItem) {
+        // Using isInstance() also returns false on null, so if we don't have an item call context
+        // because this job isn't being launched directly (i.e. it's a downstream job, or scheduled job),
+        // then we simply assume the System identity, which isn't ideal (we'd LOVE to be able to inherit the
+        // calling job's identity), but it will do for now. This is important in order for parameterized
+        // builds with restricted choice values, but without having to enable the "Editable" flag, which
+        // is not desirable for whatever reason.
+		final Authentication acl = Queue.Task.class.isInstance(pItem) ? Tasks.getAuthenticationOf((Queue.Task) pItem) : ACL.SYSTEM;
 		return CredentialsMatchers.firstOrNull(
                 CredentialsProvider.lookupCredentials(UsernamePasswordCredentialsImpl.class, pItem, acl, Collections.<DomainRequirement> emptyList()),
                 CredentialsMatchers.allOf(CredentialsMatchers.withId(pCredentialId)));
@@ -151,7 +152,7 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
 
     /**
      * Retrieves the versions from the given source.
-     * 
+     *
      * @param pInstance
      *            the artifact repository service.
      * @param pRepositoryId
@@ -180,13 +181,22 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
             ValidAndInvalidClassifier classifierBox = ValidAndInvalidClassifier.fromString(pClassifier);
 
             List<String> choices = pInstance.retrieveVersions(pRepositoryId, pGroupId, pArtifactId, pPackaging, classifierBox);
+            if (LOGGER.isLoggable(Level.FINER)) {
+				LOGGER.log(Level.FINER, "loaded the following choices from repository {0} for {1}:{2}:{3}:{4} -> {5}", new Object[] { pRepositoryId, pGroupId, pArtifactId, pPackaging, classifierBox, choices });
+            }
 
             List<String> filteredChoices = filterArtifacts(choices, pInverseFilter, pFilterExpression);
+            if (LOGGER.isLoggable(Level.FINER)) {
+				LOGGER.log(Level.FINER, "filtered down using /{0}/ (inverted={1}) to the following choices: {2}", new Object[] { pFilterExpression, pInverseFilter, choices });
+            }
 
             if (pReverseOrder)
                 Collections.reverse(filteredChoices);
 
             retVal = MavenArtifactChoiceListProviderUtils.toMap(filteredChoices);
+            if (LOGGER.isLoggable(Level.FINER)) {
+				LOGGER.log(Level.FINER, "returning the final choices: {0}", new Object[] { retVal });
+            }
         } catch (VersionReaderException e) {
             LOGGER.log(Level.INFO, "failed to retrieve versions from repository for g:" + pGroupId + ", a:" + pArtifactId + ", p:" + pPackaging + ", c:" + pClassifier, e);
             retVal.put("error", e.getMessage());
@@ -210,7 +220,7 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
      */
     public static List<String> filterArtifacts(final List<String> pChoices, final boolean pInverseFilter, final String pFilterExpression) {
     	final List<String> retVal;
-        
+
     	// We only apply and compile regex if someone has configured something none-default.
         if(StringUtils.isEmpty(pFilterExpression) || DEFAULT_REGEX_MATCH_ALL.equals(pFilterExpression)) {
         	LOGGER.log(Level.FINE, "do not filter artifacts.");
