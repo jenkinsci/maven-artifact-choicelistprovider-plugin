@@ -63,6 +63,10 @@ public abstract class AbstractRESTfulVersionReader implements IVersionReader {
 		LOGGER.info("repository search service at: " + mInstance.getUri().toString());
 	}
 
+	public List<String> retrieveVersions(String pRepositoryId, String pGroup, String pName) throws VersionReaderException {
+		return this.retrieveVersions(pRepositoryId, pGroup, pName, null, null);
+	}
+			
 	public List<String> retrieveVersions(String pRepositoryId, String pGroupId, String pArtifactId, String pPackaging,
 			ValidAndInvalidClassifier pClassifier) throws VersionReaderException {
 		try {

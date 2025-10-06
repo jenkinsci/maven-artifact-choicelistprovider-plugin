@@ -42,8 +42,8 @@ public class Nexus3RestApiSearchServiceTest {
         @Override
         protected WebTarget getInstance() {
 
-            Nexus3RestResponse response = new Nexus3RestResponse();
-            response.setItems(new Item[0]);
+            Nexus3AssetRestResponse response = new Nexus3AssetRestResponse();
+            response.setItems(new AssetItem[0]);
 
             if (instances.isEmpty()) {
 				response.setContinuationToken("12345");

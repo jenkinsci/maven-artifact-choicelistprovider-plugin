@@ -111,7 +111,7 @@
 			<artifactId>assertj-core</artifactId>
 			<version>3.27.6</version>
 		</dependency>
-	</dependencies>
+ </dependencies>
 
 	<licenses>
 		<license>

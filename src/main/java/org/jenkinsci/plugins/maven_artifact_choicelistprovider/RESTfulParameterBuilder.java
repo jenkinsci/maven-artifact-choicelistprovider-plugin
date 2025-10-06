@@ -23,14 +23,17 @@ public abstract class RESTfulParameterBuilder {
 	public static final String CLASSIFIER_ALL = "*";
 
 	// Always order the results by semantic version
-    private static final String DEFAULT_SORTORDER = "version";
+    public static final String DEFAULT_SORTORDER = "version";
     
     private static final Logger LOGGER = Logger.getLogger(RESTfulParameterBuilder.class.getName());
 
     public MultivaluedMap<String, String> create(final String pRepositoryId, final String pName) {
         return create(pRepositoryId, null, pName, null, null, "");
-        
     }
+
+    public MultivaluedMap<String, String> create(final String pRepositoryId, final String pGroup, final String pName, String pToken) {
+        return create(pRepositoryId, pGroup, pName, null, null, pToken);
+            }
     
     public MultivaluedMap<String, String> create(final String pRepositoryId, final String pGroupId, final String pArtifactId, final String pPackaging,
             final ValidAndInvalidClassifier pClassifier) {
@@ -58,7 +61,7 @@ public abstract class RESTfulParameterBuilder {
             final ValidAndInvalidClassifier pClassifier, String pToken) {
         if (LOGGER.isLoggable(Level.FINE)) {
             LOGGER.fine("create parameters for: repositoryId: " + pRepositoryId + " g:" + pGroupId + ", a:" + pArtifactId + ", p:" + pPackaging + ", c: " + (pClassifier == null ? "null" : pClassifier.toString())
-                    + "t:" + pToken);
+                    + " t:" + pToken);
         }
 
         MultivaluedMap<String, String> requestParams = new MultivaluedHashMap<String, String>();
