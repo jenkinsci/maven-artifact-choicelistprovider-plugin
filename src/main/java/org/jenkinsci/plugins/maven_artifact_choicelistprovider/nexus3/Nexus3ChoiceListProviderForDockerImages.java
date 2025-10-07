@@ -14,13 +14,12 @@ import org.jenkinsci.plugins.maven_artifact_choicelistprovider.AbstractMavenArti
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.IVersionReader;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.IVersionReaderSimple;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.MavenArtifactChoiceListProviderUtils;
-import org.jenkinsci.plugins.maven_artifact_choicelistprovider.ValidAndInvalidClassifier;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.VersionReaderException;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
-import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerRequest2;
 import org.kohsuke.stapler.interceptor.RequirePOST;
 
 import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl;
@@ -142,7 +141,7 @@ public class Nexus3ChoiceListProviderForDockerImages extends AbstractMavenArtifa
 		 * Saves the Global-Option Settings
 		 */
 		@Override
-		public boolean configure(StaplerRequest staplerRequest, JSONObject json) throws FormException {
+		public boolean configure(StaplerRequest2 staplerRequest, JSONObject json) throws FormException {
 			save();
 			return true;
 		}

@@ -14,14 +14,13 @@ import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.AbstractRESTfulVersionReader;
-import org.jenkinsci.plugins.maven_artifact_choicelistprovider.IVersionReader;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.ValidAndInvalidClassifier;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-abstract class AbstractNexus3RestApiAssetService extends AbstractRESTfulVersionReader implements IVersionReader {
+abstract class AbstractNexus3RestApiAssetService extends AbstractRESTfulVersionReader {
 
 	// https://help.sonatype.com/repomanager3/rest-and-integration-api/search-api#SearchAPI-SearchAssets
 	private static final String NEXUS3_REST_API_ENDPOINT = "service/rest/v1/search/assets";

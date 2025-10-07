@@ -2,11 +2,10 @@ package org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus3;
 
 import javax.ws.rs.core.MultivaluedMap;
 
-import org.jenkinsci.plugins.maven_artifact_choicelistprovider.IVersionReader;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.RESTfulParameterBuilder;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.ValidAndInvalidClassifier;
 
-public class Nexus3RestApiAssetService extends AbstractNexus3RestApiAssetService implements IVersionReader {
+public class Nexus3RestApiAssetService extends AbstractNexus3RestApiAssetService {
 
 	private final RESTfulParameterBuilder mMapper;
 

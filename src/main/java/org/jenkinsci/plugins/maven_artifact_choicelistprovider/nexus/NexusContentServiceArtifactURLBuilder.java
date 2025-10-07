@@ -20,7 +20,7 @@ import java.util.logging.Logger;
  * 
  * @author stephan.watermeyer, Diebold Nixdorf
  */
-public class NexusContentServiceArtifactURLBuilder extends AbstractArtifactURLBuilder implements IArtifactURLBuilder {
+public class NexusContentServiceArtifactURLBuilder extends AbstractArtifactURLBuilder {
 
 	private static final String ENCODING = "UTF-8";
 

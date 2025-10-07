@@ -2,8 +2,6 @@ package org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus3;
 
 import javax.ws.rs.core.MultivaluedMap;
 
-import org.jenkinsci.plugins.maven_artifact_choicelistprovider.IVersionReader;
-import org.jenkinsci.plugins.maven_artifact_choicelistprovider.IVersionReaderSimple;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -11,7 +9,7 @@ import javax.ws.rs.core.MultivaluedHashMap;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.RESTfulParameterBuilder;
 
-public class Nexus3RestApiSearchService extends AbstractNexus3RestApiSearchService implements IVersionReader, IVersionReaderSimple {
+public class Nexus3RestApiSearchService extends AbstractNexus3RestApiSearchService {
 
 	private final Nexus3RESTfulParameterBuilderForSearch mMapper;
 

@@ -6,6 +6,7 @@ import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
@@ -18,7 +19,7 @@ public class MavenMetadataResponseParserTest {
 	public void test() throws IOException, VersionReaderException {
 		InputStream resourceAsStream = this.getClass().getClassLoader().getResourceAsStream("maven-metadata.xml");
 		assertNotNull(resourceAsStream);
-		String mockedResponse = IOUtils.toString(resourceAsStream);
+		String mockedResponse = IOUtils.toString(resourceAsStream, Charset.forName("UTF-8"));
 
 		MavenMetadataSearchService service = new MavenMetadataSearchService("");
 		try {
@@ -35,7 +36,7 @@ public class MavenMetadataResponseParserTest {
 	public void testEmpty() throws IOException, VersionReaderException {
 		InputStream resourceAsStream = this.getClass().getClassLoader().getResourceAsStream("maven-metadata-empty.xml");
 		assertNotNull(resourceAsStream);
-		String mockedResponse = IOUtils.toString(resourceAsStream);
+		String mockedResponse = IOUtils.toString(resourceAsStream, Charset.forName("UTF-8"));
 
 		MavenMetadataSearchService service = new MavenMetadataSearchService("");
 		List<String> versions = service.parseVersions(mockedResponse);
@@ -47,7 +48,7 @@ public class MavenMetadataResponseParserTest {
 	public void testInvalidXML() throws IOException, VersionReaderException {
 		InputStream resourceAsStream = this.getClass().getClassLoader().getResourceAsStream("maven-metadata.notxml");
 		assertNotNull(resourceAsStream);
-		String mockedResponse = IOUtils.toString(resourceAsStream);
+		String mockedResponse = IOUtils.toString(resourceAsStream, Charset.forName("UTF-8"));
 		try {
 			MavenMetadataSearchService service = new MavenMetadataSearchService("");
 			service.parseVersions(mockedResponse);

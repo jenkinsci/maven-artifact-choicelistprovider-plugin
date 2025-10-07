@@ -15,11 +15,10 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.AbstractRESTfulVersionReader;
-import org.jenkinsci.plugins.maven_artifact_choicelistprovider.IVersionReader;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.ValidAndInvalidClassifier;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.VersionReaderException;
 
-public class MavenMetadataSearchService extends AbstractRESTfulVersionReader implements IVersionReader {
+public class MavenMetadataSearchService extends AbstractRESTfulVersionReader {
 	
 	private static final Logger LOGGER = Logger.getLogger(MavenMetadataSearchService.class.getName());
 

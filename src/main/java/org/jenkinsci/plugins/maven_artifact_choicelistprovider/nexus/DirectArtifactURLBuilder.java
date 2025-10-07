@@ -9,7 +9,7 @@ package org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus;
  *
  * @author stephan.watermeyer, Diebold Nixdorf
  */
-public class DirectArtifactURLBuilder extends AbstractArtifactURLBuilder implements IArtifactURLBuilder {
+public class DirectArtifactURLBuilder extends AbstractArtifactURLBuilder {
 
     @Override
 	public String build(boolean pOnlyBaseURL) {

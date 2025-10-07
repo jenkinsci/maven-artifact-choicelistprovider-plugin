@@ -13,7 +13,6 @@ import java.util.regex.PatternSyntaxException;
 
 import javax.annotation.Nonnull;
 
-import org.acegisecurity.Authentication;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.artifactory.ArtifactoryChoiceListProvider;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.central.MavenCentralChoiceListProvider;
@@ -22,7 +21,8 @@ import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.Stapler;
-import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerRequest2;
+import org.springframework.security.core.Authentication;
 
 import com.cloudbees.plugins.credentials.CredentialsMatchers;
 import com.cloudbees.plugins.credentials.CredentialsProvider;
@@ -32,7 +32,6 @@ import com.cloudbees.plugins.credentials.domains.DomainRequirement;
 import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl;
 
 import hudson.Extension;
-import hudson.ExtensionPoint;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.Descriptor;
@@ -52,7 +51,7 @@ import jp.ikedam.jenkins.plugins.extensible_choice_parameter.ExtensibleChoicePar
  *
  * @author stephan.watermeyer, Diebold Nixdorf
  */
-public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceListProvider implements ExtensionPoint {
+public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceListProvider {
 
     public static final String DEFAULT_REGEX_MATCH_ALL = ".*";
 
@@ -82,7 +81,7 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
 
     @Override
     public List<String> getChoiceList() {
-    	StaplerRequest req = Stapler.getCurrentRequest();
+    	StaplerRequest2 req = Stapler.getCurrentRequest2();
     	final Map<String, String> mChoices;
     	if(req != null) {
 	    	Item item = req.findAncestorObject(Item.class);
@@ -117,10 +116,10 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
 					return result.includeCurrentValue(credentialsId);
 				}
 			}
-			final Authentication acl = item instanceof Queue.Task ? Tasks.getAuthenticationOf((Queue.Task) item) : ACL.SYSTEM;
+			final Authentication acl = item instanceof Queue.Task ? Tasks.getAuthenticationOf2((Queue.Task) item) : ACL.SYSTEM2;
 			return result.includeEmptyValue()
 					.includeMatchingAs(
-							item instanceof Queue.Task ? Tasks.getAuthenticationOf((Queue.Task) item) : acl,
+							item instanceof Queue.Task ? Tasks.getAuthenticationOf2((Queue.Task) item) : acl,
 							item, StandardUsernamePasswordCredentials.class, Collections.emptyList(),
 							CredentialsMatchers.instanceOf(StandardUsernamePasswordCredentials.class))
 					.includeCurrentValue(credentialsId);
@@ -143,9 +142,9 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
      * @return the credentials for the ID or NULL
      */
     public static UsernamePasswordCredentialsImpl getCredentials(@Nonnull String pCredentialId, @Nonnull Item pItem) {
-		final Authentication acl = pItem instanceof Queue.Task ? Tasks.getAuthenticationOf((Queue.Task) pItem) : ACL.SYSTEM;
+		final Authentication acl = pItem instanceof Queue.Task ? Tasks.getAuthenticationOf2((Queue.Task) pItem) : ACL.SYSTEM2;
 		return CredentialsMatchers.firstOrNull(
-                CredentialsProvider.lookupCredentials(UsernamePasswordCredentialsImpl.class, pItem, acl, Collections.<DomainRequirement> emptyList()),
+                CredentialsProvider.lookupCredentialsInItem(UsernamePasswordCredentialsImpl.class, pItem, acl, Collections.<DomainRequirement> emptyList()),
                 CredentialsMatchers.allOf(CredentialsMatchers.withId(pCredentialId)));
     }
 

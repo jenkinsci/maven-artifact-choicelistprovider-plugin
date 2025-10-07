@@ -13,7 +13,6 @@ import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.AbstractRESTfulVersionReader;
-import org.jenkinsci.plugins.maven_artifact_choicelistprovider.IVersionReader;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.ValidAndInvalidClassifier;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus.StandardRESTfulParameterBuilder;
 
@@ -28,7 +27,7 @@ import com.google.gson.annotations.SerializedName;
  * 
  * @author stephan.watermeyer, Diebold Nixdorf
  */
-public class ArtifactorySearchService extends AbstractRESTfulVersionReader implements IVersionReader {
+public class ArtifactorySearchService extends AbstractRESTfulVersionReader {
 
     private static final Logger LOGGER = Logger.getLogger(ArtifactorySearchService.class.getName());
 

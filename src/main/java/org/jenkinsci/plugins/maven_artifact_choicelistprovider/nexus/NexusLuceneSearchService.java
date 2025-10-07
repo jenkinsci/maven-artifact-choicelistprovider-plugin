@@ -16,13 +16,12 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.AbstractRESTfulVersionReader;
-import org.jenkinsci.plugins.maven_artifact_choicelistprovider.IVersionReader;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.ValidAndInvalidClassifier;
 import org.sonatype.nexus.rest.model.NexusNGArtifact;
 import org.sonatype.nexus.rest.model.NexusNGArtifactHit;
 import org.sonatype.nexus.rest.model.NexusNGArtifactLink;
 
-public class NexusLuceneSearchService extends AbstractRESTfulVersionReader implements IVersionReader {
+public class NexusLuceneSearchService extends AbstractRESTfulVersionReader {
 
 	private static final String LUCENE_SEARCH_SERVICE_URI = "service/local/lucene/search";
 
