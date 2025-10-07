@@ -23,6 +23,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 abstract class AbstractNexus3RestApiSearchService extends AbstractRESTfulVersionReader implements IVersionReaderSimple {
 
+	public static final String PARAMETER_TOKEN = "continuationToken";
+
 	// https://help.sonatype.com/repomanager3/rest-and-integration-api/search-api#SearchAPI-SearchAssets
 	private static final String NEXUS3_ASSET_REST_API_ENDPOINT = "service/rest/v1/search";
 
@@ -33,8 +35,15 @@ abstract class AbstractNexus3RestApiSearchService extends AbstractRESTfulVersion
 	}
 
 	@Override
+	@Deprecated
 	public Set<String> callService(final String pRepositoryId, final String pGroup, final String pName,
-			final String pPackaging, final ValidAndInvalidClassifier pClassifier) {
+		final String pPackaging, final ValidAndInvalidClassifier pClassifier) {
+		final MultivaluedMap<String, String> requestParams = createRequestParameters(pRepositoryId, pGroup, pName, null);
+		return this.callService(requestParams, pClassifier);
+	}
+	
+
+	public Set<String> callService(MultivaluedMap<String, String> pParams, final ValidAndInvalidClassifier pClassifier) {
 
 		// init empty
 		Set<String> retVal = new LinkedHashSet<>(); // retain order of insertion
@@ -45,9 +54,10 @@ abstract class AbstractNexus3RestApiSearchService extends AbstractRESTfulVersion
 		do {
 			WebTarget theInstance = getInstance();
 
-			final MultivaluedMap<String, String> requestParams = createRequestParameters(pRepositoryId, pGroup, pName, token);
+			// Update the token in every iteration
+			pParams.putSingle(PARAMETER_TOKEN, token);
 
-			for (Map.Entry<String, List<String>> entries : requestParams.entrySet()) {
+			for (Map.Entry<String, List<String>> entries : pParams.entrySet()) {
 				theInstance = theInstance.queryParam(entries.getKey(), entries.getValue().toArray());
 			}
 

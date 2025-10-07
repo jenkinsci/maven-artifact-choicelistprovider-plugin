@@ -2,14 +2,17 @@ package org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus3;
 
 import javax.ws.rs.core.MultivaluedMap;
 
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.ws.rs.core.MultivaluedHashMap;
 import org.apache.commons.lang.StringUtils;
+import org.jenkinsci.plugins.maven_artifact_choicelistprovider.IVersionReader2;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.RESTfulParameterBuilder;
+import org.jenkinsci.plugins.maven_artifact_choicelistprovider.VersionReaderException;
 
-public class Nexus3RestApiSearchService extends AbstractNexus3RestApiSearchService {
+public class Nexus3RestApiSearchService extends AbstractNexus3RestApiSearchService implements IVersionReader2{
 
 	private final Nexus3RESTfulParameterBuilderForSearch mMapper;
 
@@ -23,6 +26,12 @@ public class Nexus3RestApiSearchService extends AbstractNexus3RestApiSearchServi
 			String pName, String token) {
 		return mMapper.create(pRepository, pGroup, pName, token);
 	}
+
+    @Override
+    public List<String> retrieveVersions(MultivaluedMap<String, String> pParams) throws VersionReaderException {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'retrieveVersions'");
+    }
 
 }
 

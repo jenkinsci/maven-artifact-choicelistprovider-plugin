@@ -32,8 +32,15 @@ abstract class AbstractNexus3RestApiAssetService extends AbstractRESTfulVersionR
 	}
 
 	@Override
+	@Deprecated
 	public Set<String> callService(final String pRepositoryId, final String pGroupId, final String pArtifactId,
-			final String pPackaging, final ValidAndInvalidClassifier pClassifier) {
+		final String pPackaging, final ValidAndInvalidClassifier pClassifier) {
+
+		final MultivaluedMap<String, String> requestParams = createRequestParameters(pRepositoryId, pGroupId, pArtifactId, pPackaging, pClassifier, null);
+		return this.callService(requestParams, pClassifier);
+	}
+	
+	public Set<String> callService(MultivaluedMap<String, String> pParams, final ValidAndInvalidClassifier pClassifier) {
 
 		// init empty
 		Set<String> retVal = new LinkedHashSet<>(); // retain order of insertion
@@ -45,9 +52,10 @@ abstract class AbstractNexus3RestApiAssetService extends AbstractRESTfulVersionR
 		do {
 			WebTarget theInstance = getInstance();
 
-			final MultivaluedMap<String, String> requestParams = createRequestParameters(pRepositoryId, pGroupId, pArtifactId, pPackaging, pClassifier, token);
+			// Update the token in every iteration
+			pParams.putSingle(AbstractNexus3RestApiSearchService.PARAMETER_TOKEN, token);
 
-			for (Map.Entry<String, List<String>> entries : requestParams.entrySet()) {
+			for (Map.Entry<String, List<String>> entries : pParams.entrySet()) {
 				theInstance = theInstance.queryParam(entries.getKey(), entries.getValue().toArray());
 			}
 
