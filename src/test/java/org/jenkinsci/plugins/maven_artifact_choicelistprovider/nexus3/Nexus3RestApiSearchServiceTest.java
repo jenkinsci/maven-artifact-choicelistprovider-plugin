@@ -42,7 +42,7 @@ public class Nexus3RestApiSearchServiceTest {
         @Override
         protected WebTarget getInstance() {
 
-            Nexus3AssetRestResponse response = new Nexus3AssetRestResponse();
+            Nexus3RestResponseAsset response = new Nexus3RestResponseAsset();
             response.setItems(new AssetItem[0]);
 
             if (instances.isEmpty()) {

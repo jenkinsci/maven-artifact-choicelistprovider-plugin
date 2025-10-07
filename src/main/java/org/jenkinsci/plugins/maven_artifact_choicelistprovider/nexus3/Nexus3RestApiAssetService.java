@@ -1,11 +1,17 @@
 package org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus3;
 
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.jenkinsci.plugins.maven_artifact_choicelistprovider.IVersionReader2;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.RESTfulParameterBuilder;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.ValidAndInvalidClassifier;
+import org.jenkinsci.plugins.maven_artifact_choicelistprovider.VersionReaderException;
 
-public class Nexus3RestApiAssetService extends AbstractNexus3RestApiAssetService {
+public class Nexus3RestApiAssetService extends AbstractNexus3RestApiAssetService implements IVersionReader2 {
 
 	private final RESTfulParameterBuilder mMapper;
 
@@ -19,6 +25,17 @@ public class Nexus3RestApiAssetService extends AbstractNexus3RestApiAssetService
 			String pArtifactId, String pPackaging, ValidAndInvalidClassifier pClassifier, String token) {
 		return mMapper.create(pRepositoryId, pGroupId, pArtifactId, pPackaging, pClassifier, token);
 	}
+
+    @Override
+    public List<String> retrieveVersions(MultivaluedMap<String, String> pParams, ValidAndInvalidClassifier pClassifier) throws VersionReaderException {
+        Set<String> callService = super.callService(pParams, pClassifier);
+        return callService.stream().collect(Collectors.toList());
+    }
+
+    @Override
+    public List<String> retrieveVersions(MultivaluedMap<String, String> pParams) throws VersionReaderException {
+        return this.retrieveVersions(pParams, null);
+    }
 
 }
 

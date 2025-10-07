@@ -66,7 +66,7 @@ abstract class AbstractNexus3RestApiAssetService extends AbstractRESTfulVersionR
 			final String plainResult = theInstance.request(MediaType.APPLICATION_JSON).get(String.class);
 
 			try {
-				final Nexus3AssetRestResponse parsedJsonResult = mapper.readValue(plainResult, Nexus3AssetRestResponse.class);
+				final Nexus3RestResponseAsset parsedJsonResult = mapper.readValue(plainResult, Nexus3RestResponseAsset.class);
 
 				if (parsedJsonResult == null) {
 					LOGGER.info("response from Nexus3 is NULL.");
@@ -110,7 +110,7 @@ abstract class AbstractNexus3RestApiAssetService extends AbstractRESTfulVersionR
 	 * @return a unique list of URLs that are matching the search criteria, sorted
 	 *         by the order of the Nexus3 service.
 	 */
-	Set<String> parseAndFilterResponse(final Nexus3AssetRestResponse pJsonResult, final ValidAndInvalidClassifier pClassifier) {
+	Set<String> parseAndFilterResponse(final Nexus3RestResponseAsset pJsonResult, final ValidAndInvalidClassifier pClassifier) {
 		// Use a Map instead of a List to filter duplicated entries and also linked to
 		// keep the order of response
 		final Set<String> retVal = new LinkedHashSet<>();

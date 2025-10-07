@@ -8,6 +8,8 @@ public interface IVersionReader2 {
 
 	public List<String> retrieveVersions(MultivaluedMap<String, String> pParams) throws VersionReaderException;
 
+	public List<String> retrieveVersions(MultivaluedMap<String, String> pParams, ValidAndInvalidClassifier pClassifier) throws VersionReaderException;	 
+
 	public void setUserName(final String pUserName);
 
 	public void setUserPassword(final String pUserPassword);

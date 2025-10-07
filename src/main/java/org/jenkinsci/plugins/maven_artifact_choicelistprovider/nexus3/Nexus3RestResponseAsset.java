@@ -8,7 +8,7 @@ import java.util.Arrays;
  * @author stephan.watermeyer
  *
  */
-public class Nexus3AssetRestResponse {
+public class Nexus3RestResponseAsset {
 
     private String continuationToken;
 

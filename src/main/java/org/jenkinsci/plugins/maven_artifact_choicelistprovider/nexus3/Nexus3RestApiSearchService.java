@@ -2,19 +2,25 @@ package org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus3;
 
 import javax.ws.rs.core.MultivaluedMap;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.core.MultivaluedHashMap;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.IVersionReader2;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.RESTfulParameterBuilder;
+import org.jenkinsci.plugins.maven_artifact_choicelistprovider.ValidAndInvalidClassifier;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.VersionReaderException;
 
-public class Nexus3RestApiSearchService extends AbstractNexus3RestApiSearchService implements IVersionReader2{
+public class Nexus3RestApiSearchService extends AbstractNexus3RestApiSearchService implements IVersionReader2 {
 
 	private final Nexus3RESTfulParameterBuilderForSearch mMapper;
+
+    private static final Logger LOGGER = Logger.getLogger(Nexus3RestApiSearchService.class.getName());
 
 	public Nexus3RestApiSearchService(String pURL) {
 		super(pURL);
@@ -29,8 +35,14 @@ public class Nexus3RestApiSearchService extends AbstractNexus3RestApiSearchServi
 
     @Override
     public List<String> retrieveVersions(MultivaluedMap<String, String> pParams) throws VersionReaderException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'retrieveVersions'");
+       return this.retrieveVersions(pParams, null);
+    }
+
+    @Override
+    public List<String> retrieveVersions(MultivaluedMap<String, String> pParams, ValidAndInvalidClassifier pClassifier)
+            throws VersionReaderException {
+        Set<String> callService = super.callService(pParams, pClassifier);
+        return callService.stream().collect(Collectors.toList());
     }
 
 }
