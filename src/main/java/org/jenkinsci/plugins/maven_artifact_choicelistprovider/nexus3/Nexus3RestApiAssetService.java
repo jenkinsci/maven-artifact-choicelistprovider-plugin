@@ -50,8 +50,6 @@ class Nexus3RESTfulParameterBuilderForMaven2Artifacts extends RESTfulParameterBu
     public static final String PARAMETER_ARTIFACTID = "maven.artifactId";
 
     public static final String PARAMETER_GROUPID = "maven.groupId";
-   
-    public static final String PARAMETER_TOKEN = "continuationToken";
     
     public static final String PACKAGING_ALL = "*";
     
@@ -84,7 +82,7 @@ class Nexus3RESTfulParameterBuilderForMaven2Artifacts extends RESTfulParameterBu
 
     @Override
     public String getContinuationToken() {
-        return PARAMETER_TOKEN;
+        return AbstractNexus3RestApiSearchService.PARAMETER_TOKEN;
     }
 
 	@Override

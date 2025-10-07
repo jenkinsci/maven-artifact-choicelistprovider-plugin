@@ -56,8 +56,6 @@ class Nexus3RESTfulParameterBuilderForSearch {
     public static final String PARAMETER_NAME = "name";
 
     public static final String PARAMETER_GROUP = "group";
-   
-    public static final String PARAMETER_TOKEN = "continuationToken";
     
     public static final String PACKAGING_ALL = "*";
     
@@ -65,7 +63,7 @@ class Nexus3RESTfulParameterBuilderForSearch {
 
 
     public String getContinuationToken() {
-        return PARAMETER_TOKEN;
+        return AbstractNexus3RestApiSearchService.PARAMETER_TOKEN;
     }
 
 	public String getSortOrder() {

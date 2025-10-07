@@ -1,5 +1,6 @@
 package org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus3;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
@@ -76,19 +77,23 @@ public abstract class MACLPChoiceParameterDefinitionBase extends ChoiceParameter
         Item item = null;
         StaplerRequest2 req = Stapler.getCurrentRequest2();
 
+        
         if (req != null) {
             item = req.findAncestorObject(Item.class);
         }
         List<String> retVal = Collections.emptyList();
 
-        if (StringUtils.isNotEmpty(getUrl())) {
+        if (StringUtils.isEmpty(getUrl())) {
             LOGGER.log(Level.FINE, "not properly initialized. URL is empty.");
+            retVal = new ArrayList<String>();
+            retVal.add("Job configuration has been changed manually. Please re-run the job to re-initiated this field.");
             return retVal;
         }
 
         final IVersionReader2 serviceInstances = createServiceInstance(getUrl());
 
         if (StringUtils.isNotEmpty(getCredentialsId())) {
+            LOGGER.log(Level.FINE, "try to get credentials: " + getCredentialsId());
             final UsernamePasswordCredentialsImpl c = CredentialsMatchers.firstOrNull(
                     CredentialsProvider.lookupCredentialsInItem(UsernamePasswordCredentialsImpl.class, item,
                             ACL.SYSTEM2, Collections.<DomainRequirement>emptyList()),
@@ -105,25 +110,14 @@ public abstract class MACLPChoiceParameterDefinitionBase extends ChoiceParameter
         try {
             final MultivaluedMap<String, String> params = createBaseParameterList();
             params.putAll(createParameterList());
+
+            LOGGER.log(Level.FINE, "call the service");
             retVal = serviceInstances.retrieveVersions(params);
         } catch (Exception e) {
             LOGGER.log(Level.WARNING, e.getMessage(), e);
         }
 
         return retVal;
-    }
-
-    @Override
-    public ParameterValue createValue(StaplerRequest2 req, JSONObject jo) {
-        LOGGER.log(Level.FINE, "create value StaplerRequest2");
-        LOGGER.log(Level.FINE, getRepository());
-        return super.createValue(req, jo);
-    }
-
-    @Override
-    public StringParameterValue createValue(String value) {
-        LOGGER.log(Level.FINE, "create value");
-        return super.createValue(value);
     }
 
     @Override
@@ -134,11 +128,19 @@ public abstract class MACLPChoiceParameterDefinitionBase extends ChoiceParameter
 
     protected MultivaluedMap<String, String> createBaseParameterList() {
         MultivaluedHashMap<String, String> retVal = new MultivaluedHashMap<>();
-
-        // if(StringUtils.isNotEmpty(getRepository())) {
-        // retVal.add("repository", getRepository());
-        // }
         return retVal;
+    }
+
+     @Override
+    public ParameterValue createValue(StaplerRequest2 req, JSONObject jo) {
+        LOGGER.log(Level.FINE, "createValue " + jo.toString());
+        return super.createValue(req, jo);
+    }
+
+    @Override
+    public StringParameterValue createValue(String value) {
+        LOGGER.log(Level.FINE, "createValue " + value);
+        return super.createValue(value);
     }
 
     protected abstract IVersionReader2 createServiceInstance(String pUrl);

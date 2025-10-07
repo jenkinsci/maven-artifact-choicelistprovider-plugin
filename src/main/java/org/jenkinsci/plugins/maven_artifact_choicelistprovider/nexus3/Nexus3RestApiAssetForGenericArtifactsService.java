@@ -28,8 +28,6 @@ class Nexus3RESTfulParameterBuilderForGenericArtifacts extends RESTfulParameterB
 
 	public static final String PARAMETER_ARTIFACTID = "name";
 
-	public static final String PARAMETER_TOKEN = "continuationToken";
-
 	public static final String PARAMETER_SORT = "sort";
 
 	@Override
@@ -59,7 +57,7 @@ class Nexus3RESTfulParameterBuilderForGenericArtifacts extends RESTfulParameterB
 
 	@Override
 	public String getContinuationToken() {
-		return PARAMETER_TOKEN;
+		return AbstractNexus3RestApiSearchService.PARAMETER_TOKEN;
 	}
 
 	@Override

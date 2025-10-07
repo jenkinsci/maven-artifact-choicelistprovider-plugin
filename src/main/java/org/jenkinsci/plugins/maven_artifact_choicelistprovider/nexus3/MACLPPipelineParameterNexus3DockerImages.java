@@ -18,9 +18,9 @@ public class MACLPPipelineParameterNexus3DockerImages extends MACLPChoiceParamet
     private static final Logger LOGGER = Logger.getLogger(MACLPPipelineParameterNexus3DockerImages.class.getName());
 
     @DataBoundConstructor
-    public MACLPPipelineParameterNexus3DockerImages(String name, String[] choices, String description, String url, String credentialsId, String repository,
+    public MACLPPipelineParameterNexus3DockerImages(String name, String choices, String description, String url, String credentialsId, String repository,
             String artifact, String group) {
-        super(name, choices, description, url, repository, credentialsId);
+        super(name, new String[0], description, url, repository, credentialsId);
         this.group = group;
         this.artifact = artifact;
     }
@@ -55,11 +55,13 @@ public class MACLPPipelineParameterNexus3DockerImages extends MACLPChoiceParamet
     
     @Override
     protected IVersionReader2 createServiceInstance(String pUrl) {
+        LOGGER.fine("createServiceInstance: "  + pUrl);
         return new Nexus3RestApiSearchService(pUrl);
     }
 
     @Override
     protected MultivaluedMap<String, String> createParameterList() {
+        LOGGER.fine("createParameterList");
         Nexus3RESTfulParameterBuilderForSearch x = new Nexus3RESTfulParameterBuilderForSearch();
         return x.create(getRepository(), getGroup(), getArtifact(), "");
     }
