@@ -3,6 +3,7 @@ package org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus3;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -10,7 +11,6 @@ import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.commons.lang.StringUtils;
-import org.jenkinsci.plugins.maven_artifact_choicelistprovider.IVersionReader;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.IVersionReader2;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.Stapler;
@@ -20,6 +20,7 @@ import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.domains.DomainRequirement;
 import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.model.ChoiceParameterDefinition;
 import hudson.model.Item;
 import hudson.model.ParameterValue;
@@ -146,5 +147,36 @@ public abstract class MACLPChoiceParameterDefinitionBase extends ChoiceParameter
     protected abstract IVersionReader2 createServiceInstance(String pUrl);
 
     protected abstract MultivaluedMap<String, String> createParameterList();
+
+    @Override
+    public int hashCode() {
+        if (MACLPChoiceParameterDefinitionBase.class != getClass()) {
+            return super.hashCode();
+        }
+        return Objects.hash(getName(), getDescription(), url, repository, credentialsId);
+    }
+
+    @Override
+    @SuppressFBWarnings(value = "EQ_GETCLASS_AND_CLASS_CONSTANT", justification = "ParameterDefinitionTest tests that subclasses are not equal to their parent classes, so the behavior appears to be intentional")
+    public boolean equals(Object obj) {
+        if (MACLPChoiceParameterDefinitionBase.class != getClass())
+            return super.equals(obj);
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        MACLPChoiceParameterDefinitionBase other = (MACLPChoiceParameterDefinitionBase) obj;
+        if (!Objects.equals(getName(), other.getName()))
+            return false;
+        if (!Objects.equals(getDescription(), other.getDescription()))
+            return false;
+        if (!Objects.equals(url, other.getUrl()))
+                return false;
+        if (!Objects.equals(repository, other.getRepository()))
+                return false;
+        return Objects.equals(credentialsId, other.credentialsId);
+    }
 
 }
