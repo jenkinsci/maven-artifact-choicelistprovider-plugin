@@ -63,10 +63,6 @@ abstract class Nexus3RestApiAssetBase extends AbstractRESTfulVersionReader imple
                         entries.getKey(), entries.getValue().toArray());
             }
 
-            if (LOGGER.isLoggable(Level.INFO)) {
-                LOGGER.info("URI: " + theInstance.getUri());
-            }
-
             final String plainResult =
                     theInstance.request(MediaType.APPLICATION_JSON).get(String.class);
 
