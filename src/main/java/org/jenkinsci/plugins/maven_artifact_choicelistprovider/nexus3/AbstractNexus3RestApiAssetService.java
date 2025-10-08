@@ -23,7 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 abstract class AbstractNexus3RestApiAssetService extends AbstractRESTfulVersionReader {
 
 	// https://help.sonatype.com/repomanager3/rest-and-integration-api/search-api#SearchAPI-SearchAssets
-	private static final String NEXUS3_REST_API_ENDPOINT = "service/rest/v1/search/assets";
+	private static final String NEXUS3_REST_API_ASSET_ENDPOINT = "service/rest/v1/search/assets";
 
 	private static final Logger LOGGER = Logger.getLogger(AbstractNexus3RestApiAssetService.class.getName());
 
@@ -143,7 +143,7 @@ abstract class AbstractNexus3RestApiAssetService extends AbstractRESTfulVersionR
 	 */
 	@Override
 	public String getRESTfulServiceEndpoint() {
-		return NEXUS3_REST_API_ENDPOINT;
+		return NEXUS3_REST_API_ASSET_ENDPOINT;
 	}
 
 }

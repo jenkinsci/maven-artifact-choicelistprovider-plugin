@@ -2,7 +2,6 @@ package org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus3;
 
 import javax.ws.rs.core.MultivaluedMap;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
