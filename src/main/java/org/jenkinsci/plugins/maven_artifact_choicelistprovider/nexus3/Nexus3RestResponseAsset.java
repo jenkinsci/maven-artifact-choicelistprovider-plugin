@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 /**
  * POJO for Nexus3 API.
- * 
+ *
  * @author stephan.watermeyer
  *
  */
@@ -32,7 +32,7 @@ public class Nexus3RestResponseAsset {
 
     @Override
     public String toString() {
-        return "Nexus3RestResponse [continuationToken = " + continuationToken + ", items = " + Arrays.toString(items) + "]";
+        return "Nexus3RestResponse [continuationToken = " + continuationToken + ", items = " + Arrays.toString(items)
+                + "]";
     }
-
 }

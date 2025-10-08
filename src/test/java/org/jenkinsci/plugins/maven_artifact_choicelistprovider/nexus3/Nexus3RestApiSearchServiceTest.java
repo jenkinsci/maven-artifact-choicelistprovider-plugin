@@ -5,17 +5,14 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.ws.rs.client.Invocation;
-import javax.ws.rs.client.WebTarget;
-
-import org.jenkinsci.plugins.maven_artifact_choicelistprovider.ValidAndInvalidClassifier;
-import org.junit.Test;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
+import java.util.List;
+import javax.ws.rs.client.Invocation;
+import javax.ws.rs.client.WebTarget;
+import org.jenkinsci.plugins.maven_artifact_choicelistprovider.ValidAndInvalidClassifier;
+import org.junit.Test;
 
 public class Nexus3RestApiSearchServiceTest {
 
@@ -27,10 +24,9 @@ public class Nexus3RestApiSearchServiceTest {
         service.callService("repositoryId", "groupId", "artifactId", "tar.gz", ValidAndInvalidClassifier.getDefault());
 
         assertThat(instances).hasSize(2);
-        
-        
-		//verify(instances.get(0), times(5)).queryParam(anyString(), anyString());
-		//verify(instances.get(1), times(6)).queryParam(anyString(), anyString());
+
+        // verify(instances.get(0), times(5)).queryParam(anyString(), anyString());
+        // verify(instances.get(1), times(6)).queryParam(anyString(), anyString());
     }
 
     private class TestService extends Nexus3RestApiAssetMavenService {
@@ -46,8 +42,8 @@ public class Nexus3RestApiSearchServiceTest {
             response.setItems(new AssetItem[0]);
 
             if (instances.isEmpty()) {
-				response.setContinuationToken("12345");
-			}
+                response.setContinuationToken("12345");
+            }
 
             ObjectMapper objectMapper = new ObjectMapper();
             try {
@@ -60,13 +56,12 @@ public class Nexus3RestApiSearchServiceTest {
                 when(mock.queryParam(anyString(), anyString())).thenReturn(mock);
                 when(mock.request(anyString())).thenReturn(builder);
 
-				instances.add(mock);
-				return mock;
+                instances.add(mock);
+                return mock;
 
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
-
         }
     }
 }

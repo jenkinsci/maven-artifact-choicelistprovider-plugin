@@ -1,30 +1,27 @@
 package org.jenkinsci.plugins.maven_artifact_choicelistprovider.artifactory;
 
+import com.google.gson.Gson;
+import com.google.gson.annotations.SerializedName;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
-
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.AbstractRESTfulVersionReader;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.ValidAndInvalidClassifier;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus.StandardRESTfulParameterBuilder;
 
-import com.google.gson.Gson;
-import com.google.gson.annotations.SerializedName;
-
 /**
- * 
+ *
  * Class utilizes the RESTful Search API from jFrog Artifactory to search for
  * items. <br>
  * <a href="https://www.jfrog.com/confluence/display/RTF/Artifactory+REST+API">Documentation</a>
- * 
+ *
  * @author stephan.watermeyer, Diebold Nixdorf
  */
 public class ArtifactorySearchService extends AbstractRESTfulVersionReader {
@@ -43,17 +40,25 @@ public class ArtifactorySearchService extends AbstractRESTfulVersionReader {
     }
 
     @Override
-    public Set<String> callService(String pRepositoryId, String pGroupId, String pArtifactId, String pPackaging, ValidAndInvalidClassifier pClassifier) {
-        final MultivaluedMap<String, String> requestParams = new StandardRESTfulParameterBuilder().create("", pGroupId, pArtifactId, pPackaging, pClassifier);
+    public Set<String> callService(
+            String pRepositoryId,
+            String pGroupId,
+            String pArtifactId,
+            String pPackaging,
+            ValidAndInvalidClassifier pClassifier) {
+        final MultivaluedMap<String, String> requestParams =
+                new StandardRESTfulParameterBuilder().create("", pGroupId, pArtifactId, pPackaging, pClassifier);
 
         Set<String> retVal = new LinkedHashSet<>();
         LOGGER.info("call artifactory service");
 
         WebTarget theInstance = getInstance();
         for (Map.Entry<String, List<String>> entries : requestParams.entrySet()) {
-            theInstance = theInstance.queryParam(entries.getKey(), entries.getValue().toArray());
+            theInstance =
+                    theInstance.queryParam(entries.getKey(), entries.getValue().toArray());
         }
-        final String plainResult = theInstance.request(MediaType.APPLICATION_JSON).get(String.class);
+        final String plainResult =
+                theInstance.request(MediaType.APPLICATION_JSON).get(String.class);
 
         if (plainResult == null) {
             LOGGER.info("response from Artifactory Service is NULL.");
@@ -91,7 +96,6 @@ public class ArtifactorySearchService extends AbstractRESTfulVersionReader {
         // in case the packaging is not empty, the equals has to check the given package
         return pArtifactURL.endsWith(pRequestedPackaging);
     }
-
 }
 
 /**
@@ -115,7 +119,6 @@ class ArtifactoryResultEntryModel {
     public void setUri(String uri) {
         this.uri = uri;
     }
-
 }
 
 class ArtifactoryResultModel {
@@ -130,5 +133,4 @@ class ArtifactoryResultModel {
     public ArtifactoryResultEntryModel[] getResults() {
         return results;
     }
-
 }

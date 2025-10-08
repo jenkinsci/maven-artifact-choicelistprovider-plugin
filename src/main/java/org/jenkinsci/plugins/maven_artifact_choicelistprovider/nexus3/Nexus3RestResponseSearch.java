@@ -3,8 +3,8 @@ package org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus3;
 import java.util.Arrays;
 
 /**
- * POJO for Nexus3 API - Search 
- * 
+ * POJO for Nexus3 API - Search
+ *
  * @author stephan.watermeyer
  *
  */
@@ -32,7 +32,7 @@ public class Nexus3RestResponseSearch {
 
     @Override
     public String toString() {
-        return "Nexus3RestResponse [continuationToken = " + continuationToken + ", items = " + Arrays.toString(items) + "]";
+        return "Nexus3RestResponse [continuationToken = " + continuationToken + ", items = " + Arrays.toString(items)
+                + "]";
     }
-
 }

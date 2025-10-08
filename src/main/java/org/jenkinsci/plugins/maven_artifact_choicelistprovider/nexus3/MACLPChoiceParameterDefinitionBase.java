@@ -1,32 +1,29 @@
 package org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus3;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.ws.rs.core.MultivaluedHashMap;
-import javax.ws.rs.core.MultivaluedMap;
-
-import org.apache.commons.lang.StringUtils;
-import org.jenkinsci.plugins.maven_artifact_choicelistprovider.IVersionReader2;
-import org.kohsuke.stapler.DataBoundSetter;
-import org.kohsuke.stapler.Stapler;
-import org.kohsuke.stapler.StaplerRequest2;
 import com.cloudbees.plugins.credentials.CredentialsMatchers;
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.domains.DomainRequirement;
 import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl;
-
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.model.ChoiceParameterDefinition;
 import hudson.model.Item;
 import hudson.model.ParameterValue;
 import hudson.model.StringParameterValue;
 import hudson.security.ACL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.MultivaluedMap;
 import net.sf.json.JSONObject;
+import org.apache.commons.lang.StringUtils;
+import org.jenkinsci.plugins.maven_artifact_choicelistprovider.IVersionReader2;
+import org.kohsuke.stapler.DataBoundSetter;
+import org.kohsuke.stapler.Stapler;
+import org.kohsuke.stapler.StaplerRequest2;
 
 public abstract class MACLPChoiceParameterDefinitionBase extends ChoiceParameterDefinition {
 
@@ -37,8 +34,14 @@ public abstract class MACLPChoiceParameterDefinitionBase extends ChoiceParameter
 
     private static final Logger LOGGER = Logger.getLogger(MACLPChoiceParameterDefinitionBase.class.getName());
 
-    public MACLPChoiceParameterDefinitionBase(String name, String[] choices, String description, String url,
-            String repository, String credentialsId, boolean reverseOrder) {
+    public MACLPChoiceParameterDefinitionBase(
+            String name,
+            String[] choices,
+            String description,
+            String url,
+            String repository,
+            String credentialsId,
+            boolean reverseOrder) {
         super(name, choices, description);
         this.url = url;
         this.repository = repository;
@@ -79,7 +82,6 @@ public abstract class MACLPChoiceParameterDefinitionBase extends ChoiceParameter
         Item item = null;
         StaplerRequest2 req = Stapler.getCurrentRequest2();
 
-        
         if (req != null) {
             item = req.findAncestorObject(Item.class);
         }
@@ -88,7 +90,8 @@ public abstract class MACLPChoiceParameterDefinitionBase extends ChoiceParameter
         if (StringUtils.isEmpty(getUrl())) {
             LOGGER.log(Level.FINE, "not properly initialized. URL is empty.");
             retVal = new ArrayList<String>();
-            retVal.add("Job configuration has been changed manually. Please re-run the job to re-initiated this field.");
+            retVal.add(
+                    "Job configuration has been changed manually. Please re-run the job to re-initiated this field.");
             return retVal;
         }
 
@@ -97,15 +100,20 @@ public abstract class MACLPChoiceParameterDefinitionBase extends ChoiceParameter
         if (StringUtils.isNotEmpty(getCredentialsId())) {
             LOGGER.log(Level.FINE, "try to get credentials: " + getCredentialsId());
             final UsernamePasswordCredentialsImpl c = CredentialsMatchers.firstOrNull(
-                    CredentialsProvider.lookupCredentialsInItem(UsernamePasswordCredentialsImpl.class, item,
-                            ACL.SYSTEM2, Collections.<DomainRequirement>emptyList()),
+                    CredentialsProvider.lookupCredentialsInItem(
+                            UsernamePasswordCredentialsImpl.class,
+                            item,
+                            ACL.SYSTEM2,
+                            Collections.<DomainRequirement>emptyList()),
                     CredentialsMatchers.allOf(CredentialsMatchers.withId(getCredentialsId())));
 
             if (c != null) {
                 serviceInstances.setCredentials(c.getUsername(), c.getPassword().getPlainText());
             } else {
-                LOGGER.log(Level.WARNING, "unable to find usernamepassword credentials with id: " + getCredentialsId()
-                        + ". continue without");
+                LOGGER.log(
+                        Level.WARNING,
+                        "unable to find usernamepassword credentials with id: " + getCredentialsId()
+                                + ". continue without");
             }
         }
 
@@ -138,7 +146,7 @@ public abstract class MACLPChoiceParameterDefinitionBase extends ChoiceParameter
         return retVal;
     }
 
-     @Override
+    @Override
     public ParameterValue createValue(StaplerRequest2 req, JSONObject jo) {
         LOGGER.log(Level.FINE, "createValue " + jo.toString());
         return super.createValue(req, jo);
@@ -163,26 +171,20 @@ public abstract class MACLPChoiceParameterDefinitionBase extends ChoiceParameter
     }
 
     @Override
-    @SuppressFBWarnings(value = "EQ_GETCLASS_AND_CLASS_CONSTANT", justification = "ParameterDefinitionTest tests that subclasses are not equal to their parent classes, so the behavior appears to be intentional")
+    @SuppressFBWarnings(
+            value = "EQ_GETCLASS_AND_CLASS_CONSTANT",
+            justification =
+                    "ParameterDefinitionTest tests that subclasses are not equal to their parent classes, so the behavior appears to be intentional")
     public boolean equals(Object obj) {
-        if (MACLPChoiceParameterDefinitionBase.class != getClass())
-            return super.equals(obj);
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
+        if (MACLPChoiceParameterDefinitionBase.class != getClass()) return super.equals(obj);
+        if (this == obj) return true;
+        if (obj == null) return false;
+        if (getClass() != obj.getClass()) return false;
         MACLPChoiceParameterDefinitionBase other = (MACLPChoiceParameterDefinitionBase) obj;
-        if (!Objects.equals(getName(), other.getName()))
-            return false;
-        if (!Objects.equals(getDescription(), other.getDescription()))
-            return false;
-        if (!Objects.equals(url, other.getUrl()))
-                return false;
-        if (!Objects.equals(repository, other.getRepository()))
-                return false;
+        if (!Objects.equals(getName(), other.getName())) return false;
+        if (!Objects.equals(getDescription(), other.getDescription())) return false;
+        if (!Objects.equals(url, other.getUrl())) return false;
+        if (!Objects.equals(repository, other.getRepository())) return false;
         return Objects.equals(credentialsId, other.credentialsId);
     }
-
 }

@@ -9,7 +9,7 @@ import com.google.gson.Gson;
  */
 public class MavenCentralResponseParser {
 
-	public static MavenCentralResponseModel parse(String pContent) {
-		return new Gson().fromJson(pContent, MavenCentralResponseModel.class);
-	}
+    public static MavenCentralResponseModel parse(String pContent) {
+        return new Gson().fromJson(pContent, MavenCentralResponseModel.class);
+    }
 }

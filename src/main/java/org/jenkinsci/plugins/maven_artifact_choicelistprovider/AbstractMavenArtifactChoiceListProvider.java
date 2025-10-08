@@ -1,5 +1,20 @@
 package org.jenkinsci.plugins.maven_artifact_choicelistprovider;
 
+import com.cloudbees.plugins.credentials.CredentialsMatchers;
+import com.cloudbees.plugins.credentials.CredentialsProvider;
+import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
+import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
+import com.cloudbees.plugins.credentials.domains.DomainRequirement;
+import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl;
+import hudson.Extension;
+import hudson.model.AbstractBuild;
+import hudson.model.AbstractProject;
+import hudson.model.Descriptor;
+import hudson.model.Item;
+import hudson.model.Queue;
+import hudson.model.queue.Tasks;
+import hudson.security.ACL;
+import hudson.util.ListBoxModel;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -10,9 +25,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-
 import javax.annotation.Nonnull;
-
+import jenkins.model.Jenkins;
+import jp.ikedam.jenkins.plugins.extensible_choice_parameter.ChoiceListProvider;
+import jp.ikedam.jenkins.plugins.extensible_choice_parameter.ExtensibleChoiceParameterDefinition;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.artifactory.ArtifactoryChoiceListProvider;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.central.MavenCentralChoiceListProvider;
@@ -24,28 +40,8 @@ import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.StaplerRequest2;
 import org.springframework.security.core.Authentication;
 
-import com.cloudbees.plugins.credentials.CredentialsMatchers;
-import com.cloudbees.plugins.credentials.CredentialsProvider;
-import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
-import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
-import com.cloudbees.plugins.credentials.domains.DomainRequirement;
-import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl;
-
-import hudson.Extension;
-import hudson.model.AbstractBuild;
-import hudson.model.AbstractProject;
-import hudson.model.Descriptor;
-import hudson.model.Item;
-import hudson.model.Queue;
-import hudson.model.queue.Tasks;
-import hudson.security.ACL;
-import hudson.util.ListBoxModel;
-import jenkins.model.Jenkins;
-import jp.ikedam.jenkins.plugins.extensible_choice_parameter.ChoiceListProvider;
-import jp.ikedam.jenkins.plugins.extensible_choice_parameter.ExtensibleChoiceParameterDefinition;
-
 /**
- * 
+ *
  * Base Class for different {@link ChoiceListProvider} that can display information from an artifact repository, like
  * {@link NexusChoiceListProvider}, {@link MavenCentralChoiceListProvider} and {@link ArtifactoryChoiceListProvider}
  *
@@ -55,7 +51,7 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
 
     public static final String DEFAULT_REGEX_MATCH_ALL = ".*";
 
-	private static final long serialVersionUID = -6055763342458172275L;
+    private static final long serialVersionUID = -6055763342458172275L;
 
     private static final Logger LOGGER = Logger.getLogger(AbstractMavenArtifactChoiceListProvider.class.getName());
 
@@ -70,7 +66,7 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
 
     /**
      * Initializes the choice list with at the artifactId.
-     * 
+     *
      * @param artifactId
      *            the artifactId is the minimum required information.
      */
@@ -81,23 +77,31 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
 
     @Override
     public List<String> getChoiceList() {
-    	StaplerRequest2 req = Stapler.getCurrentRequest2();
-    	final Map<String, String> mChoices;
-    	if(req != null) {
-	    	Item item = req.findAncestorObject(Item.class);
-	    	
-	    	IVersionReader serviceInstance = createServiceInstance(item);
-	    	
-	        LOGGER.log(Level.FINE, "retrieve the versions from the repository");
-	        mChoices = readURL(serviceInstance, getRepositoryId(), getGroupId(), getArtifactId(), getPackaging(), getClassifier(),
-	                getInverseFilter(), getFilterExpression(), getReverseOrder());
+        StaplerRequest2 req = Stapler.getCurrentRequest2();
+        final Map<String, String> mChoices;
+        if (req != null) {
+            Item item = req.findAncestorObject(Item.class);
 
-    	} else {
-    		// JENKINS-72158: In downstream projects the current request can be null.
-    		mChoices = Collections.emptyMap();
-    	}
+            IVersionReader serviceInstance = createServiceInstance(item);
 
-    	// FIXME: CHANGE-1: Return only the keys, that are shorter then the values
+            LOGGER.log(Level.FINE, "retrieve the versions from the repository");
+            mChoices = readURL(
+                    serviceInstance,
+                    getRepositoryId(),
+                    getGroupId(),
+                    getArtifactId(),
+                    getPackaging(),
+                    getClassifier(),
+                    getInverseFilter(),
+                    getFilterExpression(),
+                    getReverseOrder());
+
+        } else {
+            // JENKINS-72158: In downstream projects the current request can be null.
+            mChoices = Collections.emptyMap();
+        }
+
+        // FIXME: CHANGE-1: Return only the keys, that are shorter then the values
         // return new ArrayList<String>(mChoices.keySet());
         return new LinkedList<String>(mChoices.values());
     }
@@ -105,28 +109,30 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
     @Extension
     public static class DescriptorImpl extends Descriptor<ChoiceListProvider> {
 
-		public ListBoxModel doFillCredentialsIdItems(@AncestorInPath Item item, @QueryParameter String credentialsId) {
-			final StandardListBoxModel result = new StandardListBoxModel();
-			if (item == null) {
-				if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
-					return result.includeCurrentValue(credentialsId);
-				}
-			} else {
-				if (!item.hasPermission(Item.EXTENDED_READ) && !item.hasPermission(CredentialsProvider.USE_ITEM)) {
-					return result.includeCurrentValue(credentialsId);
-				}
-			}
-			final Authentication acl = item instanceof Queue.Task ? Tasks.getAuthenticationOf2((Queue.Task) item) : ACL.SYSTEM2;
-			return result.includeEmptyValue()
-					.includeMatchingAs(
-							item instanceof Queue.Task ? Tasks.getAuthenticationOf2((Queue.Task) item) : acl,
-							item, StandardUsernamePasswordCredentials.class, Collections.emptyList(),
-							CredentialsMatchers.instanceOf(StandardUsernamePasswordCredentials.class))
-					.includeCurrentValue(credentialsId);
-		}
-    	
+        public ListBoxModel doFillCredentialsIdItems(@AncestorInPath Item item, @QueryParameter String credentialsId) {
+            final StandardListBoxModel result = new StandardListBoxModel();
+            if (item == null) {
+                if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
+                    return result.includeCurrentValue(credentialsId);
+                }
+            } else {
+                if (!item.hasPermission(Item.EXTENDED_READ) && !item.hasPermission(CredentialsProvider.USE_ITEM)) {
+                    return result.includeCurrentValue(credentialsId);
+                }
+            }
+            final Authentication acl =
+                    item instanceof Queue.Task ? Tasks.getAuthenticationOf2((Queue.Task) item) : ACL.SYSTEM2;
+            return result.includeEmptyValue()
+                    .includeMatchingAs(
+                            item instanceof Queue.Task ? Tasks.getAuthenticationOf2((Queue.Task) item) : acl,
+                            item,
+                            StandardUsernamePasswordCredentials.class,
+                            Collections.emptyList(),
+                            CredentialsMatchers.instanceOf(StandardUsernamePasswordCredentials.class))
+                    .includeCurrentValue(credentialsId);
+        }
     }
-    
+
     /**
      * Different implementation will return different {@link IVersionReader} instances.
      * @param item for security checks.
@@ -136,21 +142,23 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
 
     /**
      * Returns the {@link UsernamePasswordCredentialsImpl} for the given CredentialId
-     * 
+     *
      * @param pCredentialId
      *            the internal jenkins id for the credentials
      * @return the credentials for the ID or NULL
      */
     public static UsernamePasswordCredentialsImpl getCredentials(@Nonnull String pCredentialId, @Nonnull Item pItem) {
-		final Authentication acl = pItem instanceof Queue.Task ? Tasks.getAuthenticationOf2((Queue.Task) pItem) : ACL.SYSTEM2;
-		return CredentialsMatchers.firstOrNull(
-                CredentialsProvider.lookupCredentialsInItem(UsernamePasswordCredentialsImpl.class, pItem, acl, Collections.<DomainRequirement> emptyList()),
+        final Authentication acl =
+                pItem instanceof Queue.Task ? Tasks.getAuthenticationOf2((Queue.Task) pItem) : ACL.SYSTEM2;
+        return CredentialsMatchers.firstOrNull(
+                CredentialsProvider.lookupCredentialsInItem(
+                        UsernamePasswordCredentialsImpl.class, pItem, acl, Collections.<DomainRequirement>emptyList()),
                 CredentialsMatchers.allOf(CredentialsMatchers.withId(pCredentialId)));
     }
 
     /**
      * Retrieves the versions from the given source.
-     * 
+     *
      * @param pInstance
      *            the artifact repository service.
      * @param pRepositoryId
@@ -172,25 +180,41 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
      *            <code>true</code> if the result should be reversed.
      * @return never null
      */
-    public static Map<String, String> readURL(final IVersionReader pInstance, final String pRepositoryId, final String pGroupId, final String pArtifactId, final String pPackaging,
-            String pClassifier, final boolean pInverseFilter, final String pFilterExpression, final boolean pReverseOrder) {
+    public static Map<String, String> readURL(
+            final IVersionReader pInstance,
+            final String pRepositoryId,
+            final String pGroupId,
+            final String pArtifactId,
+            final String pPackaging,
+            String pClassifier,
+            final boolean pInverseFilter,
+            final String pFilterExpression,
+            final boolean pReverseOrder) {
         Map<String, String> retVal = new LinkedHashMap<String, String>();
         try {
             ValidAndInvalidClassifier classifierBox = ValidAndInvalidClassifier.fromString(pClassifier);
 
-            List<String> choices = pInstance.retrieveVersions(pRepositoryId, pGroupId, pArtifactId, pPackaging, classifierBox);
+            List<String> choices =
+                    pInstance.retrieveVersions(pRepositoryId, pGroupId, pArtifactId, pPackaging, classifierBox);
 
             List<String> filteredChoices = filterArtifacts(choices, pInverseFilter, pFilterExpression);
 
-            if (pReverseOrder)
-                Collections.reverse(filteredChoices);
+            if (pReverseOrder) Collections.reverse(filteredChoices);
 
             retVal = MavenArtifactChoiceListProviderUtils.toMap(filteredChoices);
         } catch (VersionReaderException e) {
-            LOGGER.log(Level.INFO, "failed to retrieve versions from repository for g:" + pGroupId + ", a:" + pArtifactId + ", p:" + pPackaging + ", c:" + pClassifier, e);
+            LOGGER.log(
+                    Level.INFO,
+                    "failed to retrieve versions from repository for g:" + pGroupId + ", a:" + pArtifactId + ", p:"
+                            + pPackaging + ", c:" + pClassifier,
+                    e);
             retVal.put("error", e.getMessage());
         } catch (Exception e) {
-            LOGGER.log(Level.WARNING, "failed to retrieve versions from nexus for g:" + pGroupId + ", a:" + pArtifactId + ", p:" + pPackaging + ", c:" + pClassifier, e);
+            LOGGER.log(
+                    Level.WARNING,
+                    "failed to retrieve versions from nexus for g:" + pGroupId + ", a:" + pArtifactId + ", p:"
+                            + pPackaging + ", c:" + pClassifier,
+                    e);
             retVal.put("error", "Unexpected Error: " + e.getMessage());
         }
         return retVal;
@@ -207,19 +231,21 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
      * @return A new list of matching artifacts only
      * @throws PatternSyntaxException If pFilterExpression parameter is not a valid regular expression
      */
-    public static List<String> filterArtifacts(final List<String> pChoices, final boolean pInverseFilter, final String pFilterExpression) {
-    	final List<String> retVal;
-        
-    	// We only apply and compile regex if someone has configured something none-default.
-        if(StringUtils.isEmpty(pFilterExpression) || DEFAULT_REGEX_MATCH_ALL.equals(pFilterExpression)) {
-        	LOGGER.log(Level.FINE, "do not filter artifacts.");
-        	retVal = pChoices;
-        } else {
-        	LOGGER.log(Level.FINE, "filter artifacts based on " + pFilterExpression + ", inverse: " + pInverseFilter);
-        	retVal = new ArrayList<>();
-        	final Pattern compiledFilter = Pattern.compile(StringUtils.isEmpty(pFilterExpression) ? DEFAULT_REGEX_MATCH_ALL : pFilterExpression);
+    public static List<String> filterArtifacts(
+            final List<String> pChoices, final boolean pInverseFilter, final String pFilterExpression) {
+        final List<String> retVal;
 
-            for(String choice : pChoices) {
+        // We only apply and compile regex if someone has configured something none-default.
+        if (StringUtils.isEmpty(pFilterExpression) || DEFAULT_REGEX_MATCH_ALL.equals(pFilterExpression)) {
+            LOGGER.log(Level.FINE, "do not filter artifacts.");
+            retVal = pChoices;
+        } else {
+            LOGGER.log(Level.FINE, "filter artifacts based on " + pFilterExpression + ", inverse: " + pInverseFilter);
+            retVal = new ArrayList<>();
+            final Pattern compiledFilter = Pattern.compile(
+                    StringUtils.isEmpty(pFilterExpression) ? DEFAULT_REGEX_MATCH_ALL : pFilterExpression);
+
+            for (String choice : pChoices) {
                 final boolean match = compiledFilter.matcher(choice).matches();
                 // Using XOR operator: EITHER inverse was requested and filter doesn't match OR filter simply matches
                 if (pInverseFilter ^ match) {
@@ -230,16 +256,16 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
         return retVal;
     }
 
-
-
     @Override
-    public void onBuildCompletedWithValue(AbstractBuild<?, ?> build, ExtensibleChoiceParameterDefinition def, String value) {
+    public void onBuildCompletedWithValue(
+            AbstractBuild<?, ?> build, ExtensibleChoiceParameterDefinition def, String value) {
         super.onBuildCompletedWithValue(build, def, value);
         LOGGER.log(Level.INFO, "onBuildCompletedWithValue" + value);
     }
 
     @Override
-    public void onBuildTriggeredWithValue(AbstractProject<?, ?> job, ExtensibleChoiceParameterDefinition def, String value) {
+    public void onBuildTriggeredWithValue(
+            AbstractProject<?, ?> job, ExtensibleChoiceParameterDefinition def, String value) {
         super.onBuildTriggeredWithValue(job, def, value);
         LOGGER.log(Level.INFO, "onBuildTriggeredWithValue: " + value);
     }
@@ -315,6 +341,4 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
     public String getRepositoryId() {
         return repositoryId;
     }
-
-
 }

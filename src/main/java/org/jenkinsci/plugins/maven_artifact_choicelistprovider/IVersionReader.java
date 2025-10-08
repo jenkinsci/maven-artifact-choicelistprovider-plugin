@@ -4,12 +4,17 @@ import java.util.List;
 
 public interface IVersionReader {
 
-	public List<String> retrieveVersions(String pRepositoryId, String pGroupId, String pArtifactId, String pPackaging,
-			ValidAndInvalidClassifier pAcceptedClassifier) throws VersionReaderException;
+    public List<String> retrieveVersions(
+            String pRepositoryId,
+            String pGroupId,
+            String pArtifactId,
+            String pPackaging,
+            ValidAndInvalidClassifier pAcceptedClassifier)
+            throws VersionReaderException;
 
-	public void setUserName(final String pUserName);
+    public void setUserName(final String pUserName);
 
-	public void setUserPassword(final String pUserPassword);
+    public void setUserPassword(final String pUserPassword);
 
-	public void setCredentials(final String pUserName, final String pUserPassword);
+    public void setCredentials(final String pUserName, final String pUserPassword);
 }

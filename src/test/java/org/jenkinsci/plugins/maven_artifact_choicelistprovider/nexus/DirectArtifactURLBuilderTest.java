@@ -1,8 +1,7 @@
 package org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus;
 
-import org.junit.Test;
-
 import junit.framework.TestCase;
+import org.junit.Test;
 
 public class DirectArtifactURLBuilderTest extends TestCase {
 
@@ -30,14 +29,13 @@ public class DirectArtifactURLBuilderTest extends TestCase {
         builder.setPackaging("jar");
         final String urlA = builder.build();
         assertTrue(urlA.endsWith("commons-lang3-3.7-sources.jar"));
-        
+
         builder.setClassifier(null);
         final String urlB = builder.build();
         assertTrue(urlB.endsWith("commons-lang3-3.7.jar"));
-        
+
         builder.setClassifier("");
         final String urlC = builder.build();
         assertTrue(urlC.endsWith("commons-lang3-3.7.jar"));
     }
-
 }

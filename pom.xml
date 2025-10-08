@@ -1,34 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+  <modelVersion>4.0.0</modelVersion>
 
-	<parent>
+  <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>plugin</artifactId>
     <version>5.7</version>
     <relativePath />
   </parent>
 
-	<artifactId>maven-artifact-choicelistprovider</artifactId>
-	<version>${changelist}</version>
-	<packaging>hpi</packaging>
+  <artifactId>maven-artifact-choicelistprovider</artifactId>
+  <version>${changelist}</version>
+  <packaging>hpi</packaging>
 
-	<name>Maven Artifact ChoiceListProvider (Nexus)</name>
-	<description>A ChoiceListProvider to read Maven artifact information from a
+  <name>Maven Artifact ChoiceListProvider (Nexus)</name>
+  <description>A ChoiceListProvider to read Maven artifact information from a
 		Maven2 repository like Nexus, Artifactory and MavenCentral</description>
-	<url>
-		https://github.com/jenkinsci/maven-artifact-choicelistprovider-plugin/blob/master/README.md</url>
+  <url>https://github.com/jenkinsci/maven-artifact-choicelistprovider-plugin/blob/master/README.md</url>
 
-	<scm>
-		<connection>
-			scm:git:git@github.com:jenkinsci/maven-artifact-choicelistprovider-plugin.git</connection>
-		<developerConnection>
-			scm:git:git@github.com:jenkinsci/maven-artifact-choicelistprovider-plugin.git</developerConnection>
-		<url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
-		<tag>HEAD</tag>
-	</scm>
+  <licenses>
+    <license>
+      <name>MIT License</name>
+      <url>http://opensource.org/licenses/MIT</url>
+    </license>
+  </licenses>
 
- <properties>
+  <developers>
+    <developer>
+      <id>phreakadelle</id>
+      <name>Stephan Watermeyer</name>
+    </developer>
+  </developers>
+
+  <scm>
+    <connection>scm:git:git@github.com:jenkinsci/maven-artifact-choicelistprovider-plugin.git</connection>
+    <developerConnection>scm:git:git@github.com:jenkinsci/maven-artifact-choicelistprovider-plugin.git</developerConnection>
+    <tag>HEAD</tag>
+    <url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
+  </scm>
+
+  <properties>
     <changelist>999999-SNAPSHOT</changelist>
     <!-- https://www.jenkins.io/doc/developer/plugin-development/choosing-jenkins-baseline/ -->
     <jenkins.baseline>2.479</jenkins.baseline>
@@ -37,111 +48,97 @@
     <spotless.check.skip>false</spotless.check.skip>
   </properties>
 
-	<dependencyManagement>
-		<dependencies>
-			<!--
+  <dependencyManagement>
+    <dependencies>
+      <!--
 			https://mvnrepository.com/artifact/io.jenkins.tools.bom/bom-2.387.x -->
-			<dependency>
-				<groupId>io.jenkins.tools.bom</groupId>
-				<artifactId>bom-${jenkins.baseline}.x</artifactId>
-		                <version>3944.v1a_e4f8b_452db_</version>	
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
+      <dependency>
+        <groupId>io.jenkins.tools.bom</groupId>
+        <artifactId>bom-${jenkins.baseline}.x</artifactId>
+        <version>3944.v1a_e4f8b_452db_</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
 
-		</dependencies>
-	</dependencyManagement>
+    </dependencies>
+  </dependencyManagement>
 
-	<dependencies>
-		<!--  Java 11 / JAXB Stuff / Parse Nexus XML Interface -->
-		<dependency>
-			<groupId>io.jenkins.plugins</groupId>
-			<artifactId>jaxb</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>io.jenkins.plugins</groupId>
-			<artifactId>jersey2-api</artifactId>
-		</dependency>
+  <dependencies>
 
-		<!-- For Authentication Details -->
-		<dependency>
-			<groupId>org.jenkins-ci.plugins</groupId>
-			<artifactId>credentials</artifactId>
-		</dependency>
+    <!-- Necessary to parse JSON from Maven Central -->
+    <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+      <version>2.10.1</version>
+    </dependency>
+    <!--  Java 11 / JAXB Stuff / Parse Nexus XML Interface -->
+    <dependency>
+      <groupId>io.jenkins.plugins</groupId>
+      <artifactId>jaxb</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.jenkins.plugins</groupId>
+      <artifactId>jersey2-api</artifactId>
+    </dependency>
 
+    <!-- Basic Dependency to allow Extension of the ChoiceListProvider -->
+    <dependency>
+      <groupId>jp.ikedam.jenkins.plugins</groupId>
+      <artifactId>extensible-choice-parameter</artifactId>
+      <version>237.v51568f37b_78e</version>
+    </dependency>
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <version>3.27.6</version>
+    </dependency>
 
-		<!-- Basic Dependency to allow Extension of the ChoiceListProvider -->
-		<dependency>
-			<groupId>jp.ikedam.jenkins.plugins</groupId>
-			<artifactId>extensible-choice-parameter</artifactId>
-			<version>237.v51568f37b_78e</version>
-		</dependency>
+    <!-- For Authentication Details -->
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>credentials</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>jackson2-api</artifactId>
+    </dependency>
 
-		<!-- Necessary to parse the XML from Nexus Lucene Service -->
-		<dependency>
-			<groupId>org.sonatype.nexus.plugins</groupId>
-			<artifactId>nexus-indexer-lucene-model</artifactId>
-			<version>2.15.1-02</version>
-			<exclusions>
-				<exclusion> <!-- provided by jackson2-api plugin -->
-					<groupId>org.json</groupId>
-					<artifactId>json</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
+    <!-- Necessary to parse the XML from Nexus Lucene Service -->
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-indexer-lucene-model</artifactId>
+      <version>2.15.1-02</version>
+      <exclusions>
+        <exclusion>
+          <!-- provided by jackson2-api plugin -->
+          <groupId>org.json</groupId>
+          <artifactId>json</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
 
-		<!-- Necessary to parse JSON from Maven Central -->
-		<dependency>
-			<groupId>com.google.code.gson</groupId>
-			<artifactId>gson</artifactId>
-			<version>2.10.1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.jenkins-ci.plugins</groupId>
-			<artifactId>jackson2-api</artifactId>
-		</dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
 
-		<dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-core</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.assertj</groupId>
-			<artifactId>assertj-core</artifactId>
-			<version>3.27.6</version>
-		</dependency>
- </dependencies>
+  <repositories>
+    <repository>
+      <id>repo.jenkins-ci.org</id>
+      <url>https://repo.jenkins-ci.org/public/</url>
+    </repository>
+  </repositories>
 
-	<licenses>
-		<license>
-			<name>MIT License</name>
-			<url>http://opensource.org/licenses/MIT</url>
-		</license>
-	</licenses>
+  <pluginRepositories>
+    <pluginRepository>
+      <id>repo.jenkins-ci.org</id>
+      <url>https://repo.jenkins-ci.org/public/</url>
+    </pluginRepository>
+  </pluginRepositories>
 
-	<developers>
-		<developer>
-			<id>phreakadelle</id>
-			<name>Stephan Watermeyer</name>
-		</developer>
-	</developers>
-
-	<repositories>
-		<repository>
-			<id>repo.jenkins-ci.org</id>
-			<url>https://repo.jenkins-ci.org/public/</url>
-		</repository>
-	</repositories>
-
-	<pluginRepositories>
-		<pluginRepository>
-			<id>repo.jenkins-ci.org</id>
-			<url>https://repo.jenkins-ci.org/public/</url>
-		</pluginRepository>
-	</pluginRepositories>
-
-	 <build>
+  <build>
     <plugins>
       <plugin>
         <groupId>org.jenkins-ci.tools</groupId>
@@ -153,5 +150,4 @@
     </plugins>
   </build>
 
-	
 </project>
