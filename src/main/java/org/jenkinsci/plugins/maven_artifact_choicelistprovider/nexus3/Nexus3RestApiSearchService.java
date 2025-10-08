@@ -15,6 +15,8 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedHashMap;
 import org.apache.commons.lang.StringUtils;
+import org.jenkinsci.plugins.maven_artifact_choicelistprovider.AbstractRESTfulVersionReader;
+import org.jenkinsci.plugins.maven_artifact_choicelistprovider.IVersionReader2;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.RESTfulParameterBuilder;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.ValidAndInvalidClassifier;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.VersionReaderException;
@@ -23,9 +25,15 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class Nexus3RestApiSearchService extends Nexus3RestApiSearchServiceBase  {
+public class Nexus3RestApiSearchService extends AbstractRESTfulVersionReader implements IVersionReader2 {
 
     private static final Logger LOGGER = Logger.getLogger(Nexus3RestApiSearchService.class.getName());
+
+	public static final String PARAMETER_TOKEN = "continuationToken";
+
+	// https://help.sonatype.com/repomanager3/rest-and-integration-api/search-api#SearchAPI-SearchAssets
+	private static final String NEXUS3_ASSET_REST_API_ENDPOINT = "service/rest/v1/search";
+
 
     private String imagePrefix; 
 
@@ -38,10 +46,17 @@ public class Nexus3RestApiSearchService extends Nexus3RestApiSearchServiceBase  
         this.imagePrefix = pImagePrefix;
 	}
 
-	@Override
 	protected MultivaluedMap<String, String> createRequestParameters(String pRepository, String pGroup,
 			String pName, String token) {
 		return Nexus3RESTfulParameterBuilderForSearch.create(pRepository, pGroup, pName, token);
+	}
+
+	@Override
+	@Deprecated
+	public Set<String> callService(final String pRepositoryId, final String pGroup, final String pName,
+		final String pPackaging, final ValidAndInvalidClassifier pClassifier) {
+		final MultivaluedMap<String, String> requestParams = createRequestParameters(pRepositoryId, pGroup, pName, null);
+		return this.callService(requestParams, pClassifier);
 	}
 
     @Override
@@ -146,6 +161,16 @@ public class Nexus3RestApiSearchService extends Nexus3RestApiSearchServiceBase  
 		return retVal;
 	}
 
+	/**
+	 * Return the configured service endpoint in this repository.
+	 * 
+	 * @return the configured service endpoint in this repository.
+	 */
+	@Override
+	public String getRESTfulServiceEndpoint() {
+		return NEXUS3_ASSET_REST_API_ENDPOINT;
+	}
+
 }
 
 class Nexus3RESTfulParameterBuilderForSearch {
@@ -164,7 +189,7 @@ class Nexus3RESTfulParameterBuilderForSearch {
 
 
     public String getContinuationToken() {
-        return Nexus3RestApiSearchServiceBase.PARAMETER_TOKEN;
+        return Nexus3RestApiSearchService.PARAMETER_TOKEN;
     }
 
 	public String getSortOrder() {
@@ -199,7 +224,7 @@ class Nexus3RESTfulParameterBuilderForSearch {
         }
       
         if (!StringUtils.isEmpty(pToken)) {
-            requestParams.putSingle(Nexus3RestApiSearchServiceBase.PARAMETER_TOKEN, pToken);
+            requestParams.putSingle(Nexus3RestApiSearchService.PARAMETER_TOKEN, pToken);
         }
         
         requestParams.putSingle(PARAMETER_SORT, RESTfulParameterBuilder.DEFAULT_SORTORDER);

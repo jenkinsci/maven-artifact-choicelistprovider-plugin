@@ -78,7 +78,7 @@ class Nexus3RESTfulParameterBuilderForGenericArtifacts extends RESTfulParameterB
 
 	@Override
 	public String getContinuationToken() {
-		return Nexus3RestApiSearchServiceBase.PARAMETER_TOKEN;
+		return Nexus3RestApiSearchService.PARAMETER_TOKEN;
 	}
 
 	@Override

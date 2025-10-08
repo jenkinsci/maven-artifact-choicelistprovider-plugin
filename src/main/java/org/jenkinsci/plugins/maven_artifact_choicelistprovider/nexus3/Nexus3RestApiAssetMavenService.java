@@ -6,12 +6,11 @@ import java.util.stream.Collectors;
 
 import javax.ws.rs.core.MultivaluedMap;
 
-import org.jenkinsci.plugins.maven_artifact_choicelistprovider.IVersionReader2;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.RESTfulParameterBuilder;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.ValidAndInvalidClassifier;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.VersionReaderException;
 
-public class Nexus3RestApiAssetMavenService extends Nexus3RestApiAssetBase implements IVersionReader2 {
+public class Nexus3RestApiAssetMavenService extends Nexus3RestApiAssetBase {
 
 	private final RESTfulParameterBuilder mMapper;
 
@@ -82,7 +81,7 @@ class Nexus3RESTfulParameterBuilderForAssets extends RESTfulParameterBuilder {
 
     @Override
     public String getContinuationToken() {
-        return Nexus3RestApiSearchServiceBase.PARAMETER_TOKEN;
+        return Nexus3RestApiSearchService.PARAMETER_TOKEN;
     }
 
 	@Override

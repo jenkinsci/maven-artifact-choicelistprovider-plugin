@@ -54,7 +54,7 @@ abstract class Nexus3RestApiAssetBase extends AbstractRESTfulVersionReader imple
 			WebTarget theInstance = getInstance();
 
 			// Update the token in every iteration
-			pParams.putSingle(Nexus3RestApiSearchServiceBase.PARAMETER_TOKEN, token);
+			pParams.putSingle(Nexus3RestApiSearchService.PARAMETER_TOKEN, token);
 
 			for (Map.Entry<String, List<String>> entries : pParams.entrySet()) {
 				theInstance = theInstance.queryParam(entries.getKey(), entries.getValue().toArray());
