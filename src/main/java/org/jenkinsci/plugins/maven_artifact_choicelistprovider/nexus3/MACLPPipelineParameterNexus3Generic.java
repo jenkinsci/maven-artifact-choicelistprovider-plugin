@@ -14,40 +14,28 @@ import javax.ws.rs.core.MultivaluedMap;
 
 import hudson.Extension;
 
-public class MACLPPipelineParameterNexus3DockerImages extends MACLPChoiceParameterDefinitionBase {
+public class MACLPPipelineParameterNexus3Generic extends MACLPChoiceParameterDefinitionBase {
 
-    private String imageName;
+    private String assetName;
     private String group;
-    
-    private String imagePrefix;
 
     private static final Logger LOGGER = Logger.getLogger(MACLPPipelineParameterNexus3DockerImages.class.getName());
 
     @DataBoundConstructor
-    public MACLPPipelineParameterNexus3DockerImages(String name, String choices, String description, String url, String credentialsId, String repository,
-            String imageName, String imagePrefix, String group, boolean reverseOrder) {
+    public MACLPPipelineParameterNexus3Generic(String name, String choices, String description, String url, String credentialsId, String repository,
+            String assetName, String group, boolean reverseOrder) {
         super(name, new String[0], description, url, repository, credentialsId, reverseOrder);
-        this.group = group;
-        this.imageName = imageName;
-        this.imagePrefix = imagePrefix;
+       this.assetName = assetName;
+       this.group = group;
     }
 
-    public String getImagePrefix() {
-        return imagePrefix;
-    }
-
-    @DataBoundSetter
-    public void setImagePrefix(String imagePrefix) {
-        this.imagePrefix = imagePrefix;
-    }
-
-    public String getImageName() {
-        return imageName;
+    public String getAssetName() {
+        return assetName;
     }
 
     @DataBoundSetter
-    public void setImageName(String imageName) {
-        this.imageName = imageName;
+    public void setAssetName(String assetName) {
+        this.assetName = assetName;
     }
 
     public String getGroup() {
@@ -60,39 +48,40 @@ public class MACLPPipelineParameterNexus3DockerImages extends MACLPChoiceParamet
     }
 
     @Extension
-    @Symbol("nexus3DockerImage")
+    @Symbol("nexus3Generic")
     public static final class DescriptorImpl extends ParameterDescriptor {
 
         @Override
         public final String getDisplayName() {
-            return "Nexus3 Docker Image";
+            return "Nexus3 Generic artifact";
         }
     }
     
     @Override
     protected IVersionReader2 createServiceInstance(String pUrl) {
         LOGGER.fine("createServiceInstance: "  + pUrl);
-        return new Nexus3RestApiSearchService(pUrl, getImagePrefix());
+        return new Nexus3RestApiAssetGenericService(pUrl);
     }
 
     @Override
     protected MultivaluedMap<String, String> createParameterList() {
         LOGGER.fine("createParameterList");
-        return Nexus3RESTfulParameterBuilderForSearch.create(getRepository(), getGroup(), getImageName());
+        Nexus3RESTfulParameterBuilderForGenericArtifacts mapper = new Nexus3RESTfulParameterBuilderForGenericArtifacts();
+        return mapper.create(getRepository(), getGroup(), getAssetName(), null, null);
     }
 
      @Override
     public int hashCode() {
-        if (MACLPPipelineParameterNexus3DockerImages.class != getClass()) {
+        if (MACLPPipelineParameterNexus3Generic.class != getClass()) {
             return super.hashCode();
         }
-        return Objects.hash(getName(), getDescription(), group, imageName);
+        return Objects.hash(getName(), getDescription(), group, assetName);
     }
 
     @Override
     @SuppressFBWarnings(value = "EQ_GETCLASS_AND_CLASS_CONSTANT", justification = "ParameterDefinitionTest tests that subclasses are not equal to their parent classes, so the behavior appears to be intentional")
     public boolean equals(Object obj) {
-        if (MACLPPipelineParameterNexus3DockerImages.class != getClass())
+        if (MACLPPipelineParameterNexus3Generic.class != getClass())
             return super.equals(obj);
         if (this == obj)
             return true;
@@ -100,12 +89,12 @@ public class MACLPPipelineParameterNexus3DockerImages extends MACLPChoiceParamet
             return false;
         if (getClass() != obj.getClass())
             return false;
-        MACLPPipelineParameterNexus3DockerImages other = (MACLPPipelineParameterNexus3DockerImages) obj;
+        MACLPPipelineParameterNexus3Generic other = (MACLPPipelineParameterNexus3Generic) obj;
         if (!Objects.equals(getName(), other.getName()))
             return false;
         if (!Objects.equals(getDescription(), other.getDescription()))
             return false;
-        if (!Objects.equals(imageName, other.getImageName()))
+        if (!Objects.equals(assetName, other.getAssetName()))
                 return false;
         return Objects.equals(group, other.getGroup());
     }

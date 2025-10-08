@@ -77,7 +77,7 @@ public abstract class RESTfulParameterBuilder {
         if (!StringUtils.isEmpty(pPackaging) && !PACKAGING_ALL.equals(pPackaging)) {
             requestParams.putSingle(getPackaging(), pPackaging);
         }
-        if (pClassifier != null && getClassifier() != null) {
+        if (pClassifier != null && !StringUtils.isEmpty(getClassifier())) {
             boolean retrieveAllClassifiers = false;
             
             // FIXME: There is of course a better way how to do it...

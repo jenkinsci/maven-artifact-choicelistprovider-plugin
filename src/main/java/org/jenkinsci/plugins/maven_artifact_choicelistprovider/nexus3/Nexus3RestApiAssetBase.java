@@ -14,40 +14,39 @@ import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.AbstractRESTfulVersionReader;
-import org.jenkinsci.plugins.maven_artifact_choicelistprovider.IVersionReaderSimple;
+import org.jenkinsci.plugins.maven_artifact_choicelistprovider.IVersionReader2;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.ValidAndInvalidClassifier;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-abstract class AbstractNexus3RestApiSearchService extends AbstractRESTfulVersionReader implements IVersionReaderSimple {
-
-	public static final String PARAMETER_TOKEN = "continuationToken";
+abstract class Nexus3RestApiAssetBase extends AbstractRESTfulVersionReader implements IVersionReader2 {
 
 	// https://help.sonatype.com/repomanager3/rest-and-integration-api/search-api#SearchAPI-SearchAssets
-	private static final String NEXUS3_ASSET_REST_API_ENDPOINT = "service/rest/v1/search";
+	private static final String NEXUS3_REST_API_ASSET_ENDPOINT = "service/rest/v1/search/assets";
 
-	private static final Logger LOGGER = Logger.getLogger(AbstractNexus3RestApiAssetService.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(Nexus3RestApiAssetBase.class.getName());
 
-	public AbstractNexus3RestApiSearchService(String pURL) {
+	public Nexus3RestApiAssetBase(String pURL) {
 		super(pURL);
 	}
 
 	@Override
 	@Deprecated
-	public Set<String> callService(final String pRepositoryId, final String pGroup, final String pName,
+	public Set<String> callService(final String pRepositoryId, final String pGroupId, final String pArtifactId,
 		final String pPackaging, final ValidAndInvalidClassifier pClassifier) {
-		final MultivaluedMap<String, String> requestParams = createRequestParameters(pRepositoryId, pGroup, pName, null);
+
+		final MultivaluedMap<String, String> requestParams = createRequestParameters(pRepositoryId, pGroupId, pArtifactId, pPackaging, pClassifier, null);
 		return this.callService(requestParams, pClassifier);
 	}
 	
-
 	public Set<String> callService(MultivaluedMap<String, String> pParams, final ValidAndInvalidClassifier pClassifier) {
 
 		// init empty
 		Set<String> retVal = new LinkedHashSet<>(); // retain order of insertion
 		String token = null;
+
 
 		final ObjectMapper mapper = new ObjectMapper();
 
@@ -55,7 +54,7 @@ abstract class AbstractNexus3RestApiSearchService extends AbstractRESTfulVersion
 			WebTarget theInstance = getInstance();
 
 			// Update the token in every iteration
-			pParams.putSingle(PARAMETER_TOKEN, token);
+			pParams.putSingle(Nexus3RestApiSearchServiceBase.PARAMETER_TOKEN, token);
 
 			for (Map.Entry<String, List<String>> entries : pParams.entrySet()) {
 				theInstance = theInstance.queryParam(entries.getKey(), entries.getValue().toArray());
@@ -67,12 +66,8 @@ abstract class AbstractNexus3RestApiSearchService extends AbstractRESTfulVersion
 
 			final String plainResult = theInstance.request(MediaType.APPLICATION_JSON).get(String.class);
 
-			if (LOGGER.isLoggable(Level.FINEST)) {
-				LOGGER.info(plainResult);
-			}
-
 			try {
-				final Nexus3RestResponseSearch parsedJsonResult = mapper.readValue(plainResult, Nexus3RestResponseSearch.class);
+				final Nexus3RestResponseAsset parsedJsonResult = mapper.readValue(plainResult, Nexus3RestResponseAsset.class);
 
 				if (parsedJsonResult == null) {
 					LOGGER.info("response from Nexus3 is NULL.");
@@ -84,7 +79,7 @@ abstract class AbstractNexus3RestApiSearchService extends AbstractRESTfulVersion
 					// So we get the token from the request which should be null.
 					token = parsedJsonResult.getContinuationToken();
 				} else {
-					Set<String> currentResult = parseAndFilterResponse(parsedJsonResult);
+					Set<String> currentResult = parseAndFilterResponse(parsedJsonResult, pClassifier);
 					retVal.addAll(currentResult);
 
 					// control the loop and maybe query again
@@ -104,7 +99,8 @@ abstract class AbstractNexus3RestApiSearchService extends AbstractRESTfulVersion
 		return retVal;
 	}
 
-	protected abstract MultivaluedMap<String, String> createRequestParameters(String pRepositoryId, String pGroup, String pName, String token);
+	protected abstract MultivaluedMap<String, String> createRequestParameters(String pRepositoryId, String pGroupId,
+			String pArtifactId, String pPackaging, ValidAndInvalidClassifier pClassifier, String token);
 
 	/**
 	 * Parses the JSON response from Nexus3 and creates a list of links where the
@@ -115,17 +111,27 @@ abstract class AbstractNexus3RestApiSearchService extends AbstractRESTfulVersion
 	 * @return a unique list of URLs that are matching the search criteria, sorted
 	 *         by the order of the Nexus3 service.
 	 */
-	Set<String> parseAndFilterResponse(final Nexus3RestResponseSearch pJsonResult) {
+	Set<String> parseAndFilterResponse(final Nexus3RestResponseAsset pJsonResult, final ValidAndInvalidClassifier pClassifier) {
 		// Use a Map instead of a List to filter duplicated entries and also linked to
 		// keep the order of response
 		final Set<String> retVal = new LinkedHashSet<>();
 
+		boolean mustApplyInvalidFilter = pClassifier != null && pClassifier.getInvalid().isEmpty() == false;
 		boolean addItemToResult = true;
 		
-		for (final SearchItem current : pJsonResult.getItems()) {
+		for (final AssetItem current : pJsonResult.getItems()) {
+		    if(mustApplyInvalidFilter) {
+		        addItemToResult = true;
+		        for(final String currentInvalidClassifier : pClassifier.getInvalid()) {
+		            // Example: "https://xxx/repository/r/com/a/b/c/log-uploader/1.0.56/log-uploader-1.0.56-javadoc.jar",
+		            if(current.getDownloadUrl().contains("-" + currentInvalidClassifier+ ".")) {
+		                addItemToResult = false;
+		            }
+		        }
+		    }
 			
 		    if(addItemToResult) {
-		        retVal.add(current.getName() + ":" + current.getVersion());
+		        retVal.add(current.getDownloadUrl());
 		    }
 		}
 		return retVal;
@@ -138,7 +144,7 @@ abstract class AbstractNexus3RestApiSearchService extends AbstractRESTfulVersion
 	 */
 	@Override
 	public String getRESTfulServiceEndpoint() {
-		return NEXUS3_ASSET_REST_API_ENDPOINT;
+		return NEXUS3_REST_API_ASSET_ENDPOINT;
 	}
 
 }

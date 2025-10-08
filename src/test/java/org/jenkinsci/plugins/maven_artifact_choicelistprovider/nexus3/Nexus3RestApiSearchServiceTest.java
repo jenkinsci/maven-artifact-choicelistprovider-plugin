@@ -23,7 +23,7 @@ public class Nexus3RestApiSearchServiceTest {
 
     @Test
     public void testCallService() {
-        Nexus3RestApiAssetService service = new TestService("http://nexus");
+        Nexus3RestApiAssetMavenService service = new TestService("http://nexus");
         service.callService("repositoryId", "groupId", "artifactId", "tar.gz", ValidAndInvalidClassifier.getDefault());
 
         assertThat(instances).hasSize(2);
@@ -33,7 +33,7 @@ public class Nexus3RestApiSearchServiceTest {
 		//verify(instances.get(1), times(6)).queryParam(anyString(), anyString());
     }
 
-    private class TestService extends Nexus3RestApiAssetService {
+    private class TestService extends Nexus3RestApiAssetMavenService {
 
         public TestService(String pURL) {
             super(pURL);

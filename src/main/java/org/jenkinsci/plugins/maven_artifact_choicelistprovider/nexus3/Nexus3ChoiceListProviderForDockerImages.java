@@ -8,11 +8,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.inject.Inject;
+import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.AbstractMavenArtifactChoiceListProvider;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.IVersionReader;
-import org.jenkinsci.plugins.maven_artifact_choicelistprovider.IVersionReaderSimple;
+import org.jenkinsci.plugins.maven_artifact_choicelistprovider.IVersionReader2;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.MavenArtifactChoiceListProviderUtils;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.VersionReaderException;
 import org.kohsuke.stapler.AncestorInPath;
@@ -81,7 +82,7 @@ public class Nexus3ChoiceListProviderForDockerImages extends AbstractMavenArtifa
 			// SECURITY-1022
 			pItem.checkPermission(Job.CONFIGURE);
 
-			final IVersionReaderSimple service = new Nexus3RestApiSearchService(url);
+			final IVersionReader2 service = new Nexus3RestApiSearchService(url);
 			
 			// If configured, set User Credentials
 			final UsernamePasswordCredentialsImpl c = getCredentials(credentialsId, pItem);
@@ -106,11 +107,12 @@ public class Nexus3ChoiceListProviderForDockerImages extends AbstractMavenArtifa
 
 		}		
 
-		private Map<String, String> readURL(final IVersionReaderSimple pInstance, final String pRepository,
+		private Map<String, String> readURL(final IVersionReader2 pInstance, final String pRepository,
 				final String pName, final boolean pReverseOrder) {
 			Map<String, String> retVal = new LinkedHashMap<String, String>();
 			try {
-				final List<String> filteredChoices = pInstance.retrieveVersions(pRepository, "", pName);
+				MultivaluedMap<String, String> params = Nexus3RESTfulParameterBuilderForSearch.create(pRepository, "", pName);
+				final List<String> filteredChoices = pInstance.retrieveVersions(params);
 				
 				if (pReverseOrder) {
 					Collections.reverse(filteredChoices);

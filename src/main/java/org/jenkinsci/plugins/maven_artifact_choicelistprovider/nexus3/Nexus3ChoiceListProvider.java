@@ -70,7 +70,7 @@ public class Nexus3ChoiceListProvider extends AbstractMavenArtifactChoiceListPro
             // SECURITY-1022
             pItem.checkPermission(Job.CONFIGURE);
 
-            final IVersionReader service = new Nexus3RestApiAssetService(url);
+            final IVersionReader service = new Nexus3RestApiAssetMavenService(url);
 
 			// If configured, set User Credentials
             final UsernamePasswordCredentialsImpl c = getCredentials(credentialsId, pItem);
@@ -109,7 +109,7 @@ public class Nexus3ChoiceListProvider extends AbstractMavenArtifactChoiceListPro
     @Override
     public IVersionReader createServiceInstance(Item item) {
         // init the service
-        final IVersionReader retVal = new Nexus3RestApiAssetService(url);
+        final IVersionReader retVal = new Nexus3RestApiAssetMavenService(url);
 		final UsernamePasswordCredentialsImpl c = getCredentials(getCredentialsId(), item);
         if (c != null) {
             retVal.setCredentials(c.getUsername(), c.getPassword().getPlainText());

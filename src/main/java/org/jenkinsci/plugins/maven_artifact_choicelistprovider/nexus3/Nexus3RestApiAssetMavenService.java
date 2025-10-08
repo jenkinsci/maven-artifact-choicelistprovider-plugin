@@ -11,13 +11,13 @@ import org.jenkinsci.plugins.maven_artifact_choicelistprovider.RESTfulParameterB
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.ValidAndInvalidClassifier;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.VersionReaderException;
 
-public class Nexus3RestApiAssetService extends AbstractNexus3RestApiAssetService implements IVersionReader2 {
+public class Nexus3RestApiAssetMavenService extends Nexus3RestApiAssetBase implements IVersionReader2 {
 
 	private final RESTfulParameterBuilder mMapper;
 
-	public Nexus3RestApiAssetService(String pURL) {
+	public Nexus3RestApiAssetMavenService(String pURL) {
 		super(pURL);
-		mMapper = new Nexus3RESTfulParameterBuilderForMaven2Artifacts();
+		mMapper = new Nexus3RESTfulParameterBuilderForAssets();
 	}
 
 	@Override
@@ -39,7 +39,7 @@ public class Nexus3RestApiAssetService extends AbstractNexus3RestApiAssetService
 
 }
 
-class Nexus3RESTfulParameterBuilderForMaven2Artifacts extends RESTfulParameterBuilder {
+class Nexus3RESTfulParameterBuilderForAssets extends RESTfulParameterBuilder {
 
     public static final String PARAMETER_REPOSITORYID = "repository";
 
@@ -82,7 +82,7 @@ class Nexus3RESTfulParameterBuilderForMaven2Artifacts extends RESTfulParameterBu
 
     @Override
     public String getContinuationToken() {
-        return AbstractNexus3RestApiSearchService.PARAMETER_TOKEN;
+        return Nexus3RestApiSearchServiceBase.PARAMETER_TOKEN;
     }
 
 	@Override

@@ -33,16 +33,17 @@ public abstract class MACLPChoiceParameterDefinitionBase extends ChoiceParameter
     private String url;
     private String repository;
     private String credentialsId;
+    private boolean reverseOrder;
 
     private static final Logger LOGGER = Logger.getLogger(MACLPChoiceParameterDefinitionBase.class.getName());
 
     public MACLPChoiceParameterDefinitionBase(String name, String[] choices, String description, String url,
-            String repository, String credentialsId) {
+            String repository, String credentialsId, boolean reverseOrder) {
         super(name, choices, description);
         this.url = url;
         this.repository = repository;
         this.credentialsId = credentialsId;
-
+        this.reverseOrder = reverseOrder;
     }
 
     public String getUrl() {
@@ -114,6 +115,11 @@ public abstract class MACLPChoiceParameterDefinitionBase extends ChoiceParameter
 
             LOGGER.log(Level.FINE, "call the service");
             retVal = serviceInstances.retrieveVersions(params);
+
+            if (reverseOrder) {
+                LOGGER.log(Level.FINE, "reverse order");
+                Collections.reverse(retVal);
+            }
         } catch (Exception e) {
             LOGGER.log(Level.WARNING, e.getMessage(), e);
         }
