@@ -1,12 +1,12 @@
 package org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.ValidAndInvalidClassifier;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.VersionReaderException;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 /**
  *
@@ -17,30 +17,18 @@ import org.jenkinsci.plugins.maven_artifact_choicelistprovider.VersionReaderExce
  *
  * @author stephan.watermeyer, Diebold Nixdorf
  */
-public class NexusLuceneSearchServiceTest {
+class NexusLuceneSearchServiceTest {
 
-    public static void main(String args[]) throws VersionReaderException {
-        testWithNull();
-        testWithoutExplicitQualifier();
-        testWithQualifier();
-        testWithNegativeQualifier();
-        testWithNotExistentQualifier();
-    }
-
-    public static void testWithNull() throws VersionReaderException {
+    @Test
+    void testWithNull() {
         NexusLuceneSearchService s = new NexusLuceneSearchService(null);
 
-        try {
-            s.retrieveVersions(null, null, null, null, null);
-            fail("shouldn work");
-        } catch (VersionReaderException e) {
-            // expected
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
+        assertThrows(VersionReaderException.class, () -> s.retrieveVersions(null, null, null, null, null));
     }
 
-    public static void testWithoutExplicitQualifier() throws VersionReaderException {
+    @Test
+    @Disabled("FIXME: Underlying implementation seems broken")
+    void testWithoutExplicitQualifier() throws Exception {
         NexusLuceneSearchService s = new NexusLuceneSearchService("https://artifacts.alfresco.com/nexus/");
         List<String> retrieveVersions =
                 s.retrieveVersions("", "org.apache.tomcat", "tomcat", "", ValidAndInvalidClassifier.getDefault());
@@ -49,7 +37,9 @@ public class NexusLuceneSearchServiceTest {
         }
     }
 
-    public static void testWithQualifier() throws VersionReaderException {
+    @Test
+    @Disabled("FIXME: Underlying implementation seems broken")
+    void testWithQualifier() throws Exception {
         NexusLuceneSearchService s = new NexusLuceneSearchService("https://artifacts.alfresco.com/nexus/");
         List<String> retrieveVersions = s.retrieveVersions(
                 "", "org.apache.tomcat", "tomcat", "tgz", ValidAndInvalidClassifier.fromString("linux"));
@@ -60,7 +50,9 @@ public class NexusLuceneSearchServiceTest {
         }
     }
 
-    public static void testWithNegativeQualifier() throws VersionReaderException {
+    @Test
+    @Disabled("FIXME: Underlying implementation seems broken")
+    void testWithNegativeQualifier() throws Exception {
         NexusLuceneSearchService s = new NexusLuceneSearchService("https://artifacts.alfresco.com/nexus/");
         List<String> retrieveVersions = s.retrieveVersions(
                 "", "org.apache.tomcat", "tomcat", "tgz", ValidAndInvalidClassifier.fromString("!linux,!osx"));
@@ -71,13 +63,15 @@ public class NexusLuceneSearchServiceTest {
         }
     }
 
-    public static void testWithNotExistentQualifier() throws VersionReaderException {
+    @Test
+    @Disabled("FIXME: Underlying implementation seems broken")
+    void testWithNotExistentQualifier() throws Exception {
         NexusLuceneSearchService s = new NexusLuceneSearchService("https://artifacts.alfresco.com/nexus/");
         List<String> retrieveVersions = s.retrieveVersions(
                 "", "org.apache.tomcat", "tomcat", "tgz", ValidAndInvalidClassifier.fromString("foobar"));
         for (String current : retrieveVersions) {
             System.out.println(current);
         }
-        assertTrue("should not return any results", retrieveVersions.isEmpty());
+        assertTrue(retrieveVersions.isEmpty(), "should not return any results");
     }
 }

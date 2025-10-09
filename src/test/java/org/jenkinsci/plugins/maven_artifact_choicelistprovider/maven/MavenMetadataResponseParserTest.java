@@ -1,38 +1,31 @@
 package org.jenkinsci.plugins.maven_artifact_choicelistprovider.maven;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.List;
 import org.apache.commons.io.IOUtils;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.VersionReaderException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class MavenMetadataResponseParserTest {
+class MavenMetadataResponseParserTest {
 
     @Test
-    public void test() throws IOException, VersionReaderException {
+    void test() throws Exception {
         InputStream resourceAsStream = this.getClass().getClassLoader().getResourceAsStream("maven-metadata.xml");
         assertNotNull(resourceAsStream);
         String mockedResponse = IOUtils.toString(resourceAsStream, Charset.forName("UTF-8"));
 
         MavenMetadataSearchService service = new MavenMetadataSearchService("");
-        try {
-            List<String> versions = service.parseVersions(mockedResponse);
-            assertEquals("Parsing couldn't find all versions", 144, versions.size());
-            assertEquals("Parsing didn't preserve order", "200.0.0-ASSA-SNAPSHOT", versions.get(versions.size() - 1));
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail(e.getMessage());
-        }
+        List<String> versions = service.parseVersions(mockedResponse);
+
+        assertEquals(144, versions.size(), "Parsing couldn't find all versions");
+        assertEquals("200.0.0-ASSA-SNAPSHOT", versions.get(versions.size() - 1), "Parsing didn't preserve order");
     }
 
     @Test
-    public void testEmpty() throws IOException, VersionReaderException {
+    void testEmpty() throws Exception {
         InputStream resourceAsStream = this.getClass().getClassLoader().getResourceAsStream("maven-metadata-empty.xml");
         assertNotNull(resourceAsStream);
         String mockedResponse = IOUtils.toString(resourceAsStream, Charset.forName("UTF-8"));
@@ -40,20 +33,17 @@ public class MavenMetadataResponseParserTest {
         MavenMetadataSearchService service = new MavenMetadataSearchService("");
         List<String> versions = service.parseVersions(mockedResponse);
 
-        assertEquals("Parsing should find 0 version", 0, versions.size());
+        assertEquals(0, versions.size(), "Parsing should find 0 version");
     }
 
     @Test
-    public void testInvalidXML() throws IOException, VersionReaderException {
+    void testInvalidXML() throws Exception {
         InputStream resourceAsStream = this.getClass().getClassLoader().getResourceAsStream("maven-metadata.notxml");
         assertNotNull(resourceAsStream);
         String mockedResponse = IOUtils.toString(resourceAsStream, Charset.forName("UTF-8"));
-        try {
-            MavenMetadataSearchService service = new MavenMetadataSearchService("");
-            service.parseVersions(mockedResponse);
-            fail("Expected a stack of RuntimeException(SAXException) exception");
-        } catch (VersionReaderException e) {
-            // happy path
-        }
+
+        MavenMetadataSearchService service = new MavenMetadataSearchService("");
+
+        assertThrows(VersionReaderException.class, () -> service.parseVersions(mockedResponse));
     }
 }
