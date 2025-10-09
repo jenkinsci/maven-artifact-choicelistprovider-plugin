@@ -1,18 +1,19 @@
 package org.jenkinsci.plugins.maven_artifact_choicelistprovider.central;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.InputStream;
-import org.junit.Test;
+import java.util.Scanner;
+import org.junit.jupiter.api.Test;
 
-public class MavenCentralResponseParserTest {
+class MavenCentralResponseParserTest {
 
     @Test
-    public void testSth() {
+    void testSth() {
         InputStream resourceAsStream = this.getClass().getClassLoader().getResourceAsStream("response.json");
         assertNotNull(resourceAsStream);
 
-        java.util.Scanner s = new java.util.Scanner(resourceAsStream);
+        Scanner s = new Scanner(resourceAsStream);
         s.useDelimiter("\\A");
         String in = s.hasNext() ? s.next() : "";
         s.close();

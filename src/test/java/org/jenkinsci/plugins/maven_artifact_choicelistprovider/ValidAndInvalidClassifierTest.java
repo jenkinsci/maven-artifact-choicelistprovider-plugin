@@ -1,58 +1,59 @@
 package org.jenkinsci.plugins.maven_artifact_choicelistprovider;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class ValidAndInvalidClassifierTest {
+class ValidAndInvalidClassifierTest {
 
     @Test
-    public void testOnlyOneInvalid() {
+    void testOnlyOneInvalid() {
         ValidAndInvalidClassifier c = ValidAndInvalidClassifier.fromString("!preinstalled");
-        assertFalse("must be invalid", c.isValid("preinstalled"));
-        assertTrue("must be valid", c.isValid("foo"));
+        assertFalse(c.isValid("preinstalled"), "must be invalid");
+        assertTrue(c.isValid("foo"), "must be valid");
     }
 
     @Test
-    public void testOnlyOneValid() {
+    void testOnlyOneValid() {
         ValidAndInvalidClassifier c = ValidAndInvalidClassifier.fromString("preinstalled");
-        assertTrue("must be valid", c.isValid("preinstalled"));
-        assertFalse("must be invalid", c.isValid("foo"));
+        assertTrue(c.isValid("preinstalled"), "must be valid");
+        assertFalse(c.isValid("foo"), "must be invalid");
     }
 
     @Test
-    public void testMultipleInvalid() {
+    void testMultipleInvalid() {
         ValidAndInvalidClassifier c = ValidAndInvalidClassifier.fromString("!preinstalled,!source");
-        assertFalse("must be invalid", c.isValid("preinstalled"));
-        assertFalse("must be invalid", c.isValid("source"));
-        assertTrue("must be valid", c.isValid("foo"));
+        assertFalse(c.isValid("preinstalled"), "must be invalid");
+        assertFalse(c.isValid("source"), "must be invalid");
+        assertTrue(c.isValid("foo"), "must be valid");
     }
 
     @Test
-    public void testMultipleValid() {
+    void testMultipleValid() {
         ValidAndInvalidClassifier c = ValidAndInvalidClassifier.fromString("preinstalled,source");
-        assertTrue("must be invalid", c.isValid("preinstalled"));
-        assertTrue("must be invalid", c.isValid("source"));
-        assertFalse("must be valid", c.isValid("foo"));
+        assertTrue(c.isValid("preinstalled"), "must be invalid");
+        assertTrue(c.isValid("source"), "must be invalid");
+        assertFalse(c.isValid("foo"), "must be valid");
     }
 
     @Test
-    public void testWithNull() {
+    void testWithNull() {
         ValidAndInvalidClassifier c = ValidAndInvalidClassifier.fromString("");
-        assertTrue("must be valid by default", c.isValid(null));
-        assertTrue("must be valid by default", c.isValid(""));
-        assertTrue("must be valid by default", c.isValid("foo"));
+        assertTrue(c.isValid(null), "must be valid by default");
+        assertTrue(c.isValid(""), "must be valid by default");
+        assertTrue(c.isValid("foo"), "must be valid by default");
     }
 
     @Test
-    public void testInit() {
+    void testInit() {
         ValidAndInvalidClassifier c = ValidAndInvalidClassifier.fromString(",,,");
-        assertTrue("must be valid by default", c.isValid("foo"));
+        assertTrue(c.isValid("foo"), "must be valid by default");
     }
 
     @Test
-    public void testToString() {
+    void testToString() {
         ValidAndInvalidClassifier c = ValidAndInvalidClassifier.fromString("!preinstalled");
-        System.out.println(c.toString());
+        System.out.println(c);
     }
 }

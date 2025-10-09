@@ -43,7 +43,7 @@ public abstract class AbstractMavenArtifactDescriptorImpl extends Descriptor<Cho
 
     public FormValidation doCheckClassifier(@QueryParameter String classifier) {
         if (StringUtils.isBlank(classifier)) {
-            FormValidation.ok("OK, will not filter for any classifier");
+            return FormValidation.ok("OK, will not filter for any classifier");
         }
         return FormValidation.ok();
     }

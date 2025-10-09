@@ -1,12 +1,14 @@
 package org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus;
 
-import junit.framework.TestCase;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class DirectArtifactURLBuilderTest extends TestCase {
+import org.junit.jupiter.api.Test;
+
+class DirectArtifactURLBuilderTest {
 
     @Test
-    public void testWithEndingSlash() {
+    void testWithEndingSlash() {
         DirectArtifactURLBuilder builder = new DirectArtifactURLBuilder();
         builder.setNexusURL("http://foo.com/bar");
 
@@ -19,7 +21,7 @@ public class DirectArtifactURLBuilderTest extends TestCase {
     }
 
     @Test
-    public void testWithClassifierDash() {
+    void testWithClassifierDash() {
         DirectArtifactURLBuilder builder = new DirectArtifactURLBuilder();
         builder.setNexusURL("http://repo1.maven.org/maven2/");
         builder.setArtifactId("commons-lang3");
