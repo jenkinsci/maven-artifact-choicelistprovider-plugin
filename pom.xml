@@ -35,7 +35,7 @@
   <scm>
     <connection>scm:git:git@github.com:jenkinsci/maven-artifact-choicelistprovider-plugin.git</connection>
     <developerConnection>scm:git:git@github.com:jenkinsci/maven-artifact-choicelistprovider-plugin.git</developerConnection>
-    <tag>HEAD</tag>
+    <tag>maven-artifact-choicelistprovider-1.19</tag>
     <url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
   </scm>
 
