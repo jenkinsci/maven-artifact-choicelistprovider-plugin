@@ -1,7 +1,9 @@
 # MavenArtifact ChoiceListProvider
 [![Build Status](https://ci.jenkins.io/job/Plugins/job/maven-artifact-choicelistprovider-plugin/job/master/badge/icon)](https://ci.jenkins.io/job/Plugins/job/maven-artifact-choicelistprovider-plugin/job/master)
+[![Coverage](https://ci.jenkins.io/job/Plugins/job/aven-artifact-choicelistprovider-plugin/job/master/badge/icon?status=${instructionCoverage}&subject=coverage&color=${colorInstructionCoverage})](https://ci.jenkins.io/job/Plugins/job/aven-artifact-choicelistprovider-plugin/job/master/coverage)
 [![Contributors](https://img.shields.io/github/contributors/jenkinsci/maven-artifact-choicelistprovider-plugin.svg)](https://github.com/jenkinsci/maven-artifact-choicelistprovider-plugin/graphs/contributors)
 [![Jenkins Plugin](https://img.shields.io/jenkins/plugin/v/maven-artifact-choicelistprovider.svg)](https://plugins.jenkins.io/maven-artifact-choicelistprovider)
+[![GitHub release](https://img.shields.io/github/release/jenkinsci/maven-artifact-choicelistprovider.svg?label=changelog)](https://github.com/jenkinsci/maven-artifact-choicelistprovider/releases/latest)
 [![Jenkins Plugin Installs](https://img.shields.io/jenkins/plugin/i/maven-artifact-choicelistprovider.svg?color=blue)](https://plugins.jenkins.io/maven-artifact-choicelistprovider)
 
 ## What does this  this?
@@ -16,6 +18,41 @@ We are using this plugin to let our QA department choose between the various ava
 
 ## Configuration Example
 ![Alt text](/src/site/resources/project-config-1.jpg?raw=true "Example Project Configuration")
+
+## Pipeline Example
+### Declarative Pipeline
+```
+pipeline {
+    agent any
+    
+    parameters {
+        nexus3DockerImage(name: 'theDockerImageWithCustomPrefix', url: "https://repo.company.com", imagePrefix: "docker-dev-hosted.repo.company.com/", repository: "ps-docker-dev-hosted", group: "", imageName: 'dn-ps-nagios', credentialsId: "my-credential-id", reverseOrder: true)
+        
+        nexus3DockerImage(name: 'theDockerImageNoPrefix', url: "https://repo.company.com", imagePrefix: "", repository: "ps-docker-dev-hosted", group: "", imageName: 'dn-ps-nagios', credentialsId: "my-credential-id", reverseOrder: true)
+        
+        nexus3Generic(name: 'theGenericArtifact', url: "https://repo.company.com", repository: "ps-docker-dev-hosted", assetName: 'dn-ps-nagios', credentialsId: "my-credential-id")
+        
+        nexus3Maven(name: 'theMavenArtifact', url: "https://repo.company.com", repository: "maven-central-ext-proxy", groupId: "org.apache.logging.log4j", artifactId: 'log4j-core', packaging: 'jar', credentialsId: "my-credential-id")
+    }
+    
+    stages {
+        stage("Sample") {
+            steps {
+                echo "$theDockerImageWithCustomPrefix"
+                echo "$theDockerImageNoPrefix"
+                echo "$theGenericArtifact"
+                echo "$theMavenArtifact"
+            }
+        }
+    }
+}
+  ```
+
+### Declarative Pipeline in UI
+![Alt text](/src/site/resources/MACLPipelineSample1.png?raw=true "Example Pipeline Configuration UI")
+
+### Declarative Pipeline Console Output
+![Alt text](/src/site/resources/MACLPipelineSample2.png?raw=true "Example Pipeline Configuration Console")
 
 # Known Issues
 ## Nexus Snapshots
