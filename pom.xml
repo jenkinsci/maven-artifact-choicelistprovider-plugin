@@ -10,7 +10,7 @@
   </parent>
 
   <artifactId>maven-artifact-choicelistprovider</artifactId>
-  <version>${revision}${changelist}</version>
+  <version>${changelist}</version>
   <packaging>hpi</packaging>
 
   <name>Maven Artifact ChoiceListProvider (Nexus)</name>
@@ -40,8 +40,7 @@
   </scm>
 
   <properties>
-    <revision>1.23</revision>
-    <changelist>-SNAPSHOT</changelist>
+    <changelist>999999-SNAPSHOT</changelist>
     <!-- https://www.jenkins.io/doc/developer/plugin-development/choosing-jenkins-baseline/ -->
     <jenkins.baseline>2.479</jenkins.baseline>
     <jenkins.version>${jenkins.baseline}.1</jenkins.version>
