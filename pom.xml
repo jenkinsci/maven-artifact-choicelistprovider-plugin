@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>plugin</artifactId>
-    <version>5.7</version>
+    <version>5.28</version>
     <relativePath />
   </parent>
 
@@ -43,7 +43,7 @@
     <changelist>999999-SNAPSHOT</changelist>
     <!-- https://www.jenkins.io/doc/developer/plugin-development/choosing-jenkins-baseline/ -->
     <jenkins.baseline>2.479</jenkins.baseline>
-    <jenkins.version>${jenkins.baseline}.1</jenkins.version>
+    <jenkins.version>${jenkins.baseline}.3</jenkins.version>
     <gitHubRepo>jenkinsci/${project.artifactId}-plugin</gitHubRepo>
     <spotless.check.skip>false</spotless.check.skip>
     <ban-junit4-imports.skip>false</ban-junit4-imports.skip>
@@ -56,7 +56,7 @@
       <dependency>
         <groupId>io.jenkins.tools.bom</groupId>
         <artifactId>bom-${jenkins.baseline}.x</artifactId>
-        <version>3944.v1a_e4f8b_452db_</version>
+        <version>5054.v620b_5d2b_d5e6</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -86,8 +86,9 @@
     <dependency>
       <groupId>jp.ikedam.jenkins.plugins</groupId>
       <artifactId>extensible-choice-parameter</artifactId>
-      <version>237.v51568f37b_78e</version>
+      <version>250.va_1cf60782b_1a_</version>
     </dependency>
+
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
@@ -123,6 +124,7 @@
       <artifactId>mockito-core</artifactId>
       <scope>test</scope>
     </dependency>
+
   </dependencies>
 
   <repositories>
