@@ -109,7 +109,7 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-indexer-lucene-model</artifactId>
-      <version>2.15.1-02</version>
+      <version>2.16.0-01</version>
       <exclusions>
         <exclusion>
           <!-- provided by jackson2-api plugin -->
