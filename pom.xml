@@ -10,7 +10,7 @@
   </parent>
 
   <artifactId>maven-artifact-choicelistprovider</artifactId>
-  <version>${changelist}</version>
+  <version>${revision}${changelist}</version>
   <packaging>hpi</packaging>
 
   <name>Maven Artifact ChoiceListProvider (Nexus)</name>
@@ -33,14 +33,15 @@
   </developers>
 
   <scm>
-    <connection>scm:git:git@github.com:jenkinsci/maven-artifact-choicelistprovider-plugin.git</connection>
-    <developerConnection>scm:git:git@github.com:jenkinsci/maven-artifact-choicelistprovider-plugin.git</developerConnection>
-    <tag>HEAD</tag>
-    <url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
+    <connection>scm:git:git@github.com:${gitHubRepo}.git</connection>
+    <developerConnection>scm:git:git@github.com:${gitHubRepo}.git</developerConnection>
+    <tag>${scmTag}</tag>
+    <url>https://github.com/${gitHubRepo}</url>
   </scm>
 
   <properties>
-    <changelist>999999-SNAPSHOT</changelist>
+    <revision>1.23</revision>
+    <changelist>-SNAPSHOT</changelist>
     <!-- https://www.jenkins.io/doc/developer/plugin-development/choosing-jenkins-baseline/ -->
     <jenkins.baseline>2.479</jenkins.baseline>
     <jenkins.version>${jenkins.baseline}.1</jenkins.version>
