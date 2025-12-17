@@ -142,6 +142,9 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
      *            the internal jenkins id for the credentials
      * @return the credentials for the ID or NULL
      */
+    // NOTE: we remove the @Nonnull annotation from pItem because we WANT to support the ability to query
+    // as system, outside of an authentication context, because we may not have one at the time we need
+    // to run the query ...
     public static UsernamePasswordCredentialsImpl getCredentials(@Nonnull String pCredentialId, Item pItem) {
         final Authentication acl =
                 pItem instanceof Queue.Task ? Tasks.getAuthenticationOf2((Queue.Task) pItem) : ACL.SYSTEM2;
