@@ -1,60 +1,59 @@
 package org.jenkinsci.plugins.maven_artifact_choicelistprovider;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.jenkinsci.plugins.maven_artifact_choicelistprovider.ValidAndInvalidClassifier;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class ValidAndInvalidClassifierTest {
+class ValidAndInvalidClassifierTest {
 
-	@Test
-	public void testOnlyOneInvalid() {
-		ValidAndInvalidClassifier c = ValidAndInvalidClassifier.fromString("!preinstalled");
-		assertFalse("must be invalid", c.isValid("preinstalled"));
-		assertTrue("must be valid", c.isValid("foo"));
-	}
+    @Test
+    void testOnlyOneInvalid() {
+        ValidAndInvalidClassifier c = ValidAndInvalidClassifier.fromString("!preinstalled");
+        assertFalse(c.isValid("preinstalled"), "must be invalid");
+        assertTrue(c.isValid("foo"), "must be valid");
+    }
 
-	@Test
-	public void testOnlyOneValid() {
-		ValidAndInvalidClassifier c = ValidAndInvalidClassifier.fromString("preinstalled");
-		assertTrue("must be valid", c.isValid("preinstalled"));
-		assertFalse("must be invalid", c.isValid("foo"));
-	}
+    @Test
+    void testOnlyOneValid() {
+        ValidAndInvalidClassifier c = ValidAndInvalidClassifier.fromString("preinstalled");
+        assertTrue(c.isValid("preinstalled"), "must be valid");
+        assertFalse(c.isValid("foo"), "must be invalid");
+    }
 
-	@Test
-	public void testMultipleInvalid() {
-		ValidAndInvalidClassifier c = ValidAndInvalidClassifier.fromString("!preinstalled,!source");
-		assertFalse("must be invalid", c.isValid("preinstalled"));
-		assertFalse("must be invalid", c.isValid("source"));
-		assertTrue("must be valid", c.isValid("foo"));
-	}
-	
-	@Test
-	public void testMultipleValid() {
-		ValidAndInvalidClassifier c = ValidAndInvalidClassifier.fromString("preinstalled,source");
-		assertTrue("must be invalid", c.isValid("preinstalled"));
-		assertTrue("must be invalid", c.isValid("source"));
-		assertFalse("must be valid", c.isValid("foo"));
-	}
-	
-	@Test
-	public void testWithNull() {
-		ValidAndInvalidClassifier c = ValidAndInvalidClassifier.fromString("");
-		assertTrue("must be valid by default", c.isValid(null));
-		assertTrue("must be valid by default", c.isValid(""));
-		assertTrue("must be valid by default", c.isValid("foo"));
-	}
+    @Test
+    void testMultipleInvalid() {
+        ValidAndInvalidClassifier c = ValidAndInvalidClassifier.fromString("!preinstalled,!source");
+        assertFalse(c.isValid("preinstalled"), "must be invalid");
+        assertFalse(c.isValid("source"), "must be invalid");
+        assertTrue(c.isValid("foo"), "must be valid");
+    }
 
-	@Test
-	public void testInit() {
-		ValidAndInvalidClassifier c = ValidAndInvalidClassifier.fromString(",,,");
-		assertTrue("must be valid by default", c.isValid("foo"));
-	}
+    @Test
+    void testMultipleValid() {
+        ValidAndInvalidClassifier c = ValidAndInvalidClassifier.fromString("preinstalled,source");
+        assertTrue(c.isValid("preinstalled"), "must be invalid");
+        assertTrue(c.isValid("source"), "must be invalid");
+        assertFalse(c.isValid("foo"), "must be valid");
+    }
 
-	
-	@Test
-	public void testToString() {
-		ValidAndInvalidClassifier c = ValidAndInvalidClassifier.fromString("!preinstalled");
-		System.out.println(c.toString());
-	}
+    @Test
+    void testWithNull() {
+        ValidAndInvalidClassifier c = ValidAndInvalidClassifier.fromString("");
+        assertTrue(c.isValid(null), "must be valid by default");
+        assertTrue(c.isValid(""), "must be valid by default");
+        assertTrue(c.isValid("foo"), "must be valid by default");
+    }
+
+    @Test
+    void testInit() {
+        ValidAndInvalidClassifier c = ValidAndInvalidClassifier.fromString(",,,");
+        assertTrue(c.isValid("foo"), "must be valid by default");
+    }
+
+    @Test
+    void testToString() {
+        ValidAndInvalidClassifier c = ValidAndInvalidClassifier.fromString("!preinstalled");
+        System.out.println(c);
+    }
 }

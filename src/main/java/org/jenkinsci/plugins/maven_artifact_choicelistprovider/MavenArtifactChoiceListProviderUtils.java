@@ -8,7 +8,7 @@ public class MavenArtifactChoiceListProviderUtils {
 
     /**
      * Cuts of the first parts of the URL and only returns a smaller set of items.
-     * 
+     *
      * @param pChoices
      *            the list which is transformed to a map
      * @return the map containing the short url as Key and the long url as value.

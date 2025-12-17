@@ -4,15 +4,15 @@ import java.util.Arrays;
 
 /**
  * POJO for Nexus3 API.
- * 
+ *
  * @author stephan.watermeyer
  *
  */
-public class Nexus3RestResponse {
+public class Nexus3RestResponseAsset {
 
     private String continuationToken;
 
-    private Item[] items;
+    private AssetItem[] items;
 
     public String getContinuationToken() {
         return continuationToken;
@@ -22,17 +22,17 @@ public class Nexus3RestResponse {
         this.continuationToken = continuationToken;
     }
 
-    public Item[] getItems() {
+    public AssetItem[] getItems() {
         return Arrays.copyOf(items, items.length);
     }
 
-    public void setItems(Item[] items) {
+    public void setItems(AssetItem[] items) {
         this.items = Arrays.copyOf(items, items.length);
     }
 
     @Override
     public String toString() {
-        return "Nexus3RestResponse [continuationToken = " + continuationToken + ", items = " + Arrays.toString(items) + "]";
+        return "Nexus3RestResponse [continuationToken = " + continuationToken + ", items = " + Arrays.toString(items)
+                + "]";
     }
-
 }

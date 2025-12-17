@@ -4,7 +4,7 @@ import org.jenkinsci.plugins.maven_artifact_choicelistprovider.RESTfulParameterB
 
 /**
  * Valid for Nexus2 and Artifactory.
- * 
+ *
  * @author stephan.watermeyer
  *
  */
@@ -19,7 +19,7 @@ public class StandardRESTfulParameterBuilder extends RESTfulParameterBuilder {
     public static final String PARAMETER_ARTIFACTID = "a";
 
     public static final String PARAMETER_GROUPID = "g";
-    
+
     public static final String PARAMETER_SORT = "s";
 
     @Override
@@ -49,12 +49,11 @@ public class StandardRESTfulParameterBuilder extends RESTfulParameterBuilder {
 
     @Override
     public String getContinuationToken() {
-       throw new UnsupportedOperationException("this method is not supported getContinuationToken()");
+        throw new UnsupportedOperationException("this method is not supported getContinuationToken()");
     }
 
-	@Override
-	public String getSortOrder() {
-		return PARAMETER_SORT;
-	}
-
+    @Override
+    public String getSortOrder() {
+        return PARAMETER_SORT;
+    }
 }

@@ -6,7 +6,7 @@ public class Checksum {
     private String sha1;
 
     private String sha256;
-    
+
     private String sha512;
 
     public String getMd5() {
@@ -32,7 +32,6 @@ public class Checksum {
     public void setSha256(String sha256) {
         this.sha256 = sha256;
     }
-
 
     public String getSha512() {
         return sha512;

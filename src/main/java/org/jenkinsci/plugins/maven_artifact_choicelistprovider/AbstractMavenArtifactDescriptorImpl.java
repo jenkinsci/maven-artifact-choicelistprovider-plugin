@@ -1,18 +1,16 @@
 package org.jenkinsci.plugins.maven_artifact_choicelistprovider;
 
+import hudson.model.Descriptor;
+import hudson.util.FormValidation;
 import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-
+import jp.ikedam.jenkins.plugins.extensible_choice_parameter.ChoiceListProvider;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.QueryParameter;
 
-import hudson.model.Descriptor;
-import hudson.util.FormValidation;
-import jp.ikedam.jenkins.plugins.extensible_choice_parameter.ChoiceListProvider;
-
 /**
- * 
+ *
  * Base Class for a Descriptor.
  *
  * @author stephan.watermeyer, Diebold Nixdorf
@@ -45,39 +43,57 @@ public abstract class AbstractMavenArtifactDescriptorImpl extends Descriptor<Cho
 
     public FormValidation doCheckClassifier(@QueryParameter String classifier) {
         if (StringUtils.isBlank(classifier)) {
-            FormValidation.ok("OK, will not filter for any classifier");
+            return FormValidation.ok("OK, will not filter for any classifier");
         }
         return FormValidation.ok();
     }
 
     public FormValidation doCheckFilterExpression(@QueryParameter String filterExpression) {
         if (StringUtils.isEmpty(filterExpression)) {
-            return FormValidation.warning("Although blank string is a syntactically valid regular expression, it would result no match. " +
-                                          "To maintain backward compatibility of the plugin, blank string is considered as match all. " +
-                                          "Please explicitly type '.*' instead (without quotes) to remove this warning.");
+            return FormValidation.warning(
+                    "Although blank string is a syntactically valid regular expression, it would result no match. "
+                            + "To maintain backward compatibility of the plugin, blank string is considered as match all. "
+                            + "Please explicitly type '.*' instead (without quotes) to remove this warning.");
         }
 
         try {
             Pattern.compile(filterExpression);
         } catch (PatternSyntaxException pse) {
-            return FormValidation.error("Filter Expression is not a valid regular expression. Try '.*' instead (without quotes). " +
-                                        "Please check https://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html " +
-                                        "for the accepted syntax");
+            return FormValidation.error(
+                    "Filter Expression is not a valid regular expression. Try '.*' instead (without quotes). "
+                            + "Please check https://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html "
+                            + "for the accepted syntax");
         }
 
         return FormValidation.ok();
     }
 
-    public FormValidation performTest(final IVersionReader pService, @QueryParameter String repositoryId, @QueryParameter String groupId, @QueryParameter String artifactId,
-            @QueryParameter String packaging, @QueryParameter String classifier,
-            @QueryParameter boolean inverseFilter, @QueryParameter String filterExpression, @QueryParameter boolean reverseOrder) {
+    public FormValidation performTest(
+            final IVersionReader pService,
+            @QueryParameter String repositoryId,
+            @QueryParameter String groupId,
+            @QueryParameter String artifactId,
+            @QueryParameter String packaging,
+            @QueryParameter String classifier,
+            @QueryParameter boolean inverseFilter,
+            @QueryParameter String filterExpression,
+            @QueryParameter boolean reverseOrder) {
         if (StringUtils.isEmpty(packaging) && !StringUtils.isEmpty(classifier)) {
-            return FormValidation
-                    .error("You have choosen an empty Packaging configuration but have configured a Classifier. Please either define a Packaging value or remove the Classifier");
+            return FormValidation.error(
+                    "You have choosen an empty Packaging configuration but have configured a Classifier. Please either define a Packaging value or remove the Classifier");
         }
 
         try {
-            final Map<String, String> entriesFromURL = wrapTestConnection(pService, repositoryId, groupId, artifactId, packaging, classifier, inverseFilter, filterExpression, reverseOrder);
+            final Map<String, String> entriesFromURL = wrapTestConnection(
+                    pService,
+                    repositoryId,
+                    groupId,
+                    artifactId,
+                    packaging,
+                    classifier,
+                    inverseFilter,
+                    filterExpression,
+                    reverseOrder);
 
             if (entriesFromURL.isEmpty()) {
                 return FormValidation.ok("(Working, but no Entries found)");
@@ -92,7 +108,7 @@ public abstract class AbstractMavenArtifactDescriptorImpl extends Descriptor<Cho
      * Own implementations of this DescriptorImpl might do this normally as a static inner class. The
      * surrounding class then has to extend {@link AbstractMavenArtifactChoiceListProvider} and thus this wrapper method
      * can forward to the implementation of readURL.
-     * 
+     *
      * @param service
      *            TBD
      * @param repositoryId
@@ -113,7 +129,14 @@ public abstract class AbstractMavenArtifactDescriptorImpl extends Descriptor<Cho
      *            TBD
      * @return the list of found items.
      */
-    protected abstract Map<String, String> wrapTestConnection(IVersionReader service, String repositoryId, String groupId, String artifactId, String packaging, String classifier,
-            boolean inverseFilter, String filterExpression, boolean reverseOrder);
-
+    protected abstract Map<String, String> wrapTestConnection(
+            IVersionReader service,
+            String repositoryId,
+            String groupId,
+            String artifactId,
+            String packaging,
+            String classifier,
+            boolean inverseFilter,
+            String filterExpression,
+            boolean reverseOrder);
 }

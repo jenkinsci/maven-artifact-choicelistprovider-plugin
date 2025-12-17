@@ -1,9 +1,15 @@
 package org.jenkinsci.plugins.maven_artifact_choicelistprovider.maven;
 
+import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl;
+import hudson.Extension;
+import hudson.model.Descriptor;
+import hudson.model.Item;
+import hudson.model.Job;
+import hudson.util.FormValidation;
+import hudson.util.ListBoxModel;
 import java.util.Map;
-
 import javax.inject.Inject;
-
+import jp.ikedam.jenkins.plugins.extensible_choice_parameter.ChoiceListProvider;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.AbstractMavenArtifactChoiceListProvider;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.IVersionReader;
@@ -12,17 +18,6 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.interceptor.RequirePOST;
-
-import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl;
-
-import hudson.Extension;
-import hudson.model.Descriptor;
-import hudson.model.Item;
-import hudson.model.Job;
-import hudson.util.FormValidation;
-import hudson.util.ListBoxModel;
-import jp.ikedam.jenkins.plugins.extensible_choice_parameter.ChoiceListProvider;
-
 
 /**
  * @author Attila Simon
@@ -41,9 +36,9 @@ public class MavenMetadataChoiceListProvider extends AbstractMavenArtifactChoice
     @Extension
     public static class MavenMetadataDescriptorImpl extends Descriptor<ChoiceListProvider> {
 
-    	@Inject
-    	private AbstractMavenArtifactChoiceListProvider.DescriptorImpl delegate;
-    	   
+        @Inject
+        private AbstractMavenArtifactChoiceListProvider.DescriptorImpl delegate;
+
         public MavenMetadataDescriptorImpl() {
             // When Jenkins is restarted, load any saved configuration from disk.
             load();
@@ -97,29 +92,43 @@ public class MavenMetadataChoiceListProvider extends AbstractMavenArtifactChoice
         }
 
         @RequirePOST
-        public FormValidation doTest(@AncestorInPath Item pItem, @QueryParameter String url, @QueryParameter String credentialsId, @QueryParameter String repositoryId,
-                                     @QueryParameter String groupId, @QueryParameter String artifactId,
-                                     @QueryParameter boolean inverseFilter, @QueryParameter String filterExpression, @QueryParameter boolean reverseOrder) {
+        public FormValidation doTest(
+                @AncestorInPath Item pItem,
+                @QueryParameter String url,
+                @QueryParameter String credentialsId,
+                @QueryParameter String repositoryId,
+                @QueryParameter String groupId,
+                @QueryParameter String artifactId,
+                @QueryParameter boolean inverseFilter,
+                @QueryParameter String filterExpression,
+                @QueryParameter boolean reverseOrder) {
 
             // SECURITY-1022
             pItem.checkPermission(Job.CONFIGURE);
 
             final IVersionReader service = new MavenMetadataSearchService(url);
 
-			// If configured, set User Credentials
+            // If configured, set User Credentials
             final UsernamePasswordCredentialsImpl c = getCredentials(credentialsId, pItem);
             if (c != null) {
                 service.setCredentials(c.getUsername(), c.getPassword().getPlainText());
             }
-            return performTest(service, repositoryId, groupId, artifactId, inverseFilter, filterExpression, reverseOrder);
+            return performTest(
+                    service, repositoryId, groupId, artifactId, inverseFilter, filterExpression, reverseOrder);
         }
 
-
-        private FormValidation performTest(final IVersionReader pService, @QueryParameter String repositoryId, @QueryParameter String groupId, @QueryParameter String artifactId,
-                                           @QueryParameter boolean inverseFilter, @QueryParameter String filterExpression, @QueryParameter boolean reverseOrder) {
+        private FormValidation performTest(
+                final IVersionReader pService,
+                @QueryParameter String repositoryId,
+                @QueryParameter String groupId,
+                @QueryParameter String artifactId,
+                @QueryParameter boolean inverseFilter,
+                @QueryParameter String filterExpression,
+                @QueryParameter boolean reverseOrder) {
 
             try {
-                final Map<String, String> entriesFromURL = wrapTestConnection(pService, repositoryId, groupId, artifactId, inverseFilter, filterExpression, reverseOrder);
+                final Map<String, String> entriesFromURL = wrapTestConnection(
+                        pService, repositoryId, groupId, artifactId, inverseFilter, filterExpression, reverseOrder);
 
                 if (entriesFromURL.isEmpty()) {
                     return FormValidation.ok("(Working, but no Entries found)");
@@ -130,10 +139,24 @@ public class MavenMetadataChoiceListProvider extends AbstractMavenArtifactChoice
             }
         }
 
-        private Map<String, String> wrapTestConnection(IVersionReader pService, String pRepositoryId, String pGroupId, String pArtifactId,
-                                                       boolean pInverseFilter, String pFilterExpression, boolean pReverseOrder) {
-            return readURL(pService, pRepositoryId, pGroupId, pArtifactId, null, null,
-                    pInverseFilter, pFilterExpression, pReverseOrder);
+        private Map<String, String> wrapTestConnection(
+                IVersionReader pService,
+                String pRepositoryId,
+                String pGroupId,
+                String pArtifactId,
+                boolean pInverseFilter,
+                String pFilterExpression,
+                boolean pReverseOrder) {
+            return readURL(
+                    pService,
+                    pRepositoryId,
+                    pGroupId,
+                    pArtifactId,
+                    null,
+                    null,
+                    pInverseFilter,
+                    pFilterExpression,
+                    pReverseOrder);
         }
     }
 
@@ -141,7 +164,7 @@ public class MavenMetadataChoiceListProvider extends AbstractMavenArtifactChoice
     public IVersionReader createServiceInstance(Item item) {
         // init the service
         final IVersionReader retVal = new MavenMetadataSearchService(url);
-		final UsernamePasswordCredentialsImpl c = getCredentials(getCredentialsId(), item);
+        final UsernamePasswordCredentialsImpl c = getCredentials(getCredentialsId(), item);
         if (c != null) {
             retVal.setCredentials(c.getUsername(), c.getPassword().getPlainText());
         }
