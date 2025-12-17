@@ -79,31 +79,26 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
     public List<String> getChoiceList() {
         StaplerRequest2 req = Stapler.getCurrentRequest2();
         final Map<String, String> mChoices;
-        if (req != null) {
-            Item item = req.findAncestorObject(Item.class);
+        // Allow null Items b/c this will cause the job to be run as System,
+        // since we're being run outside of an authentication context (i.e.
+        // either downstream, or by the system, which means: ACL.SYSTEM)
+        Item item = (req != null ? req.findAncestorObject(Item.class) : null);
+        IVersionReader serviceInstance = createServiceInstance(item);
 
-            IVersionReader serviceInstance = createServiceInstance(item);
-
-            LOGGER.log(Level.FINE, "retrieve the versions from the repository");
-            mChoices = readURL(
-                    serviceInstance,
-                    getRepositoryId(),
-                    getGroupId(),
-                    getArtifactId(),
-                    getPackaging(),
-                    getClassifier(),
-                    getInverseFilter(),
-                    getFilterExpression(),
-                    getReverseOrder());
-
-        } else {
-            // JENKINS-72158: In downstream projects the current request can be null.
-            mChoices = Collections.emptyMap();
-        }
-
+        LOGGER.log(Level.FINE, "retrieve the versions from the repository");
+        mChoices = readURL(
+                serviceInstance,
+                getRepositoryId(),
+                getGroupId(),
+                getArtifactId(),
+                getPackaging(),
+                getClassifier(),
+                getInverseFilter(),
+                getFilterExpression(),
+                getReverseOrder());
+        LOGGER.log(Level.FINER, "found these choices: {0}", mChoices);
         // FIXME: CHANGE-1: Return only the keys, that are shorter then the values
-        // return new ArrayList<String>(mChoices.keySet());
-        return new LinkedList<String>(mChoices.values());
+        return new LinkedList<String>(mChoices.keySet());
     }
 
     @Extension
@@ -147,7 +142,10 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
      *            the internal jenkins id for the credentials
      * @return the credentials for the ID or NULL
      */
-    public static UsernamePasswordCredentialsImpl getCredentials(@Nonnull String pCredentialId, @Nonnull Item pItem) {
+    // NOTE: we remove the @Nonnull annotation from pItem because we WANT to support the ability to query
+    // as system, outside of an authentication context, because we may not have one at the time we need
+    // to run the query ...
+    public static UsernamePasswordCredentialsImpl getCredentials(@Nonnull String pCredentialId, Item pItem) {
         final Authentication acl =
                 pItem instanceof Queue.Task ? Tasks.getAuthenticationOf2((Queue.Task) pItem) : ACL.SYSTEM2;
         return CredentialsMatchers.firstOrNull(
@@ -196,12 +194,27 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
 
             List<String> choices =
                     pInstance.retrieveVersions(pRepositoryId, pGroupId, pArtifactId, pPackaging, classifierBox);
+            if (LOGGER.isLoggable(Level.FINER)) {
+                LOGGER.log(
+                        Level.FINER,
+                        "loaded the following choices from repository {0} for {1}:{2}:{3}:{4} -> {5}",
+                        new Object[] {pRepositoryId, pGroupId, pArtifactId, pPackaging, classifierBox, choices});
+            }
 
             List<String> filteredChoices = filterArtifacts(choices, pInverseFilter, pFilterExpression);
+            if (LOGGER.isLoggable(Level.FINER)) {
+                LOGGER.log(
+                        Level.FINER,
+                        "filtered down using /{0}/ (inverted={1}) to the following choices: {2}",
+                        new Object[] {pFilterExpression, pInverseFilter, filteredChoices});
+            }
 
             if (pReverseOrder) Collections.reverse(filteredChoices);
 
             retVal = MavenArtifactChoiceListProviderUtils.toMap(filteredChoices);
+            if (LOGGER.isLoggable(Level.FINER)) {
+                LOGGER.log(Level.FINER, "returning the final choices: {0}", new Object[] {retVal});
+            }
         } catch (VersionReaderException e) {
             LOGGER.log(
                     Level.INFO,
