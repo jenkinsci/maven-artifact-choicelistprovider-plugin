@@ -97,7 +97,7 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
                 getFilterExpression(),
                 getReverseOrder());
         LOGGER.log(Level.FINER, "found these choices: {0}", mChoices);
-        // CHANGE-1: Return only the keys, that are shorter then the values
+        // FIXME: CHANGE-1: Return only the keys, that are shorter then the values
         return new LinkedList<String>(mChoices.keySet());
     }
 
@@ -214,7 +214,7 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
                     new Object[] {
                         pFilterExpression,
                         pInverseFilter,
-                        choices
+                        filteredChoices
                     }
                 );
             }
