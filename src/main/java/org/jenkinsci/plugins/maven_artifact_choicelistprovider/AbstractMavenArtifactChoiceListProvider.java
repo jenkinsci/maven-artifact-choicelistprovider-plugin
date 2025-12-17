@@ -196,37 +196,24 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
                     pInstance.retrieveVersions(pRepositoryId, pGroupId, pArtifactId, pPackaging, classifierBox);
             if (LOGGER.isLoggable(Level.FINER)) {
                 LOGGER.log(
-                    Level.FINER,
-                    "loaded the following choices from repository {0} for {1}:{2}:{3}:{4} -> {5}",
-                    new Object[] {
-                        pRepositoryId,
-                        pGroupId,
-                        pArtifactId,
-                        pPackaging,
-                        classifierBox,
-                        choices
-                    }
-                );
+                        Level.FINER,
+                        "loaded the following choices from repository {0} for {1}:{2}:{3}:{4} -> {5}",
+                        new Object[] {pRepositoryId, pGroupId, pArtifactId, pPackaging, classifierBox, choices});
             }
 
             List<String> filteredChoices = filterArtifacts(choices, pInverseFilter, pFilterExpression);
             if (LOGGER.isLoggable(Level.FINER)) {
                 LOGGER.log(
-                    Level.FINER,
-                    "filtered down using /{0}/ (inverted={1}) to the following choices: {2}",
-                    new Object[] {
-                        pFilterExpression,
-                        pInverseFilter,
-                        filteredChoices
-                    }
-                );
+                        Level.FINER,
+                        "filtered down using /{0}/ (inverted={1}) to the following choices: {2}",
+                        new Object[] {pFilterExpression, pInverseFilter, filteredChoices});
             }
 
             if (pReverseOrder) Collections.reverse(filteredChoices);
 
             retVal = MavenArtifactChoiceListProviderUtils.toMap(filteredChoices);
             if (LOGGER.isLoggable(Level.FINER)) {
-                LOGGER.log(Level.FINER, "returning the final choices: {0}", new Object[] { retVal });
+                LOGGER.log(Level.FINER, "returning the final choices: {0}", new Object[] {retVal});
             }
         } catch (VersionReaderException e) {
             LOGGER.log(

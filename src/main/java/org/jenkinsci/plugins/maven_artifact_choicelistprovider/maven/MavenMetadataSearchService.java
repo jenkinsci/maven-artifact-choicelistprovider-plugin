@@ -68,7 +68,7 @@ public class MavenMetadataSearchService extends AbstractRESTfulVersionReader {
         LOGGER.info("Received response. Parsing maven-metadata.xml of size: " + response.length());
         final List<String> parseVersions = parseVersions(response);
         if (LOGGER.isLoggable(Level.FINER)) {
-            LOGGER.log(Level.FINER, "Received the following versions: {0}", new Object[] { parseVersions });
+            LOGGER.log(Level.FINER, "Received the following versions: {0}", new Object[] {parseVersions});
         }
 
         final LinkedHashSet<String> retVal = new LinkedHashSet<>();
@@ -76,7 +76,7 @@ public class MavenMetadataSearchService extends AbstractRESTfulVersionReader {
             retVal.add(baseURL + "/" + version);
         }
         if (LOGGER.isLoggable(Level.FINER)) {
-            LOGGER.log(Level.FINER, "Returning the following versions: {0}", new Object[] { retVal });
+            LOGGER.log(Level.FINER, "Returning the following versions: {0}", new Object[] {retVal});
         }
         return retVal;
     }
