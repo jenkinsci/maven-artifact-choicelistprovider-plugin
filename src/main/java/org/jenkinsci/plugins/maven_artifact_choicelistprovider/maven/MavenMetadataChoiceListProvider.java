@@ -133,7 +133,7 @@ public class MavenMetadataChoiceListProvider extends AbstractMavenArtifactChoice
                 if (entriesFromURL.isEmpty()) {
                     return FormValidation.ok("(Working, but no Entries found)");
                 }
-                return FormValidation.ok(StringUtils.join(entriesFromURL.values(), '\n'));
+                return FormValidation.ok(StringUtils.join(entriesFromURL.keySet(), '\n'));
             } catch (Exception e) {
                 return FormValidation.error("error reading versions from url:" + e.getMessage());
             }
