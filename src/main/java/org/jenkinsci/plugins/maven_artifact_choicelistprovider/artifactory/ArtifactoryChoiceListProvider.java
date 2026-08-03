@@ -8,7 +8,7 @@ import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import java.util.Map;
 import javax.inject.Inject;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.AbstractMavenArtifactChoiceListProvider;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.AbstractMavenArtifactDescriptorImpl;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.IVersionReader;

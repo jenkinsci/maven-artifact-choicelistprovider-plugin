@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import jp.ikedam.jenkins.plugins.extensible_choice_parameter.ChoiceListProvider;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.kohsuke.stapler.QueryParameter;
 
 /**
