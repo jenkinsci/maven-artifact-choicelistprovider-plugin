@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import net.sf.json.JSONObject;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.IVersionReader2;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.Stapler;
