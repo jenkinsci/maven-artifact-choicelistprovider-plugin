@@ -118,5 +118,6 @@ https://ci.jenkins.io/job/Plugins/job/maven-artifact-choicelistprovider-plugin/
 ## Authors
 Stephan Watermeyer (Profile: https://github.com/phreakadelle)
 
+
 ## License
 Licensed under the [MIT License (MIT)](https://github.com/heremaps/buildrotator-plugin/blob/master/LICENSE).
