@@ -97,7 +97,7 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
                 getFilterExpression(),
                 getReverseOrder());
         LOGGER.log(Level.FINER, "found these choices: {0}", mChoices);
-        
+
         return new LinkedList<String>(mChoices.values());
     }
 
