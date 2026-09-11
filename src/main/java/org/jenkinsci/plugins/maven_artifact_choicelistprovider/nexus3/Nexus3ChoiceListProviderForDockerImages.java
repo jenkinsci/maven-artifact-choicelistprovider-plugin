@@ -17,7 +17,7 @@ import javax.inject.Inject;
 import javax.ws.rs.core.MultivaluedMap;
 import jp.ikedam.jenkins.plugins.extensible_choice_parameter.ChoiceListProvider;
 import net.sf.json.JSONObject;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.AbstractMavenArtifactChoiceListProvider;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.IVersionReader;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.IVersionReader2;

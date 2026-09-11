@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 import javax.inject.Inject;
 import net.sf.json.JSONObject;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.AbstractMavenArtifactChoiceListProvider;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.AbstractMavenArtifactDescriptorImpl;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.IVersionReader;
