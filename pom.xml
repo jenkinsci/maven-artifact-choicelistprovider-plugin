@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>plugin</artifactId>
-    <version>5.28</version>
+    <version>6.2221.va_045130417c9</version>
     <relativePath />
   </parent>
 
@@ -47,6 +47,7 @@
     <gitHubRepo>jenkinsci/${project.artifactId}-plugin</gitHubRepo>
     <spotless.check.skip>false</spotless.check.skip>
     <ban-junit4-imports.skip>false</ban-junit4-imports.skip>
+    <ban-commons-lang-2.skip>false</ban-commons-lang-2.skip>
   </properties>
 
   <dependencyManagement>
@@ -60,6 +61,14 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
+      <!-- gson 2.14.0 needs a newer error_prone_annotations than the BOM manages, which
+           trips the RequireUpperBoundDeps enforcer rule. Annotations only, so raising it
+           is safe. -->
+      <dependency>
+        <groupId>com.google.errorprone</groupId>
+        <artifactId>error_prone_annotations</artifactId>
+        <version>2.50.0</version>
+      </dependency>
 
     </dependencies>
   </dependencyManagement>
@@ -70,7 +79,11 @@
     <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
-      <version>2.10.1</version>
+      <version>2.14.0</version>
+    </dependency>
+    <dependency>
+      <groupId>io.jenkins.plugins</groupId>
+      <artifactId>commons-lang3-api</artifactId>
     </dependency>
     <!--  Java 11 / JAXB Stuff / Parse Nexus XML Interface -->
     <dependency>
@@ -86,13 +99,13 @@
     <dependency>
       <groupId>jp.ikedam.jenkins.plugins</groupId>
       <artifactId>extensible-choice-parameter</artifactId>
-      <version>250.va_1cf60782b_1a_</version>
+      <version>255.vfa_41f46828ef</version>
     </dependency>
 
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
-      <version>3.27.6</version>
+      <version>3.27.7</version>
     </dependency>
 
     <!-- For Authentication Details -->

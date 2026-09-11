@@ -1,9 +1,8 @@
 # MavenArtifact ChoiceListProvider
-[![Build Status](https://ci.jenkins.io/job/Plugins/job/maven-artifact-choicelistprovider-plugin/job/master/badge/icon)](https://ci.jenkins.io/job/Plugins/job/maven-artifact-choicelistprovider-plugin/job/master)
-[![Coverage](https://ci.jenkins.io/job/Plugins/job/maven-artifact-choicelistprovider-plugin/job/master/badge/icon?status=${instructionCoverage}&subject=coverage&color=${colorInstructionCoverage})](https://ci.jenkins.io/job/Plugins/job/maven-artifact-choicelistprovider-plugin/job/master/coverage)
+[![Build Status](https://ci.jenkins.io/buildStatus/icon?job=Plugins%2Fmaven-artifact-choicelistprovider-plugin%2Fmaster)](https://ci.jenkins.io/job/Plugins/job/maven-artifact-choicelistprovider-plugin/job/master)
 [![Contributors](https://img.shields.io/github/contributors/jenkinsci/maven-artifact-choicelistprovider-plugin.svg)](https://github.com/jenkinsci/maven-artifact-choicelistprovider-plugin/graphs/contributors)
 [![Jenkins Plugin](https://img.shields.io/jenkins/plugin/v/maven-artifact-choicelistprovider.svg)](https://plugins.jenkins.io/maven-artifact-choicelistprovider)
-[![GitHub release](https://img.shields.io/github/release/jenkinsci/maven-artifact-choicelistprovider.svg?label=changelog)](https://github.com/jenkinsci/maven-artifact-choicelistprovider/releases/latest)
+[![GitHub release](https://img.shields.io/github/release/jenkinsci/maven-artifact-choicelistprovider.svg?label=changelog)](https://github.com/jenkinsci/maven-artifact-choicelistprovider-plugin/releases/latest)
 [![Jenkins Plugin Installs](https://img.shields.io/jenkins/plugin/i/maven-artifact-choicelistprovider.svg?color=blue)](https://plugins.jenkins.io/maven-artifact-choicelistprovider)
 
 ## What does this  this - Overview
@@ -117,6 +116,7 @@ https://ci.jenkins.io/job/Plugins/job/maven-artifact-choicelistprovider-plugin/
 
 ## Authors
 Stephan Watermeyer (Profile: https://github.com/phreakadelle)
+
 
 ## License
 Licensed under the [MIT License (MIT)](https://github.com/heremaps/buildrotator-plugin/blob/master/LICENSE).
