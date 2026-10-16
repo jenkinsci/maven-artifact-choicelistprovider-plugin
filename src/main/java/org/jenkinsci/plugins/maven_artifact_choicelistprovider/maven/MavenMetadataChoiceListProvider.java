@@ -7,6 +7,7 @@ import hudson.model.Item;
 import hudson.model.Job;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
+import java.util.Collection;
 import java.util.Map;
 import javax.inject.Inject;
 import jp.ikedam.jenkins.plugins.extensible_choice_parameter.ChoiceListProvider;
@@ -27,6 +28,7 @@ public class MavenMetadataChoiceListProvider extends AbstractMavenArtifactChoice
 
     private String url;
     private String credentialsId;
+    private boolean listVersionNumbersOnly;
 
     @DataBoundConstructor
     public MavenMetadataChoiceListProvider(String artifactId) {
@@ -101,7 +103,8 @@ public class MavenMetadataChoiceListProvider extends AbstractMavenArtifactChoice
                 @QueryParameter String artifactId,
                 @QueryParameter boolean inverseFilter,
                 @QueryParameter String filterExpression,
-                @QueryParameter boolean reverseOrder) {
+                @QueryParameter boolean reverseOrder,
+                @QueryParameter boolean listVersionNumbersOnly) {
 
             // SECURITY-1022
             pItem.checkPermission(Job.CONFIGURE);
@@ -114,7 +117,14 @@ public class MavenMetadataChoiceListProvider extends AbstractMavenArtifactChoice
                 service.setCredentials(c.getUsername(), c.getPassword().getPlainText());
             }
             return performTest(
-                    service, repositoryId, groupId, artifactId, inverseFilter, filterExpression, reverseOrder);
+                    service,
+                    repositoryId,
+                    groupId,
+                    artifactId,
+                    inverseFilter,
+                    filterExpression,
+                    reverseOrder,
+                    listVersionNumbersOnly);
         }
 
         private FormValidation performTest(
@@ -124,7 +134,8 @@ public class MavenMetadataChoiceListProvider extends AbstractMavenArtifactChoice
                 @QueryParameter String artifactId,
                 @QueryParameter boolean inverseFilter,
                 @QueryParameter String filterExpression,
-                @QueryParameter boolean reverseOrder) {
+                @QueryParameter boolean reverseOrder,
+                @QueryParameter boolean listVersionNumbersOnly) {
 
             try {
                 final Map<String, String> entriesFromURL = wrapTestConnection(
@@ -133,7 +144,8 @@ public class MavenMetadataChoiceListProvider extends AbstractMavenArtifactChoice
                 if (entriesFromURL.isEmpty()) {
                     return FormValidation.ok("(Working, but no Entries found)");
                 }
-                return FormValidation.ok(StringUtils.join(entriesFromURL.keySet(), '\n'));
+                return FormValidation.ok(
+                        StringUtils.join(selectChoiceList(entriesFromURL, listVersionNumbersOnly), '\n'));
             } catch (Exception e) {
                 return FormValidation.error("error reading versions from url:" + e.getMessage());
             }
@@ -169,6 +181,42 @@ public class MavenMetadataChoiceListProvider extends AbstractMavenArtifactChoice
             retVal.setCredentials(c.getUsername(), c.getPassword().getPlainText());
         }
         return retVal;
+    }
+
+    /**
+     * If {@link #getListVersionNumbersOnly()} is set, only the bare version numbers are displayed instead of the full
+     * artifact URLs.
+     */
+    @Override
+    protected Collection<String> selectChoiceList(final Map<String, String> pChoices) {
+        return selectChoiceList(pChoices, getListVersionNumbersOnly());
+    }
+
+    /**
+     * Selects what to display, for both the choice list and the "List Versions Now" button.
+     *
+     * @param pChoices
+     *            the map returned by {@link #readURL}: version number to full artifact URL.
+     * @param pListVersionNumbersOnly
+     *            <code>true</code> to return the version numbers, <code>false</code> to return the full URLs.
+     * @return the entries to display, never null
+     */
+    static Collection<String> selectChoiceList(
+            final Map<String, String> pChoices, final boolean pListVersionNumbersOnly) {
+        // The button doesn't go through getChoiceList(), so it needs the error check too
+        if (isErrorResult(pChoices)) return pChoices.values();
+
+        // The keys are the bare version numbers, the values are the full artifact URLs.
+        return pListVersionNumbersOnly ? pChoices.keySet() : pChoices.values();
+    }
+
+    @DataBoundSetter
+    public void setListVersionNumbersOnly(boolean listVersionNumbersOnly) {
+        this.listVersionNumbersOnly = listVersionNumbersOnly;
+    }
+
+    public boolean getListVersionNumbersOnly() {
+        return listVersionNumbersOnly;
     }
 
     @DataBoundSetter

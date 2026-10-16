@@ -64,7 +64,6 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
     private boolean inverseFilter;
     private String filterExpression;
     private boolean reverseOrder;
-    private boolean listVersionNumbersOnly;
 
     /**
      * Initializes the choice list with at the artifactId.
@@ -77,13 +76,28 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
         this.setArtifactId(artifactId);
     }
 
-    private Collection<String> selectChoiceList(Map<String, String> pChoices) {
-        // If there's a single entry and it's named "error", then we must return
-        // the error string for display instead of the key
-        if ((pChoices.size() == 1) && pChoices.containsKey("error")) return pChoices.values();
+    /**
+     * Checks whether {@link #readURL} failed: then the result holds a single entry named "error", whose value is the
+     * error message.
+     *
+     * @param pChoices
+     *            the map returned by {@link #readURL}.
+     * @return <code>true</code> if the result is an error.
+     */
+    protected static boolean isErrorResult(final Map<String, String> pChoices) {
+        return (pChoices.size() == 1) && pChoices.containsKey("error");
+    }
 
-        // The keys are the bare version numbers, the values are the full artifact URLs.
-        return getListVersionNumbersOnly() ? pChoices.keySet() : pChoices.values();
+    /**
+     * Selects what to display from the result of {@link #readURL}. Returns the full artifact URLs; subclasses may
+     * override this to display something else. Not called when the result is an error, see {@link #isErrorResult}.
+     *
+     * @param pChoices
+     *            the map returned by {@link #readURL}: version number to full artifact URL.
+     * @return the entries to display, never null
+     */
+    protected Collection<String> selectChoiceList(final Map<String, String> pChoices) {
+        return pChoices.values();
     }
 
     @Override
@@ -109,6 +123,10 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
                 getReverseOrder());
         LOGGER.log(Level.FINER, "found these choices: {0}", mChoices);
 
+        // On error, always return the error message for display, whatever the subclass would select
+        if (isErrorResult(mChoices)) {
+            return new LinkedList<String>(mChoices.values());
+        }
         return new LinkedList<String>(selectChoiceList(mChoices));
     }
 
@@ -330,11 +348,6 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
     }
 
     @DataBoundSetter
-    public void setListVersionNumbersOnly(boolean listVersionNumbersOnly) {
-        this.listVersionNumbersOnly = listVersionNumbersOnly;
-    }
-
-    @DataBoundSetter
     public void setRepositoryId(String repositoryId) {
         this.repositoryId = repositoryId;
     }
@@ -365,10 +378,6 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
 
     public boolean getReverseOrder() {
         return reverseOrder;
-    }
-
-    public boolean getListVersionNumbersOnly() {
-        return listVersionNumbersOnly;
     }
 
     public String getRepositoryId() {
