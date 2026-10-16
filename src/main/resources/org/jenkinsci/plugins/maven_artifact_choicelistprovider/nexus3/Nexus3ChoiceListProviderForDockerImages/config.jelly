@@ -38,6 +38,7 @@ THE SOFTWARE.
      <f:entry title="${%Reverse Order}" field="reverseOrder">
         <f:checkbox />
     </f:entry>
+    <st:include page="listVersionNumbersOnly.jelly" class="org.jenkinsci.plugins.maven_artifact_choicelistprovider.AbstractMavenArtifactChoiceListProvider" />
     
     <f:validateButton
         method="test"

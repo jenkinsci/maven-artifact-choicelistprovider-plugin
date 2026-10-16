@@ -16,6 +16,7 @@ import hudson.model.queue.Tasks;
 import hudson.security.ACL;
 import hudson.util.ListBoxModel;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -63,6 +64,7 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
     private boolean inverseFilter;
     private String filterExpression;
     private boolean reverseOrder;
+    private boolean listVersionNumbersOnly;
 
     /**
      * Initializes the choice list with at the artifactId.
@@ -73,6 +75,15 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
     public AbstractMavenArtifactChoiceListProvider(final String artifactId) {
         super();
         this.setArtifactId(artifactId);
+    }
+
+    private Collection<String> selectChoiceList(Map<String, String> pChoices) {
+        // If there's a single entry and it's named "error", then we must return
+        // the error string for display instead of the key
+        if ((pChoices.size() == 1) && pChoices.containsKey("error")) return pChoices.values();
+
+        // The keys are the bare version numbers, the values are the full artifact URLs.
+        return getListVersionNumbersOnly() ? pChoices.keySet() : pChoices.values();
     }
 
     @Override
@@ -97,8 +108,8 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
                 getFilterExpression(),
                 getReverseOrder());
         LOGGER.log(Level.FINER, "found these choices: {0}", mChoices);
-        // FIXME: CHANGE-1: Return only the keys, that are shorter then the values
-        return new LinkedList<String>(mChoices.keySet());
+
+        return new LinkedList<String>(selectChoiceList(mChoices));
     }
 
     @Extension
@@ -319,6 +330,11 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
     }
 
     @DataBoundSetter
+    public void setListVersionNumbersOnly(boolean listVersionNumbersOnly) {
+        this.listVersionNumbersOnly = listVersionNumbersOnly;
+    }
+
+    @DataBoundSetter
     public void setRepositoryId(String repositoryId) {
         this.repositoryId = repositoryId;
     }
@@ -349,6 +365,10 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
 
     public boolean getReverseOrder() {
         return reverseOrder;
+    }
+
+    public boolean getListVersionNumbersOnly() {
+        return listVersionNumbersOnly;
     }
 
     public String getRepositoryId() {

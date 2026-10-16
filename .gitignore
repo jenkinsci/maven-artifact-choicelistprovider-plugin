@@ -7,3 +7,6 @@ jenkins-cli.jar
 /maven-artifact-choicelistprovider.iml
 /.idea/
 /work/
+
+**/.sw?
+**/.*.sw?
