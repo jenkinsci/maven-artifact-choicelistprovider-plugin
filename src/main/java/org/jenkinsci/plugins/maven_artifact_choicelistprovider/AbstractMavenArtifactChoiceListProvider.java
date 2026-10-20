@@ -16,6 +16,7 @@ import hudson.model.queue.Tasks;
 import hudson.security.ACL;
 import hudson.util.ListBoxModel;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -75,6 +76,30 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
         this.setArtifactId(artifactId);
     }
 
+    /**
+     * Checks whether {@link #readURL} failed: then the result holds a single entry named "error", whose value is the
+     * error message.
+     *
+     * @param pChoices
+     *            the map returned by {@link #readURL}.
+     * @return <code>true</code> if the result is an error.
+     */
+    protected static boolean isErrorResult(final Map<String, String> pChoices) {
+        return (pChoices.size() == 1) && pChoices.containsKey("error");
+    }
+
+    /**
+     * Selects what to display from the result of {@link #readURL}. Returns the full artifact URLs; subclasses may
+     * override this to display something else. Not called when the result is an error, see {@link #isErrorResult}.
+     *
+     * @param pChoices
+     *            the map returned by {@link #readURL}: version number to full artifact URL.
+     * @return the entries to display, never null
+     */
+    protected Collection<String> selectChoiceList(final Map<String, String> pChoices) {
+        return pChoices.values();
+    }
+
     @Override
     public List<String> getChoiceList() {
         StaplerRequest2 req = Stapler.getCurrentRequest2();
@@ -98,7 +123,11 @@ public abstract class AbstractMavenArtifactChoiceListProvider extends ChoiceList
                 getReverseOrder());
         LOGGER.log(Level.FINER, "found these choices: {0}", mChoices);
 
-        return new LinkedList<String>(mChoices.values());
+        // On error, always return the error message for display, whatever the subclass would select
+        if (isErrorResult(mChoices)) {
+            return new LinkedList<String>(mChoices.values());
+        }
+        return new LinkedList<String>(selectChoiceList(mChoices));
     }
 
     @Extension
