@@ -25,6 +25,9 @@ public class ArtifactoryChoiceListProvider extends AbstractMavenArtifactChoiceLi
     private String url;
     private String credentialsId;
 
+    private String repositoryId;
+    private String name;
+
     @DataBoundConstructor
     public ArtifactoryChoiceListProvider(String artifactId) {
         super(artifactId);
@@ -146,5 +149,23 @@ public class ArtifactoryChoiceListProvider extends AbstractMavenArtifactChoiceLi
 
     public String getUrl() {
         return url;
+    }
+
+     @DataBoundSetter
+    public void setRepositoryId(String repositoryId) {
+        this.repositoryId = repositoryId;
+    }
+
+    public String getRepositoryId() {
+        return repositoryId;
+    }
+
+    @DataBoundSetter
+    public void setName(String name) {
+        this.name = StringUtils.trim(name);
+    }
+
+    public String getName() {
+        return name;
     }
 }
