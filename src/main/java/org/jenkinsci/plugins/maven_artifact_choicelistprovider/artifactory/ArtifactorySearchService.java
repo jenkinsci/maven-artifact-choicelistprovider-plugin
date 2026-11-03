@@ -2,6 +2,7 @@ package org.jenkinsci.plugins.maven_artifact_choicelistprovider.artifactory;
 
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
+
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -14,7 +15,6 @@ import javax.ws.rs.core.MultivaluedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.AbstractRESTfulVersionReader;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.ValidAndInvalidClassifier;
-import org.jenkinsci.plugins.maven_artifact_choicelistprovider.nexus.StandardRESTfulParameterBuilder;
 
 /**
  *
@@ -28,11 +28,16 @@ public class ArtifactorySearchService extends AbstractRESTfulVersionReader {
 
     private static final Logger LOGGER = Logger.getLogger(ArtifactorySearchService.class.getName());
 
+    /**
+     * Default Read Timeout when connecting to the Repository Service
+     */
+    private static final int ARTIFACTORY_SERVICE_READ_TIMEOUT = 15000;
+
     public ArtifactorySearchService(String pURL) {
         super(pURL);
     }
 
-    private static final String SEARCH_SERVICE = "api/search/gavc";
+    private static final String SEARCH_SERVICE = "artifactory/api/search/gavc";
 
     @Override
     public String getRESTfulServiceEndpoint() {
@@ -41,27 +46,27 @@ public class ArtifactorySearchService extends AbstractRESTfulVersionReader {
 
     @Override
     public Set<String> callService(
-            String pRepositoryId,
+            String pRepositoryIdList,
             String pGroupId,
             String pArtifactId,
             String pPackaging,
             ValidAndInvalidClassifier pClassifier) {
+        // repositoryIds can be a comma separated list
         final MultivaluedMap<String, String> requestParams =
-                new StandardRESTfulParameterBuilder().create("", pGroupId, pArtifactId, pPackaging, pClassifier);
+                new ArtifactoryGAVCRESTfulParameterBuilder().create(pRepositoryIdList, pGroupId, pArtifactId, pClassifier);
 
         Set<String> retVal = new LinkedHashSet<>();
         LOGGER.info("call artifactory service");
 
         WebTarget theInstance = getInstance();
         for (Map.Entry<String, List<String>> entries : requestParams.entrySet()) {
-            theInstance =
-                    theInstance.queryParam(entries.getKey(), entries.getValue().toArray());
+            theInstance = theInstance.queryParam(entries.getKey(), entries.getValue().toArray());
         }
-        final String plainResult =
-                theInstance.request(MediaType.APPLICATION_JSON).get(String.class);
+        
+        final String plainResult = theInstance.request(MediaType.APPLICATION_JSON).get(String.class);
 
         if (plainResult == null) {
-            LOGGER.info("response from Artifactory Service is NULL.");
+            LOGGER.info("response from Artifactory service is NULL.");
         } else {
             LOGGER.info("parse result from artifactory service to JSON");
             retVal = parseResult(plainResult, pPackaging);
@@ -76,10 +81,9 @@ public class ArtifactorySearchService extends AbstractRESTfulVersionReader {
             final ArtifactoryResultModel fromJson = new Gson().fromJson(pContent, ArtifactoryResultModel.class);
             for (ArtifactoryResultEntryModel current : fromJson.getResults()) {
 
-                // XXX: As the Artifactory Service is not able to filter on
-                // packaging level, we do it in the code.
-                if (validPackaging(current.getUri(), pPackaging)) {
-                    retVal.add(current.getUri());
+                // XXX: As the Artifactory Service is not able to filter on packaging level, we do it in the code.
+                if (validatePackaging(current, pPackaging)) {
+                    retVal.add(current.getDownloadUri());
                 }
             }
         } catch (Exception e) {
@@ -88,13 +92,20 @@ public class ArtifactorySearchService extends AbstractRESTfulVersionReader {
         return retVal;
     }
 
-    private boolean validPackaging(final String pArtifactURL, String pRequestedPackaging) {
+    private boolean validatePackaging(final ArtifactoryResultEntryModel current, String pRequestedPackaging) {
         if (StringUtils.isEmpty(pRequestedPackaging.trim())) {
             return true;
         }
 
         // in case the packaging is not empty, the equals has to check the given package
-        return pArtifactURL.endsWith(pRequestedPackaging);
+        return pRequestedPackaging.equalsIgnoreCase(current.getExt());
+    }
+
+    /**
+     * Our Artifactory is slow. We extend the default timeout.
+     */
+    protected int getTimeout() {
+        return ARTIFACTORY_SERVICE_READ_TIMEOUT;
     }
 }
 
@@ -108,6 +119,12 @@ class ArtifactoryResultEntryModel {
     @SerializedName("uri")
     String uri;
 
+    @SerializedName("downloadUri")
+    String downloadUri;
+
+    @SerializedName("ext")
+    String ext;
+
     public ArtifactoryResultEntryModel() {
         // Important to do nothing
     }
@@ -118,6 +135,22 @@ class ArtifactoryResultEntryModel {
 
     public void setUri(String uri) {
         this.uri = uri;
+    }
+
+    public String getDownloadUri() {
+        return downloadUri;
+    }
+
+    public void setDownloadUri(String downloadUri) {
+        this.downloadUri = downloadUri;
+    }
+
+    public String getExt() {
+        return ext;
+    }
+
+    public void setExt(String ext) {
+        this.ext = ext;
     }
 }
 

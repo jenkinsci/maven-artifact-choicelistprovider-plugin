@@ -55,6 +55,7 @@ public class ArtifactoryChoiceListProvider extends AbstractMavenArtifactChoiceLi
         public FormValidation doTest(
                 @AncestorInPath Item pItem,
                 @QueryParameter String url,
+                @QueryParameter String repositoryId,
                 @QueryParameter String credentialsId,
                 @QueryParameter String groupId,
                 @QueryParameter String artifactId,
@@ -76,7 +77,7 @@ public class ArtifactoryChoiceListProvider extends AbstractMavenArtifactChoiceLi
             }
             return super.performTest(
                     service,
-                    "",
+                    repositoryId,
                     groupId,
                     artifactId,
                     packaging,
