@@ -4,6 +4,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class MavenArtifactChoiceListProviderUtils {
 
     /**
@@ -16,7 +18,9 @@ public class MavenArtifactChoiceListProviderUtils {
     public static Map<String, String> toMap(List<String> pChoices) {
         Map<String, String> retVal = new LinkedHashMap<String, String>();
         for (String current : pChoices) {
-            retVal.put(current.substring(current.lastIndexOf("/") + 1), current);
+            if(StringUtils.isNotEmpty(current)) {
+                retVal.put(current.substring(current.lastIndexOf("/") + 1), current);
+            }
         }
         return retVal;
     }
