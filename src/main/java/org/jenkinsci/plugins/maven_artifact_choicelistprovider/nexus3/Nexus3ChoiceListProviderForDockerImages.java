@@ -186,11 +186,20 @@ public class Nexus3ChoiceListProviderForDockerImages extends AbstractMavenArtifa
     }
 
     @DataBoundSetter
-    public void setImageName(String imageName) {
-        this.setArtifactId(imageName);
+    public void setImageName(String name) {
+        this.setArtifactId(name);
     }
 
-    public String getImageName() {
+    public String getName() {
         return this.getArtifactId();
+    }
+
+     @DataBoundSetter
+    public void setRepository(String repository) {
+        this.setRepositoryId(repository);
+    }
+
+    public String getRepository() {
+        return super.getRepositoryId();
     }
 }

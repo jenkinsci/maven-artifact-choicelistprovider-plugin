@@ -162,25 +162,6 @@ public class ArtifactoryChoiceListProviderForDockerImages extends AbstractMavenA
             return true;
         }
 
-         @DataBoundSetter
-        public void setRepositoryId(String repositoryId) {
-            this.repositoryId = StringUtils.trim(repositoryId);
-        }
-
-
-        @DataBoundSetter
-        public void setName(String name) {
-            this.name = StringUtils.trim(name);
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public String getRepositoryId() {
-            return repositoryId;
-        }
-
     }
 
     @Override
@@ -213,12 +194,21 @@ public class ArtifactoryChoiceListProviderForDockerImages extends AbstractMavenA
     }
 
     @DataBoundSetter
-    public void setImageName(String imageName) {
-        this.setArtifactId(imageName);
+    public void setName(String name) {
+        this.setArtifactId(name);
     }
 
-    public String getImageName() {
+    public String getName() {
         return this.getArtifactId();
+    }
+
+    @DataBoundSetter
+    public void setRepository(String repository) {
+        this.setRepositoryId(repository);
+    }
+
+    public String getRepository() {
+        return super.getRepositoryId();
     }
 }
 
