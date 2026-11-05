@@ -74,15 +74,14 @@ public abstract class ArtifactoryRestApiAQLService extends AbstractRESTfulVersio
             LOGGER.info("responsecode from Artifactory is " + response.getStatus());
             
             String plainResult = response.readEntity(String.class);
-
             if (LOGGER.isLoggable(Level.FINEST)) {
                 LOGGER.info(plainResult);
             }
 
-            final JsonNode resultAsJSON = mapper.readTree(plainResult);
-            if(response.getStatus() == 200 ) {         
+            if(response.getStatus() == 200 ) {               
+                final JsonNode resultAsJSON = mapper.readTree(plainResult);
                 if (resultAsJSON == null) {
-                    LOGGER.info("response from Artifactory is NULL.");
+                    LOGGER.info("response from Artifactory cannot be parse to JSON: " + plainResult);
                 } else {
                     Set<String> currentResult = parseAndFilterResponse(resultAsJSON);
                     retVal.addAll(currentResult);
