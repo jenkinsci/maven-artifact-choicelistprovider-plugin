@@ -86,7 +86,7 @@ public class ArtifactoryChoiceListProviderForDockerImages extends AbstractMavenA
             // SECURITY-1022
             pItem.checkPermission(Job.CONFIGURE);
 
-            final IVersionReader2 service = new ArtifactoryRestApiAQLService(url);
+            final IVersionReader2 service = new ArtifactoryAQLDockerImageService(url);
 
             // If configured, set User Credentials
             final UsernamePasswordCredentialsImpl c = getCredentials(credentialsId, pItem);
@@ -121,7 +121,12 @@ public class ArtifactoryChoiceListProviderForDockerImages extends AbstractMavenA
                 final boolean pReverseOrder) {
             Map<String, String> retVal = new LinkedHashMap<String, String>();
             try {
-                MultivaluedMap<String, String> requestParams =  ArtifactoryRESTfulParameterBuilderForAQL.create(pRepository, pName);
+                final String queryString = new ArtifactoryAQLDockerImageAndTagBuilder()
+                    .setRepositoryId(pRepository)
+                    .setImageName(pName)
+                    .build();
+                    
+                MultivaluedMap<String, String> requestParams =  ArtifactoryRESTfulParameterBuilderForAQL.create(queryString);
                 final List<String> filteredChoices = pInstance.retrieveVersions(requestParams);
 
                 if (pReverseOrder) {
@@ -167,7 +172,7 @@ public class ArtifactoryChoiceListProviderForDockerImages extends AbstractMavenA
     @Override
     public IVersionReader createServiceInstance(Item item) {
         // init the service
-        final IVersionReader retVal = new ArtifactoryRestApiAQLService(url);
+        final IVersionReader retVal = new ArtifactoryAQLDockerImageService(url);
         final UsernamePasswordCredentialsImpl c = getCredentials(getCredentialsId(), item);
         if (c != null) {
             retVal.setCredentials(c.getUsername(), c.getPassword().getPlainText());
@@ -236,19 +241,14 @@ class ArtifactoryRESTfulParameterBuilderForAQL {
     }
 
     public static MultivaluedMap<String, String> create(
-            String pRepository, String pName) {
+            String pQueryString) {
         if (LOGGER.isLoggable(Level.FINE)) {
-            LOGGER.fine("create parameters for: repository: " + pRepository + ", n:" + pName);
+            LOGGER.fine("create parameters for: " + pQueryString);
         }
 
         MultivaluedMap<String, String> requestParams = new MultivaluedHashMap<String, String>();
 
-        final StringBuilder aql = new StringBuilder();
-        aql.append("items.find({");
-        aql.append("\"repo\": \"").append(pRepository).append("\",");
-        aql.append("\"@docker.repoName\": {\"$eq\":\"").append(pName).append("\"}");
-        aql.append("}).include(\"repo\",\"path\",\"name\",\"@docker.repoName\",\"@docker.manifest\")");
-        requestParams.putSingle(ArtifactoryRestApiAQLService.PARAMETER_QUERY, aql.toString());
+        requestParams.putSingle(ArtifactoryRestApiAQLService.PARAMETER_QUERY, pQueryString);
 
         return requestParams;
     }

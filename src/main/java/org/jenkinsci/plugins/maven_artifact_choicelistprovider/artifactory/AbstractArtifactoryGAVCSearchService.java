@@ -9,12 +9,17 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.AbstractRESTfulVersionReader;
+import org.jenkinsci.plugins.maven_artifact_choicelistprovider.IVersionReader2;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.ValidAndInvalidClassifier;
+import org.jenkinsci.plugins.maven_artifact_choicelistprovider.VersionReaderException;
+
 
 /**
  *
@@ -24,16 +29,16 @@ import org.jenkinsci.plugins.maven_artifact_choicelistprovider.ValidAndInvalidCl
  *
  * @author stephan.watermeyer, Diebold Nixdorf
  */
-public class ArtifactorySearchService extends AbstractRESTfulVersionReader {
+public class AbstractArtifactoryGAVCSearchService extends AbstractRESTfulVersionReader implements IVersionReader2 {
 
-    private static final Logger LOGGER = Logger.getLogger(ArtifactorySearchService.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(AbstractArtifactoryGAVCSearchService.class.getName());
 
     /**
      * Default Read Timeout when connecting to the Repository Service
      */
     private static final int ARTIFACTORY_SERVICE_READ_TIMEOUT = 15000;
 
-    public ArtifactorySearchService(String pURL) {
+    public AbstractArtifactoryGAVCSearchService(String pURL) {
         super(pURL);
     }
 
@@ -43,17 +48,25 @@ public class ArtifactorySearchService extends AbstractRESTfulVersionReader {
     public String getRESTfulServiceEndpoint() {
         return SEARCH_SERVICE;
     }
-
-    @Override
+   
+    @Override 
     public Set<String> callService(
             String pRepositoryIdList,
             String pGroupId,
             String pArtifactId,
             String pPackaging,
             ValidAndInvalidClassifier pClassifier) {
+        
         // repositoryIds can be a comma separated list
         final MultivaluedMap<String, String> requestParams =
                 new ArtifactoryGAVCRESTfulParameterBuilder().create(pRepositoryIdList, pGroupId, pArtifactId, pClassifier);
+
+        return this.callService(requestParams, pClassifier, pPackaging);
+    }
+
+    protected Set<String> callService(MultivaluedMap<String, String> requestParams,
+            ValidAndInvalidClassifier pClassifier,
+            String pPackaging) {
 
         Set<String> retVal = new LinkedHashSet<>();
         LOGGER.info("call artifactory service");
@@ -107,6 +120,20 @@ public class ArtifactorySearchService extends AbstractRESTfulVersionReader {
     protected int getTimeout() {
         return ARTIFACTORY_SERVICE_READ_TIMEOUT;
     }
+
+    @Override
+    public List<String> retrieveVersions(MultivaluedMap<String, String> pParams) throws VersionReaderException {
+        Set<String> callService = this.callService(pParams, null, null);
+        return callService.stream().collect(Collectors.toList());
+    }
+
+    @Override
+    public List<String> retrieveVersions(MultivaluedMap<String, String> pParams, ValidAndInvalidClassifier pClassifier)
+            throws VersionReaderException {
+        Set<String> callService = this.callService(pParams, pClassifier, null);
+        return callService.stream().collect(Collectors.toList());
+    }
+
 }
 
 /**

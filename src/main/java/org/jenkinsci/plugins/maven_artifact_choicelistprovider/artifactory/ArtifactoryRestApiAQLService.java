@@ -10,7 +10,6 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
-import org.apache.commons.lang3.StringUtils;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.AbstractRESTfulVersionReader;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.IVersionReader2;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.ValidAndInvalidClassifier;
@@ -24,22 +23,15 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.ws.rs.core.MediaType;
 
-public class ArtifactoryRestApiAQLService extends AbstractRESTfulVersionReader  implements IVersionReader2 {
+public abstract class ArtifactoryRestApiAQLService extends AbstractRESTfulVersionReader  implements IVersionReader2 {
 
     private static final Logger LOGGER = Logger.getLogger(ArtifactoryRestApiAQLService.class.getName());
 
     public static final String PARAMETER_QUERY = "aql";
     
-    private String imagePrefix;
-
     public ArtifactoryRestApiAQLService(String pURL) {
         super(pURL);
-    }
-
-     public ArtifactoryRestApiAQLService(String pURL, String pImagePrefix) {
-        super(pURL);
-        this.imagePrefix = pImagePrefix;
-    }
+    }   
 
     @Override
     public List<String> retrieveVersions(MultivaluedMap<String, String> pParams) throws VersionReaderException {
@@ -49,21 +41,8 @@ public class ArtifactoryRestApiAQLService extends AbstractRESTfulVersionReader  
     @Override
     public List<String> retrieveVersions(MultivaluedMap<String, String> pParams, ValidAndInvalidClassifier pClassifier)
             throws VersionReaderException {
-        Set<String> callService = this.callService(pParams, pClassifier);
+        Set<String> callService = this.callService(pParams);
         return callService.stream().collect(Collectors.toList());
-    }
-
-    
-    @Override
-    @Deprecated
-    public Set<String> callService(
-            final String pRepositoryId,
-            final String pGroup,
-            final String pName,
-            final String pPackaging,
-            final ValidAndInvalidClassifier pClassifier) {
-        final MultivaluedMap<String, String> requestParams = ArtifactoryRESTfulParameterBuilderForAQL.create(pRepositoryId, pName);;
-        return this.callService(requestParams, pClassifier);
     }
 
     @Override
@@ -71,24 +50,27 @@ public class ArtifactoryRestApiAQLService extends AbstractRESTfulVersionReader  
         return "artifactory/api/search/aql";
     }
 
-    protected Set<String> callService(
-            MultivaluedMap<String, String> pParams, final ValidAndInvalidClassifier pClassifier) {
+    protected Set<String> callService(MultivaluedMap<String, String> pParams) {
+        final String aql = pParams.getFirst(PARAMETER_QUERY);
+        return callService(aql);
+    }
+
+    protected Set<String> callService(final String pAQL) {
         
         // init empty
         Set<String> retVal = new LinkedHashSet<>(); // retain order of insertion
 
         final ObjectMapper mapper = new ObjectMapper();
 
-        WebTarget theInstance = getInstance();
-
-        String aql = pParams.getFirst(PARAMETER_QUERY);
+        WebTarget theInstance = getInstance();        
 
         if (LOGGER.isLoggable(Level.INFO)) {
             LOGGER.info("URI: " + theInstance.getUri());
+            LOGGER.info(pAQL);
         }
 
         try {
-            final Response response = theInstance.request().post(Entity.entity(aql, MediaType.TEXT_PLAIN));
+            final Response response = theInstance.request().post(Entity.entity(pAQL, MediaType.TEXT_PLAIN));
             LOGGER.info("responsecode from Artifactory is " + response.getStatus());
             
             String plainResult = response.readEntity(String.class);
@@ -98,15 +80,16 @@ public class ArtifactoryRestApiAQLService extends AbstractRESTfulVersionReader  
             }
 
             final JsonNode resultAsJSON = mapper.readTree(plainResult);
-            if(response.getStatus() != 200 ) {
-                LOGGER.warning("error response from Artifactory is ." + response.getStatus());
-            }
-
-            if (resultAsJSON == null) {
-                LOGGER.info("response from Artifactory is NULL.");
+            if(response.getStatus() == 200 ) {         
+                if (resultAsJSON == null) {
+                    LOGGER.info("response from Artifactory is NULL.");
+                } else {
+                    Set<String> currentResult = parseAndFilterResponse(resultAsJSON);
+                    retVal.addAll(currentResult);
+                }
             } else {
-                Set<String> currentResult = parseAndFilterResponse(resultAsJSON);
-                retVal.addAll(currentResult);
+                LOGGER.warning("error response from Artifactory is ." + response.getStatus());
+                retVal.add("invalid response from artifactory, HTTP-" + response.getStatus());
             }
         } catch (JsonParseException e) {
             LOGGER.log(Level.WARNING, "failed to parse", e);
@@ -121,47 +104,7 @@ public class ArtifactoryRestApiAQLService extends AbstractRESTfulVersionReader  
         return retVal;
     }
 
-    /**
-     * Parses the JSON response from Artifactory and creates a list of links where the
-     * artifacts can be retrieved.
-     *
-     * @param pJsonResult the JSON response of the Artifactory API.
-     * @return a unique list of URLs that are matching the search criteria, sorted
-     *         by the order of the Artifactory service.
-     */
-    Set<String> parseAndFilterResponse(final JsonNode pJsonResult) {
-        // Use a Map instead of a List to filter duplicated entries and also linked to
-        // keep the order of response
-        final Set<String> retVal = new LinkedHashSet<>();
+    protected abstract Set<String> parseAndFilterResponse(final JsonNode pJsonResult);
 
-        for (JsonNode result : pJsonResult.path("results")) {
-
-            String name = null;
-            String tag = null;
-
-            for (JsonNode property : result.path("properties")) {
-
-                switch (property.path("key").asText()) {
-                    case "docker.repoName":
-                        name = property.path("value").asText();
-                        break;
-                    case "docker.manifest":
-                        tag = property.path("value").asText();
-                        break;
-                }
-            }
-
-            if (name != null && tag != null) {
-                if (StringUtils.isEmpty(imagePrefix)) {
-                    retVal.add(name + ":" + tag);
-                } else {
-                    retVal.add(imagePrefix + name + ":" + tag);
-                }
-            }
-        }
-
-        return retVal;
-    }
-   
 }
 
