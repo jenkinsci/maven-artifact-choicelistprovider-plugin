@@ -78,13 +78,17 @@ public class MACLPPipelineParameterArtifactoryDockerImages extends MACLPChoicePa
     @Override
     protected IVersionReader2 createServiceInstance(String pUrl) {
         LOGGER.fine("createServiceInstance: " + pUrl);
-        return new ArtifactoryRestApiAQLService(pUrl, getImagePrefix());
+        return new ArtifactoryAQLDockerImageService(pUrl, getImagePrefix());
     }
 
     @Override
     protected MultivaluedMap<String, String> createParameterList() {
         LOGGER.fine("createParameterList");
-        return ArtifactoryRESTfulParameterBuilderForAQL.create(getRepository(), getImageName());
+        final String queryString = new ArtifactoryAQLDockerImageAndTagBuilder()
+                    .setRepositoryId(getRepository())
+                    .setImageName(getImageName())
+                    .build();        
+        return ArtifactoryRESTfulParameterBuilderForAQL.create(queryString);
     }
 
     @Override

@@ -21,6 +21,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.IVersionReader2;
+import org.jenkinsci.plugins.maven_artifact_choicelistprovider.VersionReaderException;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.StaplerRequest2;
@@ -122,8 +123,8 @@ public abstract class MACLPChoiceParameterDefinitionBase extends ChoiceParameter
             params.putAll(createParameterList());
 
             LOGGER.log(Level.FINE, "call the service");
-            retVal = serviceInstances.retrieveVersions(params);
-
+            retVal = retrieveVersions(serviceInstances, params);
+            
             if (reverseOrder) {
                 LOGGER.log(Level.FINE, "reverse order");
                 Collections.reverse(retVal);
@@ -133,6 +134,18 @@ public abstract class MACLPChoiceParameterDefinitionBase extends ChoiceParameter
         }
 
         return retVal;
+    }
+
+    /**
+     * Child-Classes can override this method to filter the list of results returned from the service.
+     * 
+     * @throws VersionReaderException 
+     */
+    protected List<String> retrieveVersions(IVersionReader2 pTheInstance, MultivaluedMap<String, String> pParams) throws VersionReaderException {
+        if(pTheInstance == null) {
+            throw new VersionReaderException("Service instance is null");
+        }
+        return pTheInstance.retrieveVersions(pParams);
     }
 
     @Override
