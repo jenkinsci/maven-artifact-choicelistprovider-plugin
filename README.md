@@ -70,6 +70,15 @@ pipeline {
         nexus3Generic(name: 'theGenericArtifact', url: "https://repo.company.com", repository: "ps-docker-dev-hosted", assetName: 'dn-ps-nagios', credentialsId: "my-credential-id")
         
         nexus3Maven(name: 'theMavenArtifact', url: "https://repo.company.com", repository: "maven-central-ext-proxy", groupId: "org.apache.logging.log4j", artifactId: 'log4j-core', packaging: 'jar', credentialsId: "my-credential-id")
+
+
+        artifactoryDockerImage(name: 'artifactoryDockerImageWithCustomPrefix', url: "https://repo.company.com", imagePrefix: "repo.company.com/docker-dev-hosted/", repository: "docker-releases-hosted", group: "", imageName: 'sub/dn-ps-nagios', credentialsId: "my-credential-id", reverseOrder: true)
+        
+        artifactoryDockerImage(name: 'artifactoryDockerImageNoPrefix', url: "https://repo.company.com", imagePrefix: "", repository: "docker-dev-hosted", group: "", imageName: 'dn-ps-nagios', credentialsId: "my-credential-id", reverseOrder: true)
+        
+        artifactoryMaven(name: 'artifactoryMavenArtifact', url: "https://repo.company.com", repository: "maven-central-ext-proxy", groupId: "org.apache.logging.log4j", artifactId: 'log4j-core', packaging: 'jar', credentialsId: "my-credential-id")
+        
+        artifactoryMavenVersionOnly(name: 'artifactoryMavenVersionOnly', url: "https://repo.company.com", repository: "maven-central-ext-proxy", groupId: "org.apache.logging.log4j", artifactId: 'log4j-core', packaging: 'jar', credentialsId: "my-credential-id")
     }
     
     stages {
@@ -79,6 +88,11 @@ pipeline {
                 echo "$theDockerImageNoPrefix"
                 echo "$theGenericArtifact"
                 echo "$theMavenArtifact"
+
+                echo "$artifactoryDockerImageWithCustomPrefix"
+                echo "$artifactoryDockerImageNoPrefix"
+                echo "$artifactoryMavenArtifact"
+                echo "$artifactoryMavenVersionOnly"
             }
         }
     }
