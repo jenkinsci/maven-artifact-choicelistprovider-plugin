@@ -54,8 +54,6 @@ public class ArtifactoryGAVCRESTfulParameterBuilder {
      *            the GroupId
      * @param pArtifactId
      *            the ArtifactId
-     * @param pPackaging
-     *            the Packaging
      * @param pClassifier
      *            the Classifier
      * @param specificMode
