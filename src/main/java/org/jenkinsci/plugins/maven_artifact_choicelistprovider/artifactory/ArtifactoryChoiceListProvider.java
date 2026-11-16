@@ -71,7 +71,7 @@ public class ArtifactoryChoiceListProvider extends AbstractMavenArtifactChoiceLi
             // SECURITY-1022
             pItem.checkPermission(Job.CONFIGURE);
 
-            final IVersionReader service = new AbstractArtifactoryGAVCSearchService(url);
+            final IVersionReader service = new ArtifactoryGAVCSearchService(url);
 
             // If configured, set User Credentials
             final UsernamePasswordCredentialsImpl c = getCredentials(credentialsId, pItem);
@@ -124,7 +124,7 @@ public class ArtifactoryChoiceListProvider extends AbstractMavenArtifactChoiceLi
 
     @Override
     public IVersionReader createServiceInstance(Item item) {
-        final IVersionReader retVal = new AbstractArtifactoryGAVCSearchService(url);
+        final IVersionReader retVal = new ArtifactoryGAVCSearchService(url);
 
         final UsernamePasswordCredentialsImpl c = getCredentials(getCredentialsId(), item);
         if (c != null) {

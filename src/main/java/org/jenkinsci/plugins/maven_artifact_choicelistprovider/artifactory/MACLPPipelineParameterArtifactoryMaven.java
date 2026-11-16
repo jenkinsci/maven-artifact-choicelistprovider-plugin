@@ -97,13 +97,13 @@ public class MACLPPipelineParameterArtifactoryMaven extends MACLPChoiceParameter
     @Override
     protected IVersionReader2 createServiceInstance(String pUrl) {
         LOGGER.fine("createServiceInstance: " + pUrl);
-        return new AbstractArtifactoryGAVCSearchService(pUrl);
+        return new ArtifactoryGAVCSearchService(pUrl);
     }
 
     protected List<String> retrieveVersions(IVersionReader2 pTheInstance, MultivaluedMap<String, String> pParams) throws VersionReaderException {
         final List<String> retVal;
-        if(pTheInstance instanceof AbstractArtifactoryGAVCSearchService) {
-            final AbstractArtifactoryGAVCSearchService artifactoryService = (AbstractArtifactoryGAVCSearchService) pTheInstance;
+        if(pTheInstance instanceof ArtifactoryGAVCSearchService) {
+            final ArtifactoryGAVCSearchService artifactoryService = (ArtifactoryGAVCSearchService) pTheInstance;
             final Set<String> serviceResult = artifactoryService.callService(pParams, null, packaging);
             retVal = serviceResult.stream().collect(Collectors.toList());
         } else {
@@ -119,7 +119,7 @@ public class MACLPPipelineParameterArtifactoryMaven extends MACLPChoiceParameter
         ArtifactoryGAVCRESTfulParameterBuilder mapper = new ArtifactoryGAVCRESTfulParameterBuilder();
         ValidAndInvalidClassifier classifier =
                 (StringUtils.isEmpty(getClassifier()) ? null : ValidAndInvalidClassifier.fromString(getClassifier()));
-        return mapper.create(getRepository(), getGroupId(), getArtifactId(), classifier);
+        return mapper.create(getRepository(), getGroupId(), getArtifactId(), classifier, true);
     }
 
     @Override

@@ -37,21 +37,14 @@ public class ArtifactoryGAVCRESTfulParameterBuilder {
     private static final Logger LOGGER = Logger.getLogger(ArtifactoryGAVCRESTfulParameterBuilder.class.getName());
     
     public MultivaluedMap<String, String> create(final String pRepositoryId, final String pName) {
-        return create(pRepositoryId, null, pName, null, "");
+        return create(pRepositoryId, null, pName, null, true);
     }
 
     public MultivaluedMap<String, String> create(
-            final String pRepositoryId, final String pGroup, final String pName, String pToken) {
-        return create(pRepositoryId, pGroup, pName, null, pToken);
+            final String pRepositoryId, final String pGroup, final String pName) {
+        return create(pRepositoryId, pGroup, pName, null, true);
     }
 
-    public MultivaluedMap<String, String> create(
-            final String pRepositoryId,
-            final String pGroupId,
-            final String pArtifactId,
-            final ValidAndInvalidClassifier pClassifier) {
-        return create(pRepositoryId, pGroupId, pArtifactId, pClassifier, "");
-    }
     /**
      * Creates the parameter list for the RESTful service.
      *
@@ -65,8 +58,8 @@ public class ArtifactoryGAVCRESTfulParameterBuilder {
      *            the Packaging
      * @param pClassifier
      *            the Classifier
-     * @param pToken
-     *            the Continuation Token.
+     * @param specificMode
+     *            With specificMode set to TRUE the API returns the downloadURI instead of the Metadata.
      * @return the parameters to be used for the request.
      */
     public MultivaluedMap<String, String> create(
@@ -74,11 +67,11 @@ public class ArtifactoryGAVCRESTfulParameterBuilder {
             final String pGroupId,
             final String pArtifactId,
             final ValidAndInvalidClassifier pClassifier,
-            String pToken) {
+            boolean specificMode) {
         if (LOGGER.isLoggable(Level.FINE)) {
             LOGGER.fine("create parameters for: repositoryId: " + pRepositoryId + " g:" + pGroupId + ", a:"
                     + pArtifactId + ", p: artifactory-does-not-support-packaging-as-parameter, c: "
-                    + (pClassifier == null ? "null" : pClassifier.toString()) + " t:" + pToken);
+                    + (pClassifier == null ? "null" : pClassifier.toString()));
         }
 
         MultivaluedMap<String, String> requestParams = new MultivaluedHashMap<String, String>();
@@ -119,11 +112,9 @@ public class ArtifactoryGAVCRESTfulParameterBuilder {
             }
         }
 
-        // Specific Mode is activated, as we want to get the downloadUri directly.
-        requestParams.putSingle(PARAMETER_SPECIFIC, SPECIFIC_MODE.toString());
-
-        if (!StringUtils.isEmpty(pToken)) {
-            requestParams.putSingle(getContinuationToken(), pToken);
+        if(specificMode) {
+            // Specific Mode is activated, as we want to get the downloadUri directly.
+            requestParams.putSingle(PARAMETER_SPECIFIC, SPECIFIC_MODE.toString());
         }
 
         return requestParams;
@@ -136,7 +127,6 @@ public class ArtifactoryGAVCRESTfulParameterBuilder {
     public String getGroupId() {
         return PARAMETER_GROUPID;
     }
-
     
     public String getArtifactId() {
         return PARAMETER_ARTIFACTID;
@@ -144,10 +134,6 @@ public class ArtifactoryGAVCRESTfulParameterBuilder {
 
     public String getClassifier() {
         return PARAMETER_CLASSIFIER;
-    }
-
-    public String getContinuationToken() {
-        throw new UnsupportedOperationException("this method is not supported getContinuationToken()");
     }
 
 }

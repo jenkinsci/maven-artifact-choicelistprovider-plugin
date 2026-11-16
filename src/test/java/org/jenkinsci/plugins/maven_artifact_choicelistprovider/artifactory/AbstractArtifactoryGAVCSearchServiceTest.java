@@ -3,15 +3,14 @@ package org.jenkinsci.plugins.maven_artifact_choicelistprovider.artifactory;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
-import java.util.Set;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.ValidAndInvalidClassifier;
 import org.junit.jupiter.api.Test;
 
-class AbstractArtifactoryGAVCSearchServiceTest {
+class ArtifactoryGAVCSearchServiceTest {
 
     @Test
     void testWithoutExplicitQualifier() throws Exception {
-        AbstractArtifactoryGAVCSearchService s = new AbstractArtifactoryGAVCSearchService("https://repo.jenkins-ci.org/");
+        ArtifactoryGAVCSearchService s = new ArtifactoryGAVCSearchService("https://repo.jenkins-ci.org/");
         List<String> retrieveVersions = s.retrieveVersions(
                 "",
                 "org.jenkins-ci.plugins",
@@ -25,7 +24,7 @@ class AbstractArtifactoryGAVCSearchServiceTest {
 
     @Test
     void testWithExplicitQualifier() throws Exception {
-        AbstractArtifactoryGAVCSearchService s = new AbstractArtifactoryGAVCSearchService("https://repo.jenkins-ci.org/");
+        ArtifactoryGAVCSearchService s = new ArtifactoryGAVCSearchService("https://repo.jenkins-ci.org/");
         List<String> retrieveVersions = s.retrieveVersions(
                 "",
                 "org.jenkins-ci.plugins",
@@ -39,7 +38,7 @@ class AbstractArtifactoryGAVCSearchServiceTest {
 
     @Test
     void testWithPackaging() throws Exception {
-        AbstractArtifactoryGAVCSearchService s = new AbstractArtifactoryGAVCSearchService("https://repo.jenkins-ci.org/");
+        ArtifactoryGAVCSearchService s = new ArtifactoryGAVCSearchService("https://repo.jenkins-ci.org/");
         List<String> retrieveVersions = s.retrieveVersions(
                 "",
                 "org.jenkins-ci.plugins",

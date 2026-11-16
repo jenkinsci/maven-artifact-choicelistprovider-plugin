@@ -27,7 +27,7 @@ public abstract class AbstractRESTfulVersionReader implements IVersionReader {
     /**
      * Default Read Timeout when connecting to the Repository Service
      */
-    private static final int SERVICE_READ_TIMEOUT = 5000;
+    private static final int SERVICE_READ_TIMEOUT = 30000;
 
     protected static final String PACKAGING_ALL = "*";
 
@@ -89,7 +89,7 @@ public abstract class AbstractRESTfulVersionReader implements IVersionReader {
                 switch (e.getResponse().getStatus()) {
                     case 401:
                         msg =
-                                "Your repository requires user-authentication. Please configure a username and a password to list the content of this repository";
+                                "Your repository requires user-authentication. Please configure a correct username and a password to list the content of this repository";
                         break;
                     case 404:
                         msg =
@@ -103,6 +103,11 @@ public abstract class AbstractRESTfulVersionReader implements IVersionReader {
                 msg = "General Error:" + e.getMessage();
             }
             throw new VersionReaderException(msg, e);
+        } catch(javax.ws.rs.NotAuthorizedException e) {
+            // This is for Artifactory
+            throw new VersionReaderException(
+                    "Your repository requires user-authentication. Please configure a correct username and a password to list the content of this repository",
+                    e);
         } catch (javax.ws.rs.NotFoundException e) {
             throw new VersionReaderException(
                     "The artifact you are looking for does not exist (HTTP404). Have you used the correct repositoryId / baseURL?",
