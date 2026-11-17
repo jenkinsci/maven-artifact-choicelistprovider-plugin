@@ -63,7 +63,7 @@ public class ArtifactoryGAVCRESTfulParameterBuilder {
             final String pGroupId,
             final String pArtifactId,
             final ValidAndInvalidClassifier pClassifier,
-            boolean specificMode) {
+            final boolean specificMode) {
         if (LOGGER.isLoggable(Level.FINE)) {
             LOGGER.fine("create parameters for: repositoryId: " + pRepositoryId + " g:" + pGroupId + ", a:"
                     + pArtifactId + ", p: artifactory-does-not-support-packaging-as-parameter, c: "

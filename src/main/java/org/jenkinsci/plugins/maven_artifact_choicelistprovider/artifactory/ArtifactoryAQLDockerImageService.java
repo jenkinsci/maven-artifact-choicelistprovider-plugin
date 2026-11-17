@@ -63,6 +63,9 @@ public class ArtifactoryAQLDockerImageService extends ArtifactoryRestApiAQLServi
                     case "docker.manifest":
                         tag = property.path("value").asText();
                         break;
+                    default:
+                        // Nothing to do here. We ignore the other fields
+                        break;
                 }
             }
 

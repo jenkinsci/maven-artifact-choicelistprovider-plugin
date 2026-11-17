@@ -51,9 +51,6 @@ public class ArtifactoryChoiceListProviderForDockerImages extends AbstractMavenA
         @Inject
         private AbstractMavenArtifactChoiceListProvider.DescriptorImpl delegate;
 
-        private String repositoryId;
-        private String name;
-
         public ArtifactoryDockerImageDescriptorImpl() {
             // When Jenkins is restarted, load any saved configuration from disk.
             load();
