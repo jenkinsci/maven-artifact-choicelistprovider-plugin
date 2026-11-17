@@ -112,18 +112,11 @@ If you would like to use Snapshot Versions of your artifacts you have to enable 
 ![Alt text](/src/site/resources/project-config-2.png?raw=true "Nexus Snapshots")
 
 ## Artifactory
-Artifactory API is not returning the correct ArtifactIds but only a URL to a JSON file that contains the DownloadURI of the Artifact. As currently there is no way in the Extensible Choice Plugin to intercept the selected value and because its not performant to query Artifactory for all items in the list for the correct downloadURI, the workaround is like this:
+Artifactory has been introduced in earlier versions already and with the November '26 update it has been enhanced. For Artifactory the plugin now supports to do a Maven2 artifact searched based on GAVC (GroupId, ArtifactId, Version, Classifier) parameters. There is also one ChoiceListProvider to find also the version numbers of an artifact.
 
-```
-wget `wget -qO - https://repo.jenkins-ci.org/api/storage/releases/org/jenkins-ci/plugins/ant-in-workspace/1.1.0/ant-in-workspace-1.1.0-javadoc.jar | json downloadUri\`
-```
-The json command like tool is required:
-```
-json --version
-json 9.0.6
-written by Trent Mick
-https://github.com/trentm/json
-```
+Finding DockerImages (and Helm Packages) is also now supported.
+
+The plugin supports the configuration as a usual build parameter in the job configuration or as a parameter in a declarative pipeline.
 
 # Continouos Delivery
 https://ci.jenkins.io/job/Plugins/job/maven-artifact-choicelistprovider-plugin/
