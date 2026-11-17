@@ -21,11 +21,10 @@ public class ArtifactoryGAVCVersionOnlySearchService extends ArtifactoryGAVCSear
 
     private static final Logger LOGGER = Logger.getLogger(ArtifactoryGAVCVersionOnlySearchService.class.getName());
 
-
     public ArtifactoryGAVCVersionOnlySearchService(String pURL) {
         super(pURL);
     }
-    
+
     @Override
     Set<String> parseResult(final String pContent, final String pPackaging) {
         final Set<String> retVal = new LinkedHashSet<>();
@@ -43,5 +42,4 @@ public class ArtifactoryGAVCVersionOnlySearchService extends ArtifactoryGAVCSear
         }
         return retVal;
     }
-
 }

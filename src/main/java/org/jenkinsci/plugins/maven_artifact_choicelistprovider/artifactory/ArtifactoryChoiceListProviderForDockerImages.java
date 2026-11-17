@@ -122,11 +122,12 @@ public class ArtifactoryChoiceListProviderForDockerImages extends AbstractMavenA
             Map<String, String> retVal = new LinkedHashMap<String, String>();
             try {
                 final String queryString = new ArtifactoryAQLDockerImageAndTagBuilder()
-                    .setRepositoryId(pRepository)
-                    .setImageName(pName)
-                    .build();
-                    
-                MultivaluedMap<String, String> requestParams =  ArtifactoryRESTfulParameterBuilderForAQL.create(queryString);
+                        .setRepositoryId(pRepository)
+                        .setImageName(pName)
+                        .build();
+
+                MultivaluedMap<String, String> requestParams =
+                        ArtifactoryRESTfulParameterBuilderForAQL.create(queryString);
                 final List<String> filteredChoices = pInstance.retrieveVersions(requestParams);
 
                 if (pReverseOrder) {
@@ -166,7 +167,6 @@ public class ArtifactoryChoiceListProviderForDockerImages extends AbstractMavenA
             save();
             return true;
         }
-
     }
 
     @Override
@@ -217,7 +217,6 @@ public class ArtifactoryChoiceListProviderForDockerImages extends AbstractMavenA
     }
 }
 
-
 class ArtifactoryRESTfulParameterBuilderForAQL {
 
     private static final Logger LOGGER = Logger.getLogger(ArtifactoryRESTfulParameterBuilderForAQL.class.getName());
@@ -240,8 +239,7 @@ class ArtifactoryRESTfulParameterBuilderForAQL {
         return PARAMETER_REPOSITORY;
     }
 
-    public static MultivaluedMap<String, String> create(
-            String pQueryString) {
+    public static MultivaluedMap<String, String> create(String pQueryString) {
         if (LOGGER.isLoggable(Level.FINE)) {
             LOGGER.fine("create parameters for: " + pQueryString);
         }

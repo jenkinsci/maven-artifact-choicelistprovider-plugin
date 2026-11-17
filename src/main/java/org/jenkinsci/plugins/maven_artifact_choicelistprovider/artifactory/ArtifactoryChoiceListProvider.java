@@ -151,7 +151,7 @@ public class ArtifactoryChoiceListProvider extends AbstractMavenArtifactChoiceLi
         return url;
     }
 
-     @DataBoundSetter
+    @DataBoundSetter
     public void setRepositoryId(String repositoryId) {
         this.repositoryId = repositoryId;
     }

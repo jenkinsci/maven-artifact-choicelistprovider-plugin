@@ -14,6 +14,7 @@ public class ArtifactoryAQLDockerImageAndTagBuilder {
         this.imageName = imageName;
         return this;
     }
+
     public String build() {
         final StringBuilder aql = new StringBuilder();
         aql.append("items.find({");
@@ -22,5 +23,4 @@ public class ArtifactoryAQLDockerImageAndTagBuilder {
         aql.append("}).include(\"repo\",\"path\",\"name\",\"@docker.repoName\",\"@docker.manifest\")");
         return aql.toString();
     }
-    
 }

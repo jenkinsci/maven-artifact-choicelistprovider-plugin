@@ -18,7 +18,8 @@ public class MACLPPipelineParameterArtifactoryDockerImages extends MACLPChoicePa
 
     private String imagePrefix;
 
-    private static final Logger LOGGER = Logger.getLogger(MACLPPipelineParameterArtifactoryDockerImages.class.getName());
+    private static final Logger LOGGER =
+            Logger.getLogger(MACLPPipelineParameterArtifactoryDockerImages.class.getName());
 
     @DataBoundConstructor
     public MACLPPipelineParameterArtifactoryDockerImages(
@@ -85,9 +86,9 @@ public class MACLPPipelineParameterArtifactoryDockerImages extends MACLPChoicePa
     protected MultivaluedMap<String, String> createParameterList() {
         LOGGER.fine("createParameterList");
         final String queryString = new ArtifactoryAQLDockerImageAndTagBuilder()
-                    .setRepositoryId(getRepository())
-                    .setImageName(getImageName())
-                    .build();        
+                .setRepositoryId(getRepository())
+                .setImageName(getImageName())
+                .build();
         return ArtifactoryRESTfulParameterBuilderForAQL.create(queryString);
     }
 

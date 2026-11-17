@@ -2,13 +2,11 @@ package org.jenkinsci.plugins.maven_artifact_choicelistprovider.artifactory;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.Extension;
-
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-
 import javax.ws.rs.core.MultivaluedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.jenkinsci.Symbol;
@@ -26,7 +24,8 @@ public class MACLPPipelineParameterArtifactoryMavenVersionOnly extends MACLPChoi
     private String packaging;
     private String classifier;
 
-    private static final Logger LOGGER = Logger.getLogger(MACLPPipelineParameterArtifactoryMavenVersionOnly.class.getName());
+    private static final Logger LOGGER =
+            Logger.getLogger(MACLPPipelineParameterArtifactoryMavenVersionOnly.class.getName());
 
     @DataBoundConstructor
     public MACLPPipelineParameterArtifactoryMavenVersionOnly(
@@ -100,16 +99,18 @@ public class MACLPPipelineParameterArtifactoryMavenVersionOnly extends MACLPChoi
         return new ArtifactoryGAVCVersionOnlySearchService(pUrl);
     }
 
-    protected List<String> retrieveVersions(IVersionReader2 pTheInstance, MultivaluedMap<String, String> pParams) throws VersionReaderException {
+    protected List<String> retrieveVersions(IVersionReader2 pTheInstance, MultivaluedMap<String, String> pParams)
+            throws VersionReaderException {
         final List<String> retVal;
-        if(pTheInstance instanceof ArtifactoryGAVCVersionOnlySearchService) {
-            final ArtifactoryGAVCVersionOnlySearchService artifactoryService = (ArtifactoryGAVCVersionOnlySearchService) pTheInstance;
+        if (pTheInstance instanceof ArtifactoryGAVCVersionOnlySearchService) {
+            final ArtifactoryGAVCVersionOnlySearchService artifactoryService =
+                    (ArtifactoryGAVCVersionOnlySearchService) pTheInstance;
             final Set<String> serviceResult = artifactoryService.callService(pParams, null, packaging);
             retVal = serviceResult.stream().collect(Collectors.toList());
         } else {
             retVal = super.retrieveVersions(pTheInstance, pParams);
         }
-        
+
         return retVal;
     }
 
@@ -140,7 +141,8 @@ public class MACLPPipelineParameterArtifactoryMavenVersionOnly extends MACLPChoi
         if (this == obj) return true;
         if (obj == null) return false;
         if (getClass() != obj.getClass()) return false;
-        MACLPPipelineParameterArtifactoryMavenVersionOnly other = (MACLPPipelineParameterArtifactoryMavenVersionOnly) obj;
+        MACLPPipelineParameterArtifactoryMavenVersionOnly other =
+                (MACLPPipelineParameterArtifactoryMavenVersionOnly) obj;
         if (!Objects.equals(getName(), other.getName())) return false;
         if (!Objects.equals(getDescription(), other.getDescription())) return false;
         if (!Objects.equals(artifactId, other.getArtifactId())) return false;

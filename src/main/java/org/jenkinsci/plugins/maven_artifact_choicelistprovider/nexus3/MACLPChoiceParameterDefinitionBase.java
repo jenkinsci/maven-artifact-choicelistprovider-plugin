@@ -124,7 +124,7 @@ public abstract class MACLPChoiceParameterDefinitionBase extends ChoiceParameter
 
             LOGGER.log(Level.FINE, "call the service");
             retVal = retrieveVersions(serviceInstances, params);
-            
+
             if (reverseOrder) {
                 LOGGER.log(Level.FINE, "reverse order");
                 Collections.reverse(retVal);
@@ -138,11 +138,12 @@ public abstract class MACLPChoiceParameterDefinitionBase extends ChoiceParameter
 
     /**
      * Child-Classes can override this method to filter the list of results returned from the service.
-     * 
-     * @throws VersionReaderException 
+     *
+     * @throws VersionReaderException
      */
-    protected List<String> retrieveVersions(IVersionReader2 pTheInstance, MultivaluedMap<String, String> pParams) throws VersionReaderException {
-        if(pTheInstance == null) {
+    protected List<String> retrieveVersions(IVersionReader2 pTheInstance, MultivaluedMap<String, String> pParams)
+            throws VersionReaderException {
+        if (pTheInstance == null) {
             throw new VersionReaderException("Service instance is null");
         }
         return pTheInstance.retrieveVersions(pParams);

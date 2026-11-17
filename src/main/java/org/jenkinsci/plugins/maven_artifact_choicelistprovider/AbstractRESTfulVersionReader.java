@@ -103,7 +103,7 @@ public abstract class AbstractRESTfulVersionReader implements IVersionReader {
                 msg = "General Error:" + e.getMessage();
             }
             throw new VersionReaderException(msg, e);
-        } catch(javax.ws.rs.NotAuthorizedException e) {
+        } catch (javax.ws.rs.NotAuthorizedException e) {
             // This is for Artifactory
             throw new VersionReaderException(
                     "Your repository requires user-authentication. Please configure a correct username and a password to list the content of this repository",

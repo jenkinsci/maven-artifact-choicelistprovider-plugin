@@ -1,23 +1,20 @@
 package org.jenkinsci.plugins.maven_artifact_choicelistprovider.artifactory;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import java.util.LinkedHashSet;
 import java.util.Set;
-
 import javax.ws.rs.core.MultivaluedMap;
-
 import org.apache.commons.lang3.StringUtils;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.ValidAndInvalidClassifier;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
-public class ArtifactoryAQLDockerImageService extends ArtifactoryRestApiAQLService{
+public class ArtifactoryAQLDockerImageService extends ArtifactoryRestApiAQLService {
 
     private String imagePrefix;
 
     public ArtifactoryAQLDockerImageService(String pURL) {
         super(pURL);
     }
-    
+
     public ArtifactoryAQLDockerImageService(String pURL, String pImagePrefix) {
         super(pURL);
         this.imagePrefix = pImagePrefix;
@@ -31,14 +28,15 @@ public class ArtifactoryAQLDockerImageService extends ArtifactoryRestApiAQLServi
             final String pPackaging,
             final ValidAndInvalidClassifier pClassifier) {
         final String queryString = new ArtifactoryAQLDockerImageAndTagBuilder()
-                    .setRepositoryId(pRepositoryId)
-                    .setImageName(pName)
-                    .build();        
-        final MultivaluedMap<String, String> requestParams = ArtifactoryRESTfulParameterBuilderForAQL.create(queryString);
+                .setRepositoryId(pRepositoryId)
+                .setImageName(pName)
+                .build();
+        final MultivaluedMap<String, String> requestParams =
+                ArtifactoryRESTfulParameterBuilderForAQL.create(queryString);
         return this.callService(requestParams);
     }
 
-     /**
+    /**
      * Parses the JSON response from Artifactory and creates a list of links where the
      * artifacts can be retrieved.
      *
@@ -80,4 +78,3 @@ public class ArtifactoryAQLDockerImageService extends ArtifactoryRestApiAQLServi
         return retVal;
     }
 }
-

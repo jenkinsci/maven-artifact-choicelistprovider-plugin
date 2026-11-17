@@ -7,7 +7,6 @@ import java.util.logging.Logger;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import org.apache.commons.lang3.StringUtils;
-
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.RESTfulParameterBuilder;
 import org.jenkinsci.plugins.maven_artifact_choicelistprovider.ValidAndInvalidClassifier;
 
@@ -24,7 +23,7 @@ public class ArtifactoryGAVCRESTfulParameterBuilder {
 
     public static final String PARAMETER_CLASSIFIER = "c";
 
-    //public static final String PARAMETER_PACKAGING = "p";
+    // public static final String PARAMETER_PACKAGING = "p";
 
     public static final String PARAMETER_ARTIFACTID = "a";
 
@@ -35,13 +34,12 @@ public class ArtifactoryGAVCRESTfulParameterBuilder {
     public static Boolean SPECIFIC_MODE = true;
 
     private static final Logger LOGGER = Logger.getLogger(ArtifactoryGAVCRESTfulParameterBuilder.class.getName());
-    
+
     public MultivaluedMap<String, String> create(final String pRepositoryId, final String pName) {
         return create(pRepositoryId, null, pName, null, true);
     }
 
-    public MultivaluedMap<String, String> create(
-            final String pRepositoryId, final String pGroup, final String pName) {
+    public MultivaluedMap<String, String> create(final String pRepositoryId, final String pGroup, final String pName) {
         return create(pRepositoryId, pGroup, pName, null, true);
     }
 
@@ -110,22 +108,22 @@ public class ArtifactoryGAVCRESTfulParameterBuilder {
             }
         }
 
-        if(specificMode) {
+        if (specificMode) {
             // Specific Mode is activated, as we want to get the downloadUri directly.
             requestParams.putSingle(PARAMETER_SPECIFIC, SPECIFIC_MODE.toString());
         }
 
         return requestParams;
     }
-    
+
     public String getRepositoryId() {
         return PARAMETER_REPOSITORYID;
     }
-    
+
     public String getGroupId() {
         return PARAMETER_GROUPID;
     }
-    
+
     public String getArtifactId() {
         return PARAMETER_ARTIFACTID;
     }
@@ -133,5 +131,4 @@ public class ArtifactoryGAVCRESTfulParameterBuilder {
     public String getClassifier() {
         return PARAMETER_CLASSIFIER;
     }
-
 }

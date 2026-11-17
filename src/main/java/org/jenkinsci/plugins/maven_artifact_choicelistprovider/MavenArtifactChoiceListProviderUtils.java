@@ -3,7 +3,6 @@ package org.jenkinsci.plugins.maven_artifact_choicelistprovider;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.commons.lang3.StringUtils;
 
 public class MavenArtifactChoiceListProviderUtils {
@@ -18,7 +17,7 @@ public class MavenArtifactChoiceListProviderUtils {
     public static Map<String, String> toMap(List<String> pChoices) {
         Map<String, String> retVal = new LinkedHashMap<String, String>();
         for (String current : pChoices) {
-            if(StringUtils.isNotEmpty(current)) {
+            if (StringUtils.isNotEmpty(current)) {
                 retVal.put(current.substring(current.lastIndexOf("/") + 1), current);
             }
         }

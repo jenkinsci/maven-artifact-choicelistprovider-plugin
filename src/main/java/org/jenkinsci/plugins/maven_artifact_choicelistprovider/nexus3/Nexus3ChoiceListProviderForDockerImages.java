@@ -194,7 +194,7 @@ public class Nexus3ChoiceListProviderForDockerImages extends AbstractMavenArtifa
         return this.getArtifactId();
     }
 
-     @DataBoundSetter
+    @DataBoundSetter
     public void setRepository(String repository) {
         this.setRepositoryId(repository);
     }

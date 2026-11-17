@@ -2,13 +2,11 @@ package org.jenkinsci.plugins.maven_artifact_choicelistprovider.artifactory;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.Extension;
-
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-
 import javax.ws.rs.core.MultivaluedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.jenkinsci.Symbol;
@@ -100,16 +98,17 @@ public class MACLPPipelineParameterArtifactoryMaven extends MACLPChoiceParameter
         return new ArtifactoryGAVCSearchService(pUrl);
     }
 
-    protected List<String> retrieveVersions(IVersionReader2 pTheInstance, MultivaluedMap<String, String> pParams) throws VersionReaderException {
+    protected List<String> retrieveVersions(IVersionReader2 pTheInstance, MultivaluedMap<String, String> pParams)
+            throws VersionReaderException {
         final List<String> retVal;
-        if(pTheInstance instanceof ArtifactoryGAVCSearchService) {
+        if (pTheInstance instanceof ArtifactoryGAVCSearchService) {
             final ArtifactoryGAVCSearchService artifactoryService = (ArtifactoryGAVCSearchService) pTheInstance;
             final Set<String> serviceResult = artifactoryService.callService(pParams, null, packaging);
             retVal = serviceResult.stream().collect(Collectors.toList());
         } else {
             retVal = super.retrieveVersions(pTheInstance, pParams);
         }
-        
+
         return retVal;
     }
 

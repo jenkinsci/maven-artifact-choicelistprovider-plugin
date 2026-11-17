@@ -151,7 +151,7 @@ public class ArtifactoryChoiceListProviderMavenVersionOnly extends AbstractMaven
         return url;
     }
 
-     @DataBoundSetter
+    @DataBoundSetter
     public void setRepositoryId(String repositoryId) {
         this.repositoryId = repositoryId;
     }
