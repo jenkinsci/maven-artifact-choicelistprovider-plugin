@@ -16,7 +16,7 @@ public class Nexus3RestResponseSearch {
 
     private SearchItem[] items;
 
-     public String getTotal() {
+    public String getTotal() {
         return total;
     }
 
