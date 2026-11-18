@@ -12,7 +12,17 @@ public class Nexus3RestResponseSearch {
 
     private String continuationToken;
 
+    private String total;
+
     private SearchItem[] items;
+
+     public String getTotal() {
+        return total;
+    }
+
+    public void setTotal(String total) {
+        this.total = total;
+    }
 
     public String getContinuationToken() {
         return continuationToken;
